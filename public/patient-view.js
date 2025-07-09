@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Pega o ID do paciente da URL. Usaremos 'patientId' para manter o padrão.
+    // Pega o ID do paciente da URL. A chave deve ser 'patientId'.
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get('patientId');
 
@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função principal que carrega todos os dados da página
     async function loadPageData() {
         if (!patientId) {
-            patientNameHeader.textContent = "ID do Paciente não encontrado na URL.";
+            patientNameHeader.textContent = "ERRO: ID do Paciente não encontrado na URL.";
+            patientNameHeader.style.color = 'red';
             return;
         }
 
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 3. Busca o histórico de evoluções e receitas em paralelo
             const [evolutionsResponse, prescriptionsResponse] = await Promise.all([
                 fetch(`/api/patients/${patientId}/evolutions`),
-                fetch(`/api/patients/${patientId}/prescriptions`) // Essa rota será criada no backend
+                fetch(`/api/patients/${patientId}/prescriptions`)
             ]);
 
             const evolutionsResult = await evolutionsResponse.json();
@@ -64,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funções auxiliares para organizar o código
     function updateHeaders(patient) {
         patientNameHeader.textContent = patient.name;
+        // Assumindo que o backend retorna 'bed_id' e 'age' na rota /api/patients/:id
         patientDetailsHeader.textContent = `Leito ${patient.bed_id || 'N/A'} - ${patient.age || 'N/A'} anos - CNS: ${patient.cns || 'N/A'}`;
     }
 
@@ -73,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
             goToEvolutionBtn.href = `evolucao-medica.html?patientId=${patientId}`;
         }
         if (goToPrescriptionBtn) {
-            // Corrigido para apontar para a página que criamos
             goToPrescriptionBtn.href = `receita.html?patientId=${patientId}`; 
         }
     }
@@ -95,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const historyItemDiv = document.createElement('div');
             historyItemDiv.className = 'history-item';
-            // Armazena os dados do item para uso no modal
             historyItemDiv.dataset.item = JSON.stringify(item); 
 
             historyItemDiv.innerHTML = `<div class="history-item-header"><strong>${item.type}</strong> - ${formattedDate} às ${formattedTime}</div>`;
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         } else { // Para Evolução Médica e outros tipos
             // A lógica de visualização da evolução será implementada aqui no futuro
-            contentHtml = `<pre>${item.content || 'Conteúdo não disponível.'}</pre>`;
+            contentHtml = `<pre>${item.content || 'Conteúdo da evolução ainda não implementado.'}</pre>`;
         }
 
         viewerContent.innerHTML = contentHtml;
@@ -135,8 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (closeViewerBtn) closeViewerBtn.addEventListener('click', () => historyViewerModal.classList.remove('active'));
     
-    // ATENÇÃO: A função de impressão precisa ser mais elaborada para imprimir só o modal.
-    // Esta é uma implementação simples.
     if (printDocumentBtn) printDocumentBtn.addEventListener('click', () => {
         const contentToPrint = viewerContent.innerHTML;
         const printWindow = window.open('', '_blank');
