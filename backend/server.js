@@ -1,4 +1,4 @@
-// CÓDIGO COMPLETO E ATUALIZADO PARA server.js
+// VERSÃO ESTÁVEL ANTERIOR DE server.js
 
 const express = require('express');
 const path = require('path');
@@ -28,113 +28,90 @@ app.use(express.static(publicPath));
 // ================== ROTAS DA API ==================
 const apiRouter = express.Router();
 
-// ... (todas as suas rotas de units, patients, etc. que já estavam aqui) ...
-apiRouter.get('/units', async (req, res) => { /* ... código ... */ });
-apiRouter.get('/units/:id', async (req, res) => { /* ... código ... */ });
-apiRouter.get('/units/:id/beds', async (req, res) => { /* ... código ... */ });
-apiRouter.get('/patients/:id', async (req, res) => { /* ... código ... */ });
-apiRouter.get('/patients/:id/evolutions', async (req, res) => { /* ... código ... */ });
-apiRouter.post('/prescriptions', async (req, res) => { /* ... código ... */ });
-apiRouter.get('/patients/:id/prescriptions', async (req, res) => { /* ... código ... */ });
-
-
-// ROTA PARA DAR ALTA A UM PACIENTE
-apiRouter.post('/patients/:id/discharge', async (req, res) => {
-    const patientId = req.params.id;
-    const { reason, datetime, bedId } = req.body;
-
-    if (!reason || !datetime || !bedId) {
-        return res.status(400).json({ error: 'Motivo, data/hora e ID do leito são obrigatórios.' });
-    }
-
-    const client = await pool.connect();
+// --- Rotas de Unidades e Leitos ---
+apiRouter.get('/units', async (req, res) => {
     try {
-        await client.query('BEGIN');
-
-        const updatePatientSql = `
-            UPDATE patients 
-            SET status = $1, discharge_at = $2, bed_id = NULL 
-            WHERE id = $3;
+        const sql = `
+            SELECT u.id, u.name, u.total_beds, COUNT(b.id) FILTER (WHERE b.status = 'occupied') as occupied_beds
+            FROM units u
+            LEFT JOIN beds b ON u.id = b.unit_id
+            GROUP BY u.id
+            ORDER BY u.name;
         `;
-        await client.query(updatePatientSql, [`Discharged: ${reason}`, datetime, patientId]);
-
-        const updateBedSql = `
-            UPDATE beds 
-            SET status = 'free', patient_id = NULL, patient_name = NULL 
-            WHERE id = $1;
-        `;
-        await client.query(updateBedSql, [bedId]);
-
-        await client.query('COMMIT');
-        res.status(200).json({ message: 'Alta registrada com sucesso!' });
-
+        const { rows } = await pool.query(sql);
+        res.json({ data: rows });
     } catch (err) {
-        await client.query('ROLLBACK');
-        console.error('Erro ao registrar alta:', err);
-        res.status(500).json({ error: 'Erro no servidor ao processar a alta.' });
-    } finally {
-        client.release();
+        console.error('Erro ao buscar unidades:', err);
+        res.status(500).json({ error: err.message });
     }
 });
 
+apiRouter.get('/units/:id', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM units WHERE id = $1', [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ message: "Unidade não encontrada." });
+        res.json({ data: rows[0] });
+    } catch (err) {
+        console.error(`Erro ao buscar unidade ${req.params.id}:`, err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+apiRouter.get('/units/:id/beds', async (req, res) => {
+    try {
+        const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
+        const { rows } = await pool.query(sql, [req.params.id]);
+        res.json({ data: rows });
+    } catch (err) {
+        console.error(`Erro ao buscar leitos para unidade ${req.params.id}:`, err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- Rotas de Pacientes ---
+apiRouter.get('/patients/:id', async (req, res) => {
+    try {
+        const patientId = req.params.id;
+        const sql = `SELECT * FROM patients WHERE id = $1`; 
+        const { rows } = await pool.query(sql, [patientId]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Paciente não encontrado." });
+        }
+        res.json({ data: rows[0] });
+    } catch (err) {
+        console.error(`Erro ao buscar paciente ${req.params.id}:`, err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+apiRouter.get('/patients/:id/evolutions', async (req, res) => {
+    try {
+        const patientId = req.params.id;
+        const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
+        const { rows } = await pool.query(sql, [patientId]);
+        res.json({ data: rows });
+    } catch (err) {
+        if (err.code === '42P01') { 
+            res.json({ data: [] });
+        } else {
+            console.error(`Erro ao buscar evoluções para o paciente ${req.params.id}:`, err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+});
+
+// --- Rotas de Receitas (Prescriptions) ---
+apiRouter.post('/prescriptions', async (req, res) => { /* ... código ... */ });
+apiRouter.get('/patients/:id/prescriptions', async (req, res) => { /* ... código ... */ });
 
 app.use('/api', apiRouter);
 
+// ================== ROTA DE FALLBACK ==================
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-
-// ================== MIGRAÇÕES DO BANCO DE DADOS (ATUALIZADO) ==================
-async function runMigrations() {
-    console.log('Verificando a necessidade de migrações no banco de dados...');
-    const client = await pool.connect();
-    try {
-        // --- Migração 1: Tabela de Prescrições ---
-        const checkPrescriptionsTable = await client.query("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'prescriptions');");
-        if (!checkPrescriptionsTable.rows[0].exists) {
-            console.log('Criando tabela "prescriptions"...');
-            await client.query(`
-                CREATE TABLE prescriptions (
-                    id SERIAL PRIMARY KEY,
-                    patient_id INTEGER NOT NULL,
-                    medicamento TEXT NOT NULL,
-                    posologia TEXT NOT NULL,
-                    via_administracao TEXT,
-                    quantidade TEXT,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (patient_id) REFERENCES patients (id) ON DELETE CASCADE
-                );
-            `);
-            console.log('Tabela "prescriptions" criada.');
-        }
-
-        // --- Migração 2: Novas colunas na tabela de Pacientes ---
-        const checkStatusColumn = await client.query("SELECT EXISTS (SELECT FROM information_schema.columns WHERE table_name='patients' AND column_name='status');");
-        if (!checkStatusColumn.rows[0].exists) {
-            console.log('Adicionando coluna "status" à tabela "patients"...');
-            await client.query('ALTER TABLE patients ADD COLUMN status VARCHAR(255);');
-            console.log('Coluna "status" adicionada.');
-        }
-        
-        const checkDischargeColumn = await client.query("SELECT EXISTS (SELECT FROM information_schema.columns WHERE table_name='patients' AND column_name='discharge_at');");
-        if (!checkDischargeColumn.rows[0].exists) {
-            console.log('Adicionando coluna "discharge_at" à tabela "patients"...');
-            await client.query('ALTER TABLE patients ADD COLUMN discharge_at TIMESTAMPTZ;');
-            console.log('Coluna "discharge_at" adicionada.');
-        }
-        
-        console.log('Migrações do banco de dados concluídas.');
-
-    } catch (err) {
-        console.error('Erro durante a migração do banco de dados:', err);
-    } finally {
-        client.release();
-    }
-}
-
 // ================== INICIALIZAÇÃO DO SERVIDOR ==================
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
-    runMigrations();
 });
