@@ -22,12 +22,12 @@ const pool = new Pool({
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 
-// SERVIDOR DE ARQUIVOS ESTÁTICOS
-// Aponta para a pasta 'public', que está na raiz do projeto
+// Servidor de Arquivos Estáticos
 const publicPath = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicPath));
 
-// Função de inicialização do Banco de Dados
+
+// Função de Inicialização do Banco de Dados
 async function initializeDatabase() {
     let client;
     try {
@@ -78,7 +78,7 @@ async function initializeDatabase() {
 }
 
 
-// ================== API Endpoints Completos ==================
+// ================== Roteador da API ==================
 const apiRouter = express.Router();
 
 // Endpoints de Unidades
@@ -98,19 +98,6 @@ apiRouter.get('/units', async (req, res) => {
     }
 });
 
-apiRouter.delete('/units/:id', async (req, res) => {
-    try {
-        const result = await pool.query('DELETE FROM units WHERE id = $1', [req.params.id]);
-        if (result.rowCount === 0) {
-            return res.status(404).json({ message: "Unidade não encontrada." });
-        }
-        res.status(200).json({ message: "Unidade deletada com sucesso" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Endpoints de Leitos e Pacientes
 apiRouter.get('/units/:id', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM units WHERE id = $1', [req.params.id]);
@@ -121,6 +108,7 @@ apiRouter.get('/units/:id', async (req, res) => {
     }
 });
 
+// Endpoints de Leitos
 apiRouter.get('/units/:id/beds', async (req, res) => {
     try {
         const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
@@ -131,17 +119,17 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
     }
 });
 
+// Endpoint para cadastrar Paciente
 apiRouter.post('/patients', async (req, res) => {
-    const { name, dob, age, cns, dih, unitId, bedId, history } = req.body;
+    const { name, bedId, unitId } = req.body;
     if (!name || !bedId || !unitId) {
-        return res.status(400).json({ error: "Nome, ID do leito e ID da unidade são obrigatórios." });
+        return res.status(400).json({ error: "Dados obrigatórios faltando." });
     }
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const insertPatientSql = `INSERT INTO patients (name, dob, age, cns, dih, unit_id, bed_id, history) VALUES ($1, $2, $3, $4, $5, $6, $7, '[]') RETURNING id`;
-        const patientParams = [name, dob, age, cns, dih, unitId, bedId];
-        const patientRes = await client.query(insertPatientSql, patientParams);
+        const insertPatientSql = `INSERT INTO patients (name, unit_id, bed_id, history) VALUES ($1, $2, $3, '[]') RETURNING id`;
+        const patientRes = await client.query(insertPatientSql, [name, unitId, bedId]);
         const newPatientId = patientRes.rows[0].id;
         const updateBedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3`;
         await client.query(updateBedSql, [newPatientId, name, bedId]);
@@ -155,31 +143,22 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
-app.get('/patients/:id', async (req, res) => {
-    try {
-        const { rows } = await pool.query('SELECT * FROM patients WHERE id = $1', [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
-        const patient = rows[0];
-        patient.history = patient.history || [];
-        res.json({ data: patient });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-
 // Usa o roteador para todas as rotas que começam com /api
 app.use('/api', apiRouter);
 
 
-// ROTA DE FALLBACK
-// Esta rota deve vir DEPOIS de todas as outras.
-// Ela garante que o servidor entregue a página principal (index.html)
-// para qualquer endereço que não seja de API.
+// ================== Rota de Fallback ==================
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-// INICIA O SERVIDOR
+
+// ================== INICIALIZAÇÃO DO SERVIDOR ==================
 app.listen(PORT, () => {
-    console
+    console.log(`Servidor rodando na porta ${PORT}`);
+    // A inicialização do DB é feita pelo comando Pre-deploy no Render,
+    // mas mantemos aqui para testes locais.
+    if(process.env.NODE_ENV !== 'production'){
+        initializeDatabase().catch(console.error);
+    }
+});
