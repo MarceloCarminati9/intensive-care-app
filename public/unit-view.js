@@ -155,6 +155,84 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+// Em public/unit-view.js
+
+// No início do arquivo, adicione as referências ao novo modal
+const dischargeModal = document.getElementById('dischargeModal');
+const closeDischargeModal = document.getElementById('closeDischargeModal');
+const cancelDischargeBtn = document.getElementById('cancelDischargeBtn');
+const confirmDischargeBtn = document.getElementById('confirmDischargeBtn');
+const dischargePatientName = document.getElementById('dischargePatientName');
+const dischargeReasonSelect = document.getElementById('dischargeReason');
+const dischargeDateInput = document.getElementById('dischargeDate');
+
+
+// Dentro do event listener bedGridContainer.addEventListener('click', ...)
+// Adicione este novo bloco de código:
+
+const darAltaBtn = event.target.closest('.action-btn-danger');
+if (darAltaBtn) {
+    const bedCard = darAltaBtn.closest('.bed-card');
+    const patientId = bedCard.dataset.patientId;
+    const bedId = bedCard.dataset.bedId;
+    const patientName = bedCard.querySelector('.patient-info p strong').nextSibling.textContent.trim();
+
+    // Preenche os dados no modal e o exibe
+    dischargePatientName.textContent = patientName;
+    dischargeModal.dataset.patientId = patientId;
+    dischargeModal.dataset.bedId = bedId;
+    
+    // Define a data e hora atual como padrão
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    dischargeDateInput.value = now.toISOString().slice(0, 16);
+    
+    dischargeModal.classList.add('active');
+}
+
+
+// Adicione estes event listeners no final do arquivo, para o novo modal
+
+if(closeDischargeModal) closeDischargeModal.addEventListener('click', () => dischargeModal.classList.remove('active'));
+if(cancelDischargeBtn) cancelDischargeBtn.addEventListener('click', () => dischargeModal.classList.remove('active'));
+
+if(confirmDischargeBtn) {
+    confirmDischargeBtn.addEventListener('click', async () => {
+        const patientId = dischargeModal.dataset.patientId;
+        const bedId = dischargeModal.dataset.bedId;
+        const dischargeData = {
+            reason: dischargeReasonSelect.value,
+            datetime: dischargeDateInput.value,
+            bedId: bedId
+        };
+
+        if (!dischargeData.datetime) {
+            alert('Por favor, selecione a data e hora da alta.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/patients/${patientId}/discharge`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dischargeData)
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Falha ao processar a alta.');
+            }
+
+            alert('Alta do paciente registrada com sucesso!');
+            dischargeModal.classList.remove('active');
+            loadUnitAndBeds(); // Recarrega a grade de leitos
+
+        } catch (error) {
+            console.error('Erro no processo de alta:', error);
+            alert(`Erro: ${error.message}`);
+        }
+    });
+}
 
     // =================================================================================
     // INICIALIZAÇÃO

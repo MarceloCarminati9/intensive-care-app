@@ -108,7 +108,48 @@ apiRouter.get('/patients/:id/evolutions', async (req, res) => {
         }
     }
 });
+// Em server.js, dentro do apiRouter
 
+// ROTA PARA DAR ALTA A UM PACIENTE
+apiRouter.post('/patients/:id/discharge', async (req, res) => {
+    const patientId = req.params.id;
+    const { reason, datetime, bedId } = req.body;
+
+    if (!reason || !datetime || !bedId) {
+        return res.status(400).json({ error: 'Motivo, data/hora e ID do leito são obrigatórios.' });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. Atualiza o status do paciente (ex: adiciona uma nota sobre a alta)
+        const updatePatientSql = `
+            UPDATE patients 
+            SET status = $1, discharge_at = $2, bed_id = NULL 
+            WHERE id = $3;
+        `;
+        await client.query(updatePatientSql, [`Discharged: ${reason}`, datetime, patientId]);
+
+        // 2. Libera o leito
+        const updateBedSql = `
+            UPDATE beds 
+            SET status = 'free', patient_id = NULL, patient_name = NULL 
+            WHERE id = $1;
+        `;
+        await client.query(updateBedSql, [bedId]);
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Alta registrada com sucesso!' });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao registrar alta:', err);
+        res.status(500).json({ error: 'Erro no servidor ao processar a alta.' });
+    } finally {
+        client.release();
+    }
+});
 // --- Rotas de Receitas (Prescriptions) ---
 apiRouter.post('/prescriptions', async (req, res) => {
     const { patient_id, medicamento, posologia, via, quantidade } = req.body;
