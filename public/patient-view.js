@@ -1,3 +1,5 @@
+// VERSÃO ATUALIZADA PARA EXIBIR DADOS DO LEITO
+
 document.addEventListener('DOMContentLoaded', function() {
     // Pega o ID do paciente da URL. A chave deve ser 'patientId'.
     const params = new URLSearchParams(window.location.search);
@@ -5,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Elementos da Página ---
     const patientNameHeader = document.getElementById('patientNameHeader');
-    const patientDetailsHeader = document.getElementById('patientDetailsHeader');
     const historyList = document.getElementById('historyList');
 
     // --- Links de Ação Rápida ---
@@ -28,14 +29,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // 1. Busca os dados principais do paciente
+            // 1. Busca os dados principais do paciente (AGORA INCLUINDO DADOS DO LEITO)
             const patientResponse = await fetch(`/api/patients/${patientId}`);
-            if (!patientResponse.ok) throw new Error('Paciente não encontrado.');
+            if (!patientResponse.ok) throw new Error('Paciente não encontrado ou erro no servidor.');
             const patientResult = await patientResponse.json();
             const patient = patientResult.data;
 
             // 2. Atualiza os cabeçalhos e os links de ação com os dados do paciente
-            updateHeaders(patient);
+            updateHeaders(patient); // Esta função foi atualizada
             updateActionLinks(patientId);
 
             // 3. Busca o histórico de evoluções e receitas em paralelo
@@ -49,8 +50,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 4. Combina os históricos, adiciona um 'tipo' para cada um e renderiza
             const combinedHistory = [
-                ...evolutionsResult.data.map(item => ({ ...item, type: 'Evolução Médica' })),
-                ...prescriptionsResult.data.map(item => ({ ...item, type: 'Receituário' }))
+                ...(evolutionsResult.data || []).map(item => ({ ...item, type: 'Evolução Médica' })),
+                ...(prescriptionsResult.data || []).map(item => ({ ...item, type: 'Receituário' }))
             ];
             
             renderHistory(combinedHistory);
@@ -58,65 +59,50 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error("Erro ao carregar dados da página:", error);
             patientNameHeader.textContent = "Erro ao carregar dados";
-            historyList.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            historyList.innerHTML = `<p style="color: red;">Não foi possível carregar o histórico. Detalhe: ${error.message}</p>`;
         }
     }
 
-    // Funções auxiliares para organizar o código
-    // Em public/patient-view.js
+    // [MODIFICADO] Função para atualizar o cabeçalho com os dados do leito e unidade
+    function updateHeaders(patient) {
+        const patientBed = document.getElementById('patientBed');
+        const patientAge = document.getElementById('patientAge');
+        const patientCns = document.getElementById('patientCns');
+        const patientDih = document.getElementById('patientDih');
+        const patientHpp = document.getElementById('patientHpp');
+        const patientHd = document.getElementById('patientHd');
 
-function updateHeaders(patient) {
-    // Referências aos novos elementos
-    const patientNameHeader = document.getElementById('patientNameHeader');
-    const patientBed = document.getElementById('patientBed');
-    const patientAge = document.getElementById('patientAge');
-    const patientCns = document.getElementById('patientCns');
-    const patientDih = document.getElementById('patientDih');
-    const patientHpp = document.getElementById('patientHpp');
-    const patientHd = document.getElementById('patientHd'); // Supondo que HD virá como 'history' ou 'hipotese_diagnostica'
+        patientNameHeader.textContent = patient.name || 'Nome não encontrado';
+        
+        // Agora exibe a unidade e o leito
+        patientBed.textContent = `${patient.unit_name || 'Unidade não informada'} - Leito ${patient.bed_number || 'N/A'}`;
+        
+        patientAge.textContent = patient.age ? `${patient.age} anos` : 'N/A';
+        patientCns.textContent = patient.cns || 'N/A';
+        
+        if (patient.dih) {
+            const formattedDate = new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+            patientDih.textContent = formattedDate;
+        } else {
+            patientDih.textContent = 'N/A';
+        }
 
-    // Preenchendo os dados
-    patientNameHeader.textContent = patient.name || 'Nome não encontrado';
-    patientBed.textContent = patient.bed_id || 'N/A';
-    patientAge.textContent = patient.age ? `${patient.age} anos` : 'N/A';
-    patientCns.textContent = patient.cns || 'N/A';
-    
-    // Formata a data de internação hospitalar (DIH)
-    if (patient.dih) {
-        // new Date() ajusta o fuso horário, somando um dia se necessário
-        const formattedDate = new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-        patientDih.textContent = formattedDate;
-    } else {
-        patientDih.textContent = 'N/A';
+        if (patient.hpp) patientHpp.textContent = patient.hpp;
+        if (patient.hd) patientHd.textContent = patient.hd;
     }
-
-    // Preenche campos de texto mais longos
-    if (patient.hpp) {
-        patientHpp.textContent = patient.hpp;
-    }
-    if (patient.hd) { // O nome deste campo depende de como ele está no seu BD
-        patientHd.textContent = patient.hd;
-    }
-}
 
     function updateActionLinks(patientId) {
-        // Atualiza o href dos botões para incluir o ID do paciente
-        if (goToEvolutionBtn) {
-            goToEvolutionBtn.href = `evolucao-medica.html?patientId=${patientId}`;
-        }
-        if (goToPrescriptionBtn) {
-            goToPrescriptionBtn.href = `receita.html?patientId=${patientId}`; 
-        }
+        if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?id=${patientId}`; // Corrigido para 'id'
+        if (goToPrescriptionBtn) goToPrescriptionBtn.href = `receita.html?patientId=${patientId}`; 
     }
 
     function renderHistory(history) {
-        historyList.innerHTML = ''; // Limpa a lista
+        historyList.innerHTML = '';
         if (!history || history.length === 0) {
             historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';
             return;
         }
 
-        // Ordena o histórico combinado pela data de criação, do mais novo para o mais antigo
         history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         
         history.forEach(item => {
@@ -145,9 +131,8 @@ function updateHeaders(patient) {
                 <p>${item.posologia}</p>
                 <small>Emitido em: ${new Date(item.created_at).toLocaleString('pt-BR')}</small>
             `;
-        } else { // Para Evolução Médica e outros tipos
-            // A lógica de visualização da evolução será implementada aqui no futuro
-            contentHtml = `<pre>${item.content || 'Conteúdo da evolução ainda não implementado.'}</pre>`;
+        } else {
+            contentHtml = `<pre>${item.content || 'Visualização detalhada da evolução ainda não implementada.'}</pre>`;
         }
 
         viewerContent.innerHTML = contentHtml;

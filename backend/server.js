@@ -1,4 +1,4 @@
-// VERSÃO ATUALIZADA COM A FUNCIONALIDADE DE TRANSFERÊNCIA
+// VERSÃO ATUALIZADA COM A CORREÇÃO NA ROTA DE BUSCA DE PACIENTE
 
 const express = require('express');
 const path = require('path');
@@ -45,7 +45,6 @@ apiRouter.get('/units', async (req, res) => {
     }
 });
 
-// [NOVO] GET /api/units-with-free-beds - Rota para popular o modal de transferência
 apiRouter.get('/units-with-free-beds', async (req, res) => {
     try {
         const sql = `
@@ -118,10 +117,24 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
+// [MODIFICADO] Rota para buscar um paciente agora também busca o nome da unidade e o número do leito.
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
-        const { rows } = await pool.query('SELECT * FROM patients WHERE id = $1', [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
+        const sql = `
+            SELECT 
+                p.*, 
+                b.bed_number, 
+                u.name as unit_name
+            FROM patients p
+            LEFT JOIN beds b ON p.bed_id = b.id
+            LEFT JOIN units u ON p.unit_id = u.id
+            WHERE p.id = $1;
+        `;
+        const { rows } = await pool.query(sql, [req.params.id]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Paciente não encontrado." });
+        }
         res.json({ data: rows[0] });
     } catch (err) {
         console.error(`Erro ao buscar paciente ${req.params.id}:`, err);
@@ -152,7 +165,6 @@ apiRouter.post('/patients/:id/discharge', async (req, res) => {
     }
 });
 
-// [NOVO] POST /api/patients/:id/transfer - Rota que executa a transferência
 apiRouter.post('/patients/:id/transfer', async (req, res) => {
     const { id: patientId } = req.params;
     const { oldBedId, newUnitId, newBedId } = req.body;
@@ -164,20 +176,16 @@ apiRouter.post('/patients/:id/transfer', async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // Pega o nome do paciente para colocar no novo leito
         const patientRes = await client.query('SELECT name FROM patients WHERE id = $1', [patientId]);
         if (patientRes.rows.length === 0) throw new Error('Paciente não encontrado.');
         const patientName = patientRes.rows[0].name;
 
-        // 1. Libera o leito antigo
         const freeOldBedSql = 'UPDATE beds SET status = $1, patient_id = $2, patient_name = $3 WHERE id = $4';
         await client.query(freeOldBedSql, ['free', null, null, oldBedId]);
 
-        // 2. Ocupa o novo leito
         const occupyNewBedSql = 'UPDATE beds SET status = $1, patient_id = $2, patient_name = $3 WHERE id = $4';
         await client.query(occupyNewBedSql, ['occupied', patientId, patientName, newBedId]);
 
-        // 3. Atualiza os dados do paciente
         const updatePatientSql = 'UPDATE patients SET unit_id = $1, bed_id = $2 WHERE id = $3';
         await client.query(updatePatientSql, [newUnitId, newBedId, patientId]);
 
@@ -192,7 +200,8 @@ apiRouter.post('/patients/:id/transfer', async (req, res) => {
     }
 });
 
-// --- Rotas de Histórico (SEM ALTERAÇÕES) ---
+// --- Rotas de Histórico ---
+// ... (O restante do arquivo, incluindo as rotas de histórico, /api e app.listen, continua igual)
 // ... (as rotas de evolutions e prescriptions continuam aqui, sem mudanças)
 
 app.use('/api', apiRouter);
