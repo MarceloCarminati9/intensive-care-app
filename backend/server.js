@@ -5,11 +5,13 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validação da variável de ambiente do banco de dados
 if (!process.env.DATABASE_URL) {
     console.error("ERRO CRÍTICO: A variável de ambiente DATABASE_URL não foi definida.");
     process.exit(1); 
 }
 
+// Configuração da Conexão com o PostgreSQL
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -17,10 +19,12 @@ const pool = new Pool({
     }
 });
 
+// Middleware
 app.use(express.json({ limit: '10mb' }));
-const publicPath = path.resolve(__dirname, '..', 'public');
+const publicPath = path.join(__dirname, '..');
 app.use(express.static(publicPath));
 
+// Função de inicialização do Banco de Dados
 async function initializeDatabase() {
     let client;
     try {
@@ -35,6 +39,34 @@ async function initializeDatabase() {
         await client.query(createTablesQuery);
         console.log("Tabelas do sistema verificadas/criadas com sucesso.");
 
+        const defaultUnits = [
+            { name: 'UTI 3 - Hospital Geral de Roraima', total_beds: 36, type: 'uti3' },
+            { name: 'UTI 1A - Hospital Geral de Roraima', total_beds: 11, type: 'standard' },
+            { name: 'UTI 1B - Hospital Geral de Roraima', total_beds: 11, type: 'standard' },
+            { name: 'UTI 2A - Hospital Geral de Roraima', total_beds: 11, type: 'standard' },
+            { name: 'UTI 2B - Hospital Geral de Roraima', total_beds: 11, type: 'standard' }
+        ];
+
+        for (const unit of defaultUnits) {
+            const res = await client.query('SELECT * FROM units WHERE name = $1', [unit.name]);
+            if (res.rowCount === 0) {
+                console.log(`Criando unidade: ${unit.name}`);
+                const unitInsert = await client.query('INSERT INTO units (name, total_beds) VALUES ($1, $2) RETURNING id', [unit.name, unit.total_beds]);
+                const unitId = unitInsert.rows[0].id;
+                
+                const bedSql = 'INSERT INTO beds (unit_id, bed_number) VALUES ($1, $2)';
+                if (unit.type === 'uti3') {
+                    for (let i = 1; i <= 34; i++) await client.query(bedSql, [unitId, String(i).padStart(2, '0')]);
+                    await client.query(bedSql, [unitId, 'Isolamento 01']);
+                    await client.query(bedSql, [unitId, 'Isolamento 02']);
+                } else if (unit.type === 'standard') {
+                    await client.query(bedSql, [unitId, 'Isolamento 01']);
+                    for (let i = 1; i <= 10; i++) await client.query(bedSql, [unitId, String(i).padStart(2, '0')]);
+                }
+            }
+        }
+        console.log("Dados iniciais do banco de dados verificados.");
+
     } catch (err) {
         console.error('Erro na inicialização do banco de dados:', err);
     } finally {
@@ -42,9 +74,9 @@ async function initializeDatabase() {
     }
 }
 
+
 // ================== API Endpoints Completos ==================
 
-// Endpoints de Unidades
 app.get('/api/units', async (req, res) => {
     try {
         const sql = `
@@ -61,7 +93,6 @@ app.get('/api/units', async (req, res) => {
     }
 });
 
-// Endpoints de Leitos
 app.get('/api/units/:id/beds', async (req, res) => {
     try {
         const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
@@ -72,18 +103,16 @@ app.get('/api/units/:id/beds', async (req, res) => {
     }
 });
 
-// Endpoints de Pacientes
 app.post('/api/patients', async (req, res) => {
-    const { name, dob, age, cns, dih, unitId, bedId } = req.body;
+    const { name, bedId, unitId } = req.body;
     if (!name || !bedId || !unitId) {
         return res.status(400).json({ error: "Nome, ID do leito e ID da unidade são obrigatórios." });
     }
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const insertPatientSql = `INSERT INTO patients (name, dob, age, cns, dih, unit_id, bed_id, history) VALUES ($1, $2, $3, $4, $5, $6, $7, '[]') RETURNING id`;
-        const patientParams = [name, dob, age, cns, dih, unitId, bedId];
-        const patientRes = await client.query(insertPatientSql, patientParams);
+        const insertPatientSql = `INSERT INTO patients (name, unit_id, bed_id, history) VALUES ($1, $2, $3, '[]') RETURNING id`;
+        const patientRes = await client.query(insertPatientSql, [name, unitId, bedId]);
         const newPatientId = patientRes.rows[0].id;
         const updateBedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3`;
         await client.query(updateBedSql, [newPatientId, name, bedId]);
@@ -109,7 +138,6 @@ app.get('/api/patients/:id', async (req, res) => {
     }
 });
 
-// Endpoints de Evoluções
 app.post('/api/patients/:id/evolutions', async (req, res) => {
     const patientId = req.params.id;
     const evolutionData = req.body;
@@ -118,16 +146,10 @@ app.post('/api/patients/:id/evolutions', async (req, res) => {
         await client.query('BEGIN');
         const { rows } = await client.query('SELECT history FROM patients WHERE id = $1 FOR UPDATE', [patientId]);
         if (rows.length === 0) throw new Error("Paciente não encontrado");
-        
         let history = rows[0].history || [];
         const existingIndex = history.findIndex(evo => evo.timestamp === evolutionData.timestamp);
-
-        if (existingIndex > -1) {
-            history[existingIndex] = evolutionData;
-        } else {
-            history.push(evolutionData);
-        }
-
+        if (existingIndex > -1) history[existingIndex] = evolutionData;
+        else history.push(evolutionData);
         await client.query('UPDATE patients SET history = $1 WHERE id = $2', [JSON.stringify(history), patientId]);
         await client.query('COMMIT');
         res.status(201).json({ message: "Evolução salva com sucesso!", data: evolutionData });
@@ -139,9 +161,10 @@ app.post('/api/patients/:id/evolutions', async (req, res) => {
     }
 });
 
-// Rota de Fallback
+// Rota de Fallback (CORRIGIDA)
+// Esta rota deve vir DEPOIS de todas as rotas da API.
 app.get('*', (req, res) => {
-    res.sendFile(path.join(publicPath, 'index.html'));
+    res.sendFile(path.resolve(publicPath, 'index.html'));
 });
 
 // INICIA O SERVIDOR
