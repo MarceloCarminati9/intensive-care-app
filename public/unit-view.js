@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadUnitAndBeds() {
         try {
-            // CORREÇÃO: Usando caminho relativo
             const unitResponse = await fetch(`/api/units/${unitId}`);
             if (!unitResponse.ok) throw new Error('Unidade não encontrada.');
             
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
             unitNameTitle.textContent = unit.name;
             unitBedCount.textContent = `Total de ${unit.total_beds} Leitos`;
 
-            // CORREÇÃO: Usando caminho relativo
             const bedsResponse = await fetch(`/api/units/${unitId}/beds`);
             if (!bedsResponse.ok) throw new Error('Não foi possível carregar os leitos.');
 
@@ -104,7 +102,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (acessarBtn) {
             const patientId = acessarBtn.closest('.bed-card').dataset.patientId;
             if (patientId) {
-                window.location.href = `patient-view.html?id=${patientId}`;
+                // ======================================================
+                // AQUI ESTÁ A CORREÇÃO: trocamos 'id=' por 'patientId='
+                // ======================================================
+                window.location.href = `patient-view.html?patientId=${patientId}`;
             }
         }
     });
@@ -132,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                // CORREÇÃO: Usando caminho relativo
+                // Esta rota para criar o paciente ainda precisa ser criada no seu backend (server.js)
                 const response = await fetch('/api/patients', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
