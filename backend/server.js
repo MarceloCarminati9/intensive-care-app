@@ -141,17 +141,14 @@ app.get('/api/patients/:id', async (req, res) => {
     }
 });
 
-
-// Rota de Fallback - ESSENCIAL PARA A NAVEGAÇÃO
+// Rota de Fallback
+// Esta rota deve vir DEPOIS de todas as suas rotas de API.
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-
 // INICIA O SERVIDOR
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
-    // A inicialização é feita pelo comando Pre-deploy no Render,
-    // mas mantemos aqui para testes locais se necessário.
     initializeDatabase().catch(console.error);
 });
