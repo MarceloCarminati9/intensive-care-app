@@ -22,10 +22,8 @@ const pool = new Pool({
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 
-// SERVIDOR DE ARQUIVOS ESTÁTICOS (CORRIGIDO PARA A NOVA ESTRUTURA)
-// __dirname é a pasta atual (/backend)
-// '..' sobe um nível (para a raiz do projeto)
-// 'public' entra na pasta correta do site
+// SERVIDOR DE ARQUIVOS ESTÁTICOS
+// Aponta para a pasta 'public', que está um nível acima da pasta 'backend'
 const publicPath = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicPath));
 
@@ -144,8 +142,7 @@ app.get('/api/patients/:id', async (req, res) => {
 });
 
 
-// ROTA DE FALLBACK (ESSENCIAL PARA A NAVEGAÇÃO)
-// Esta rota deve vir DEPOIS de todas as suas rotas de API.
+// Rota de Fallback - ESSENCIAL PARA A NAVEGAÇÃO
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
