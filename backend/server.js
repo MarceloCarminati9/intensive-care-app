@@ -28,6 +28,42 @@ app.use(express.static(publicPath));
 // ================== ROTAS DA API ==================
 const apiRouter = express.Router();
 
+// Rota para dar alta em um paciente e liberar o leito
+apiRouter.post('/patients/:id/discharge', async (req, res) => {
+    const { id } = req.params;
+    const { bedId, reason, datetime } = req.body;
+
+    if (!bedId || !reason || !datetime) {
+        return res.status(400).json({ error: 'ID do leito, motivo e data são obrigatórios.' });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. Libera o leito
+        const bedSql = 'UPDATE beds SET status = $1, patient_id = $2, patient_name = $3 WHERE id = $4';
+        await client.query(bedSql, ['free', null, null, bedId]);
+
+        // 2. Atualiza o status do paciente para 'discharged' (opcional, mas recomendado)
+        // Você pode precisar adicionar uma coluna 'status' na sua tabela 'patients'
+        // const patientSql = 'UPDATE patients SET status = $1, discharge_date = $2, discharge_reason = $3 WHERE id = $4';
+        // await client.query(patientSql, ['discharged', datetime, reason, id]);
+        
+        console.log(`Paciente ${id} recebeu alta do leito ${bedId}. Motivo: ${reason}`);
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Alta registrada com sucesso!' });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao dar alta no paciente:', err);
+        res.status(500).json({ error: 'Erro no servidor ao registrar alta.' });
+    } finally {
+        client.release();
+    }
+});
+
 // --- Rotas de Unidades e Leitos ---
 apiRouter.get('/units', async (req, res) => {
     try {
