@@ -5,11 +5,13 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validação da variável de ambiente do banco de dados
 if (!process.env.DATABASE_URL) {
     console.error("ERRO CRÍTICO: A variável de ambiente DATABASE_URL não foi definida.");
     process.exit(1); 
 }
 
+// Configuração da Conexão com o PostgreSQL
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -17,10 +19,17 @@ const pool = new Pool({
     }
 });
 
+// Middleware
 app.use(express.json({ limit: '10mb' }));
-const publicPath = path.join(__dirname, '..');
+
+// SERVIDOR DE ARQUIVOS ESTÁTICOS (CORRIGIDO PARA A NOVA ESTRUTURA)
+// __dirname é a pasta atual (/backend)
+// '..' sobe um nível (para a raiz do projeto)
+// 'public' entra na pasta correta do site
+const publicPath = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicPath));
 
+// Função de inicialização do Banco de Dados
 async function initializeDatabase() {
     let client;
     try {
@@ -28,33 +37,12 @@ async function initializeDatabase() {
         console.log("Conectado ao PostgreSQL para inicialização.");
         
         const createTablesQuery = `
-            CREATE TABLE IF NOT EXISTS units (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL UNIQUE,
-                total_beds INTEGER NOT NULL
-            );
-            CREATE TABLE IF NOT EXISTS patients (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL,
-                dob TEXT,
-                age INTEGER,
-                cns TEXT,
-                dih TEXT,
-                unit_id INTEGER,
-                bed_id INTEGER,
-                history JSONB
-            );
-            CREATE TABLE IF NOT EXISTS beds (
-                id SERIAL PRIMARY KEY,
-                unit_id INTEGER NOT NULL REFERENCES units(id) ON DELETE CASCADE,
-                bed_number TEXT NOT NULL,
-                status TEXT DEFAULT 'free',
-                patient_id INTEGER REFERENCES patients(id) ON DELETE SET NULL,
-                patient_name TEXT
-            );
+            CREATE TABLE IF NOT EXISTS units ( id SERIAL PRIMARY KEY, name TEXT NOT NULL UNIQUE, total_beds INTEGER NOT NULL );
+            CREATE TABLE IF NOT EXISTS patients ( id SERIAL PRIMARY KEY, name TEXT NOT NULL, dob TEXT, age INTEGER, cns TEXT, dih TEXT, unit_id INTEGER, bed_id INTEGER, history JSONB );
+            CREATE TABLE IF NOT EXISTS beds ( id SERIAL PRIMARY KEY, unit_id INTEGER NOT NULL REFERENCES units(id) ON DELETE CASCADE, bed_number TEXT NOT NULL, status TEXT DEFAULT 'free', patient_id INTEGER REFERENCES patients(id) ON DELETE SET NULL, patient_name TEXT );
         `;
         await client.query(createTablesQuery);
-        console.log("Tabelas verificadas/criadas com sucesso.");
+        console.log("Tabelas do sistema verificadas/criadas com sucesso.");
 
         const defaultUnits = [
             { name: 'UTI 3 - Hospital Geral de Roraima', total_beds: 36, type: 'uti3' },
@@ -91,6 +79,7 @@ async function initializeDatabase() {
     }
 }
 
+
 // ================== API Endpoints Completos ==================
 
 app.get('/api/units', async (req, res) => {
@@ -109,19 +98,6 @@ app.get('/api/units', async (req, res) => {
     }
 });
 
-app.get('/api/units/:id', async (req, res) => {
-    try {
-        const sql = 'SELECT * FROM units WHERE id = $1';
-        const { rows } = await pool.query(sql, [req.params.id]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Unidade não encontrada." });
-        }
-        res.json({ data: rows[0] });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 app.get('/api/units/:id/beds', async (req, res) => {
     try {
         const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
@@ -132,39 +108,8 @@ app.get('/api/units/:id/beds', async (req, res) => {
     }
 });
 
-app.post('/api/units', async (req, res) => {
-    const { name, total_beds } = req.body;
-    if (!name || !total_beds) {
-        return res.status(400).json({ error: "Dados obrigatórios faltando." });
-    }
-    try {
-        const unitInsert = await pool.query('INSERT INTO units (name, total_beds) VALUES ($1, $2) RETURNING id', [name, total_beds]);
-        const unitId = unitInsert.rows[0].id;
-
-        const bedSql = 'INSERT INTO beds (unit_id, bed_number) VALUES ($1, $2)';
-        for (let i = 1; i <= total_beds; i++) {
-            await pool.query(bedSql, [unitId, String(i).padStart(2, '0')]);
-        }
-        res.status(201).json({ id: unitId, name: name, total_beds: total_beds });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.delete('/api/units/:id', async (req, res) => {
-    try {
-        const result = await pool.query('DELETE FROM units WHERE id = $1', [req.params.id]);
-        if (result.rowCount === 0) {
-            return res.status(404).json({ message: "Unidade não encontrada." });
-        }
-        res.status(200).json({ message: "Unidade deletada com sucesso" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 app.post('/api/patients', async (req, res) => {
-    const { name, bedId, unitId } = req.body; // Simplificado por agora
+    const { name, bedId, unitId } = req.body;
     if (!name || !bedId || !unitId) {
         return res.status(400).json({ error: "Nome, ID do leito e ID da unidade são obrigatórios." });
     }
@@ -198,62 +143,18 @@ app.get('/api/patients/:id', async (req, res) => {
     }
 });
 
-app.post('/api/patients/:id/evolutions', async (req, res) => {
-    const patientId = req.params.id;
-    const evolutionData = req.body;
-    const client = await pool.connect();
-    try {
-        await client.query('BEGIN');
-        const { rows } = await client.query('SELECT history FROM patients WHERE id = $1 FOR UPDATE', [patientId]);
-        if (rows.length === 0) throw new Error("Paciente não encontrado");
-        let history = rows[0].history || [];
-        const existingIndex = history.findIndex(evo => evo.timestamp === evolutionData.timestamp);
-        if (existingIndex > -1) history[existingIndex] = evolutionData;
-        else history.push(evolutionData);
-        await client.query('UPDATE patients SET history = $1 WHERE id = $2', [JSON.stringify(history), patientId]);
-        await client.query('COMMIT');
-        res.status(201).json({ message: "Evolução salva com sucesso!", data: evolutionData });
-    } catch (err) {
-        await client.query('ROLLBACK');
-        res.status(500).json({ error: err.message });
-    } finally {
-        client.release();
-    }
-});
 
-app.delete('/api/patients/:id/evolutions/:timestamp', async (req, res) => {
-    const { id: patientId, timestamp } = req.params;
-    const client = await pool.connect();
-    try {
-        await client.query('BEGIN');
-        const { rows } = await client.query('SELECT history FROM patients WHERE id = $1 FOR UPDATE', [patientId]);
-        if (rows.length === 0) throw new Error("Paciente não encontrado");
-        let history = rows[0].history || [];
-        const initialLength = history.length;
-        history = history.filter(evo => evo.timestamp !== timestamp);
-        if (history.length === initialLength) throw new Error("Evolução não encontrada.");
-        await client.query('UPDATE patients SET history = $1 WHERE id = $2', [JSON.stringify(history), patientId]);
-        await client.query('COMMIT');
-        res.status(200).json({ message: "Evolução deletada com sucesso." });
-    } catch (err) {
-        await client.query('ROLLBACK');
-        res.status(500).json({ error: err.message });
-    } finally {
-        client.release();
-    }
-});
-
-// Rota de Fallback
+// ROTA DE FALLBACK (ESSENCIAL PARA A NAVEGAÇÃO)
+// Esta rota deve vir DEPOIS de todas as suas rotas de API.
 app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api/')) {
-        res.sendFile(path.resolve(publicPath, 'index.html'));
-    } else {
-        res.status(404).json({message: "Endpoint da API não encontrado"});
-    }
+    res.sendFile(path.join(publicPath, 'index.html'));
 });
+
 
 // INICIA O SERVIDOR
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
-    // A inicialização agora é feita pelo comando Pre-deploy no Render
+    // A inicialização é feita pelo comando Pre-deploy no Render,
+    // mas mantemos aqui para testes locais se necessário.
+    initializeDatabase().catch(console.error);
 });
