@@ -5,13 +5,11 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Validação da variável de ambiente do banco de dados
 if (!process.env.DATABASE_URL) {
     console.error("ERRO CRÍTICO: A variável de ambiente DATABASE_URL não foi definida.");
     process.exit(1); 
 }
 
-// Configuração da Conexão com o PostgreSQL
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -19,15 +17,10 @@ const pool = new Pool({
     }
 });
 
-// Middleware
 app.use(express.json({ limit: '10mb' }));
-
-// SERVIDOR DE ARQUIVOS ESTÁTICOS - Aponta para a pasta 'public'
-const publicPath = path.resolve(__dirname, '..', 'public');
+const publicPath = path.join(__dirname, '..');
 app.use(express.static(publicPath));
 
-
-// Função de inicialização do Banco de Dados
 async function initializeDatabase() {
     let client;
     try {
@@ -35,12 +28,33 @@ async function initializeDatabase() {
         console.log("Conectado ao PostgreSQL para inicialização.");
         
         const createTablesQuery = `
-            CREATE TABLE IF NOT EXISTS units ( id SERIAL PRIMARY KEY, name TEXT NOT NULL UNIQUE, total_beds INTEGER NOT NULL );
-            CREATE TABLE IF NOT EXISTS patients ( id SERIAL PRIMARY KEY, name TEXT NOT NULL, dob TEXT, age INTEGER, cns TEXT, dih TEXT, unit_id INTEGER, bed_id INTEGER, history JSONB );
-            CREATE TABLE IF NOT EXISTS beds ( id SERIAL PRIMARY KEY, unit_id INTEGER NOT NULL REFERENCES units(id) ON DELETE CASCADE, bed_number TEXT NOT NULL, status TEXT DEFAULT 'free', patient_id INTEGER REFERENCES patients(id) ON DELETE SET NULL, patient_name TEXT );
+            CREATE TABLE IF NOT EXISTS units (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE,
+                total_beds INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS patients (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                dob TEXT,
+                age INTEGER,
+                cns TEXT,
+                dih TEXT,
+                unit_id INTEGER,
+                bed_id INTEGER,
+                history JSONB
+            );
+            CREATE TABLE IF NOT EXISTS beds (
+                id SERIAL PRIMARY KEY,
+                unit_id INTEGER NOT NULL REFERENCES units(id) ON DELETE CASCADE,
+                bed_number TEXT NOT NULL,
+                status TEXT DEFAULT 'free',
+                patient_id INTEGER REFERENCES patients(id) ON DELETE SET NULL,
+                patient_name TEXT
+            );
         `;
         await client.query(createTablesQuery);
-        console.log("Tabelas do sistema verificadas/criadas com sucesso.");
+        console.log("Tabelas verificadas/criadas com sucesso.");
 
         const defaultUnits = [
             { name: 'UTI 3 - Hospital Geral de Roraima', total_beds: 36, type: 'uti3' },
@@ -76,7 +90,6 @@ async function initializeDatabase() {
         if (client) client.release();
     }
 }
-
 
 // ================== API Endpoints Completos ==================
 
@@ -151,7 +164,7 @@ app.delete('/api/units/:id', async (req, res) => {
 });
 
 app.post('/api/patients', async (req, res) => {
-    const { name, bedId, unitId } = req.body; 
+    const { name, bedId, unitId } = req.body; // Simplificado por agora
     if (!name || !bedId || !unitId) {
         return res.status(400).json({ error: "Nome, ID do leito e ID da unidade são obrigatórios." });
     }
@@ -208,15 +221,39 @@ app.post('/api/patients/:id/evolutions', async (req, res) => {
     }
 });
 
+app.delete('/api/patients/:id/evolutions/:timestamp', async (req, res) => {
+    const { id: patientId, timestamp } = req.params;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const { rows } = await client.query('SELECT history FROM patients WHERE id = $1 FOR UPDATE', [patientId]);
+        if (rows.length === 0) throw new Error("Paciente não encontrado");
+        let history = rows[0].history || [];
+        const initialLength = history.length;
+        history = history.filter(evo => evo.timestamp !== timestamp);
+        if (history.length === initialLength) throw new Error("Evolução não encontrada.");
+        await client.query('UPDATE patients SET history = $1 WHERE id = $2', [JSON.stringify(history), patientId]);
+        await client.query('COMMIT');
+        res.status(200).json({ message: "Evolução deletada com sucesso." });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: err.message });
+    } finally {
+        client.release();
+    }
+});
+
 // Rota de Fallback
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(publicPath, 'index.html'));
+    if (!req.path.startsWith('/api/')) {
+        res.sendFile(path.resolve(publicPath, 'index.html'));
+    } else {
+        res.status(404).json({message: "Endpoint da API não encontrado"});
+    }
 });
 
 // INICIA O SERVIDOR
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
-    // A inicialização é feita pelo comando Pre-deploy no Render,
-    // mas mantemos aqui para testes locais se necessário.
-    initializeDatabase().catch(console.error);
+    // A inicialização agora é feita pelo comando Pre-deploy no Render
 });
