@@ -1,4 +1,4 @@
-// VERSÃO ESTÁVEL ANTERIOR DE server.js
+// VERSÃO ESTÁVEL E COMPLETA DE server.js
 
 const express = require('express');
 const path = require('path');
@@ -100,9 +100,66 @@ apiRouter.get('/patients/:id/evolutions', async (req, res) => {
     }
 });
 
+// Rota para criar pacientes novos (necessária para a função de cadastrar)
+apiRouter.post('/patients', async (req, res) => {
+    const { name, dob, age, cns, dih, unitId, bedId } = req.body;
+    if (!name || !unitId || !bedId) {
+        return res.status(400).json({ error: 'Nome, ID da unidade e ID do leito são obrigatórios.' });
+    }
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const patientSql = 'INSERT INTO patients (name, dob, age, cns, dih, unit_id, bed_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name';
+        const patientResult = await client.query(patientSql, [name, dob, age, cns, dih, unitId, bedId]);
+        const newPatient = patientResult.rows[0];
+
+        const bedSql = 'UPDATE beds SET status = $1, patient_id = $2, patient_name = $3 WHERE id = $4';
+        await client.query(bedSql, ['occupied', newPatient.id, newPatient.name, bedId]);
+
+        await client.query('COMMIT');
+        res.status(201).json({ message: 'Paciente cadastrado com sucesso!', data: newPatient });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao cadastrar novo paciente:', err);
+        res.status(500).json({ error: 'Erro no servidor ao cadastrar paciente.' });
+    } finally {
+        client.release();
+    }
+});
+
+
 // --- Rotas de Receitas (Prescriptions) ---
-apiRouter.post('/prescriptions', async (req, res) => { /* ... código ... */ });
-apiRouter.get('/patients/:id/prescriptions', async (req, res) => { /* ... código ... */ });
+apiRouter.post('/prescriptions', async (req, res) => {
+    const { patient_id, medicamento, posologia, via, quantidade } = req.body;
+    if (!patient_id || !medicamento || !posologia) {
+        return res.status(400).json({ message: 'Campos obrigatórios estão faltando.' });
+    }
+    try {
+        const sql = `
+            INSERT INTO prescriptions (patient_id, medicamento, posologia, via_administracao, quantidade)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *;
+        `;
+        const { rows } = await pool.query(sql, [patient_id, medicamento, posologia, via, quantidade]);
+        res.status(201).json({ message: 'Receita salva com sucesso!', data: rows[0] });
+    } catch (err) {
+        console.error('Erro ao salvar receita:', err);
+        res.status(500).json({ error: 'Falha ao salvar a receita no servidor.' });
+    }
+});
+
+apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const sql = 'SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC';
+        const { rows } = await pool.query(sql, [id]);
+        res.json({ data: rows });
+    } catch (err) {
+        console.error(`Erro ao buscar receitas para o paciente ${req.params.id}:`, err);
+        res.status(500).json({ error: 'Falha ao buscar receitas.' });
+    }
+});
+
 
 app.use('/api', apiRouter);
 
