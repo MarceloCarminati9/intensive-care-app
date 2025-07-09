@@ -33,7 +33,7 @@ app.use(express.static(publicPath));
 // ================== ROTAS DA API ==================
 const apiRouter = express.Router();
 
-// --- Rotas de Unidades e Leitos (Já existentes) ---
+// --- Rotas de Unidades e Leitos ---
 apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
@@ -73,9 +73,7 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
     }
 });
 
-// --- NOVAS ROTAS ADICIONADAS PARA PACIENTES ---
-
-// ROTA PARA BUSCAR DADOS DE UM PACIENTE ESPECÍFICO
+// --- Rotas de Pacientes ---
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const patientId = req.params.id;
@@ -94,18 +92,14 @@ apiRouter.get('/patients/:id', async (req, res) => {
     }
 });
 
-// ROTA PARA OBTER AS EVOLUÇÕES DE UM PACIENTE
 apiRouter.get('/patients/:id/evolutions', async (req, res) => {
     try {
         const patientId = req.params.id;
-        // Assumindo que você terá uma tabela 'evolutions' com uma coluna 'patient_id'
         const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
         const { rows } = await pool.query(sql, [patientId]);
         res.json({ data: rows });
     } catch (err) {
-        // Se a tabela 'evolutions' não existir, isso pode dar erro. 
-        // Por enquanto, vamos retornar um array vazio para não quebrar o frontend.
-        if (err.code === '42P01') { // '42P01' é o código de erro para "undefined_table" no PostgreSQL
+        if (err.code === '42P01') { 
             console.warn("A tabela 'evolutions' ainda não existe. Retornando array vazio.");
             res.json({ data: [] });
         } else {
@@ -115,8 +109,38 @@ apiRouter.get('/patients/:id/evolutions', async (req, res) => {
     }
 });
 
+// --- Rotas de Receitas (Prescriptions) ---
+apiRouter.post('/prescriptions', async (req, res) => {
+    const { patient_id, medicamento, posologia, via, quantidade } = req.body;
+    if (!patient_id || !medicamento || !posologia) {
+        return res.status(400).json({ message: 'Campos obrigatórios estão faltando.' });
+    }
+    try {
+        const sql = `
+            INSERT INTO prescriptions (patient_id, medicamento, posologia, via_administracao, quantidade)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *;
+        `;
+        const { rows } = await pool.query(sql, [patient_id, medicamento, posologia, via, quantidade]);
+        res.status(201).json({ message: 'Receita salva com sucesso!', data: rows[0] });
+    } catch (err) {
+        console.error('Erro ao salvar receita:', err);
+        res.status(500).json({ error: 'Falha ao salvar a receita no servidor.' });
+    }
+});
 
-// Usa o roteador para todas as rotas que começam com /api
+apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const sql = 'SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC';
+        const { rows } = await pool.query(sql, [id]);
+        res.json({ data: rows });
+    } catch (err) {
+        console.error(`Erro ao buscar receitas para o paciente ${req.params.id}:`, err);
+        res.status(500).json({ error: 'Falha ao buscar receitas.' });
+    }
+});
+
 app.use('/api', apiRouter);
 
 
@@ -126,7 +150,52 @@ app.get('*', (req, res) => {
 });
 
 
+// ================== MIGRAÇÕES DO BANCO DE DADOS ==================
+// ESTA FUNÇÃO SERÁ EXECUTADA NA INICIALIZAÇÃO PARA CRIAR A TABELA SE ELA NÃO EXISTIR
+async function runMigrations() {
+    console.log('Verificando a necessidade de migrações no banco de dados...');
+    const client = await pool.connect();
+    try {
+        // Verifica se a tabela 'prescriptions' existe
+        const checkTableQuery = `
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'prescriptions'
+            );
+        `;
+        const res = await client.query(checkTableQuery);
+        const tableExists = res.rows[0].exists;
+
+        if (!tableExists) {
+            console.log('Tabela "prescriptions" não encontrada. Criando tabela...');
+            const createTableQuery = `
+                CREATE TABLE prescriptions (
+                    id SERIAL PRIMARY KEY,
+                    patient_id INTEGER NOT NULL,
+                    medicamento TEXT NOT NULL,
+                    posologia TEXT NOT NULL,
+                    via_administracao TEXT,
+                    quantidade TEXT,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (patient_id) REFERENCES patients (id) ON DELETE CASCADE
+                );
+            `;
+            await client.query(createTableQuery);
+            console.log('Tabela "prescriptions" criada com sucesso.');
+        } else {
+            console.log('Tabela "prescriptions" já existe. Nenhuma migração necessária.');
+        }
+    } catch (err) {
+        console.error('Erro durante a migração do banco de dados:', err);
+    } finally {
+        client.release(); // Libera o cliente de volta para o pool
+    }
+}
+
+
 // ================== INICIALIZAÇÃO DO SERVIDOR ==================
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
+    // Executa a verificação/criação da tabela assim que o servidor iniciar
+    runMigrations();
 });

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Receita Médica</title>
+    <link rel="stylesheet" href="tool-page.css"> 
+</head>
+<body>
+    <div class="tool-container">
+        <header class="tool-header">
+            <a href="javascript:history.back()" class="back-button">&larr; Voltar</a>
+            <h1>Emissão de Receita Médical</h1>
+        </header>
+        <main>
+            <form id="receitaForm">
+                <input type="hidden" id="patientId">
+                <div class="input-group">
+                    <label>Paciente:</label>
+                    <p id="patientName" style="font-weight: bold;">Carregando...</p>
+                </div>
+                <div class="input-group">
+                    <label for="medicamento">Medicamento, Forma Farmacêutica e Dosagem</label>
+                    <textarea id="medicamento" rows="3" required placeholder="Ex: Amoxicilina 500mg, comprimido"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="posologia">Posologia (Como usar)</label>
+                    <textarea id="posologia" rows="4" required placeholder="Ex: Tomar 1 comprimido de 8 em 8 horas por 7 dias."></textarea>
+                </div>
+                 <div class="input-group">
+                    <label for="via">Via de Administração</label>
+                    <input type="text" id="via" value="Via Oral">
+                </div>
+                <div class="input-group">
+                    <label for="quantidade">Quantidade a ser fornecida</label>
+                    <input type="text" id="quantidade" placeholder="Ex: 21 comprimidos">
+                </div>
+                <button type="submit" class="main-button">Gerar e Salvar Receita</button>
+            </form>
+        </main>
+    </div>
+    <script src="receita-script.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 // SEÇÃO 1: LÓGICA DE ANÁLISE DE PDF COM IA E FUNÇÕES GLOBAIS
 // ===================================================================
 
-const API_KEY = "AIzaSyCte3YxurHgEDG-NJO755VJ7lfczziVTME"; // <<<<<<< COLOQUE SUA API KEY AQUI
+const API_KEY = "AIzaSyCeABhP9mUswEwK6HwTMPYCmYlAC_lG5lM"; // <<<<<<< COLOQUE SUA API KEY AQUI
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
 
