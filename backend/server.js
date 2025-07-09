@@ -22,10 +22,10 @@ const pool = new Pool({
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 
-// SERVIDOR DE ARQUIVOS ESTÁTICOS
-// Aponta para a pasta 'public' que está um nível acima da pasta 'backend'
+// SERVIDOR DE ARQUIVOS ESTÁTICOS - Aponta para a pasta 'public'
 const publicPath = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicPath));
+
 
 // Função de inicialização do Banco de Dados
 async function initializeDatabase() {
@@ -127,6 +127,7 @@ app.post('/api/units', async (req, res) => {
     try {
         const unitInsert = await pool.query('INSERT INTO units (name, total_beds) VALUES ($1, $2) RETURNING id', [name, total_beds]);
         const unitId = unitInsert.rows[0].id;
+
         const bedSql = 'INSERT INTO beds (unit_id, bed_number) VALUES ($1, $2)';
         for (let i = 1; i <= total_beds; i++) {
             await pool.query(bedSql, [unitId, String(i).padStart(2, '0')]);
@@ -184,29 +185,6 @@ app.get('/api/patients/:id', async (req, res) => {
     }
 });
 
-app.post('/api/patients/:id/evolutions', async (req, res) => {
-    const patientId = req.params.id;
-    const evolutionData = req.body;
-    const client = await pool.connect();
-    try {
-        await client.query('BEGIN');
-        const { rows } = await client.query('SELECT history FROM patients WHERE id = $1 FOR UPDATE', [patientId]);
-        if (rows.length === 0) throw new Error("Paciente não encontrado");
-        let history = rows[0].history || [];
-        const existingIndex = history.findIndex(evo => evo.timestamp === evolutionData.timestamp);
-        if (existingIndex > -1) history[existingIndex] = evolutionData;
-        else history.push(evolutionData);
-        await client.query('UPDATE patients SET history = $1 WHERE id = $2', [JSON.stringify(history), patientId]);
-        await client.query('COMMIT');
-        res.status(201).json({ message: "Evolução salva com sucesso!", data: evolutionData });
-    } catch (err) {
-        await client.query('ROLLBACK');
-        res.status(500).json({ error: err.message });
-    } finally {
-        client.release();
-    }
-});
-
 // Rota de Fallback
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(publicPath, 'index.html'));
@@ -215,5 +193,5 @@ app.get('*', (req, res) => {
 // INICIA O SERVIDOR
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
-    // A inicialização é feita pelo comando Pre-deploy no Render
+    initializeDatabase().catch(console.error);
 });
