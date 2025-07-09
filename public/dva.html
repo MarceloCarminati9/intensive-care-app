@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Drogas Vasoativas</title>
+    <link rel="stylesheet" href="tool-page.css">
+</head>
+<body>
+    <div class="tool-container">
+        <header class="tool-header">
+            <a href="index.html" class="back-button">&larr; Início</a>
+            <h1>Calculadora de Drogas Vasoativas</h1>
+        </header>
+        
+        <main>
+            <div class="input-group">
+                <label for="weight">Peso do Paciente (kg)</label>
+                <input type="number" id="weight" placeholder="Ex: 70">
+            </div>
+
+            <div class="input-group">
+                <label for="drug">Selecione a Droga</label>
+                <select id="drug">
+                    <option value="norepinephrine">Noradrenalina</option>
+                    <option value="dobutamine">Dobutamina</option>
+                    <option value="dopamine">Dopamina</option>
+                    <option value="epinephrine">Adrenalina</option>
+                    <option value="vasopressin">Vasopressina</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Diluição Padrão (pode ser alterada)</label>
+                <div class="grid-2-col">
+                    <input type="number" id="drugAmount" placeholder="Medicamento (mg)">
+                    <input type="number" id="solutionVolume" placeholder="Volume da Solução (ml)">
+                </div>
+            </div>
+            
+            <hr style="margin: 30px 0;">
+
+            <div class="grid-2-col">
+                <div class="input-group">
+                    <label for="dose" id="doseLabel">Dose Desejada (mcg/kg/min)</label>
+                    <input type="number" id="dose" placeholder="Calcular infusão">
+                </div>
+                <div class="input-group">
+                    <label for="rate">Infusão (ml/h)</label>
+                    <input type="number" id="rate" placeholder="Calcular dose">
+                </div>
+            </div>
+
+            <button class="main-button" id="calculateBtn">Calcular</button>
+
+            <div class="result-box" id="resultBox">
+                <h2>Resultado</h2>
+                <p id="resultText">--</p>
+            </div>
+        </main>
+    </div>
+    <script src="dva.js"></script>
+</body>
+</html>

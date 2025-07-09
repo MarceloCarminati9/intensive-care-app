@@ -1,0 +1,365 @@
+/* --- BOTÃO DE VOLTAR ADICIONADO --- */
+.back-button {
+    display: block;
+    text-align: left;
+    margin-bottom: 20px;
+    color: var(--primary-accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.back-button:hover {
+    color: var(--primary-accent-hover);
+}
+
+/* --- GERAL E LAYOUT --- */
+:root {
+    --primary-text: #2c3e50; /* Azul Ardósia Escuro */
+    --secondary-text: #555;
+    --primary-accent: #4a90e2; /* Azul Calmo */
+    --primary-accent-hover: #3a7ac8;
+    --light-bg: #f8f9fa; /* Cinza Muito Claro */
+    --white-bg: #ffffff;
+    --border-color: #dce1e6;
+    --danger-color: #e74c3c;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--light-bg);
+    color: var(--secondary-text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 40px 20px;
+}
+
+main {
+    background-color: var(--white-bg);
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 1100px; /* Aumentado para acomodar tabelas maiores */
+}
+
+.main-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h1 {
+    color: var(--primary-text);
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: var(--primary-text);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.4em;
+}
+
+p {
+    line-height: 1.6;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 25px 0;
+}
+
+.form-section {
+    margin-bottom: 40px;
+}
+
+/* --- ESTILOS DE FORMULÁRIO --- */
+.patient-data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: var(--primary-text);
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #fdfdfd;
+    font-size: 16px;
+    font-family: var(--font-family);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* --- UPLOAD DE ARQUIVO --- */
+.upload-section {
+    margin-bottom: 15px;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 12px 25px;
+    cursor: pointer;
+    background-color: #f0f4fa;
+    color: var(--primary-accent);
+    border: 1px solid var(--primary-accent);
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.custom-file-upload:hover {
+    background-color: var(--primary-accent);
+    color: var(--white-bg);
+}
+
+.file-list {
+    margin-top: 15px;
+    background-color: #fdfdfd;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 40px;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95em;
+}
+.file-item:last-child { border-bottom: none; }
+
+.remove-file-btn {
+    background-color: transparent;
+    color: var(--danger-color);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    line-height: 24px;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+.remove-file-btn:hover {
+    background-color: #fbeae8;
+}
+
+/* --- BOTÕES PRINCIPAIS E DE AÇÃO --- */
+#analyzeButton {
+    background-color: var(--primary-accent);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    padding: 15px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+    margin-top: -10px; /* Ajusta a posição após a correção */
+    margin-bottom: 20px;
+}
+#analyzeButton:hover {
+    background-color: var(--primary-accent-hover);
+    transform: translateY(-2px);
+}
+
+.action-buttons {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+.action-buttons button {
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 12px 25px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.button-secondary {
+    background-color: transparent;
+    border: 2px solid var(--primary-accent);
+    color: var(--primary-accent);
+}
+.button-secondary:hover {
+    background-color: var(--primary-accent);
+    color: white;
+}
+
+/* --- LOADER E RESULTADOS --- */
+.hidden { display: none; }
+
+#loader {
+    margin: 30px 0;
+    font-size: 1.1em;
+    color: var(--primary-text);
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-accent);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#calculatedParameters {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+#calculatedParameters h3 {
+    margin-top: 0;
+    color: var(--primary-text);
+}
+#calculatedParameters p {
+    margin: 8px 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1em;
+}
+
+/* --- ÁREA DE IMPRESSÃO, MARCA D'ÁGUA E NOVA TABELA --- */
+#printableArea {
+    margin-top: 30px;
+    position: relative; /* Necessário para a marca d'água */
+}
+/* Estilo da Marca d'água */
+#printableArea::after {
+    content: "";
+    background-image: url('intensivecare.jpeg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 250px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.08; /* Deixa a imagem bem sutil */
+    z-index: 1; /* Fica atrás do conteúdo */
+    pointer-events: none;
+}
+#patient-report-header, #resultsTableContainer, #calculatedParameters {
+    position: relative; /* Garante que o conteúdo fique sobre a marca d'água */
+    z-index: 2;
+    background-color: transparent; /* Permite ver a marca d'água por trás */
+}
+
+/* Container da Tabela */
+#resultsTableContainer {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Tabela com Novo Estilo */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 15px;
+    background-color: var(--white-bg);
+}
+
+th, td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Cabeçalho da Tabela */
+th {
+    background-color: var(--primary-text);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Primeira coluna (Nomes dos Exames) */
+td:first-child {
+    font-weight: 600;
+    color: var(--primary-text);
+    text-align: left;
+}
+
+tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+tr:hover {
+    background-color: #eef5ff; /* Azul bem claro ao passar o mouse */
+}
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* --- ESTILOS DE IMPRESSÃO --- */
+@media print {
+    body, main {
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+    }
+    body * { visibility: hidden; }
+
+    #printableArea, #printableArea * { visibility: visible; }
+    
+    #printableArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 20px;
+        padding: 0;
+        -webkit-print-color-adjust: exact; /* Força a impressão de cores e imagens de fundo no Chrome/Safari */
+        print-color-adjust: exact; /* Padrão */

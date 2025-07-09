@@ -1,0 +1,99 @@
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
+// Usa o disco persistente do Render em /var/data/database.db, ou o arquivo local se não estiver no Render.
+const dbPath = process.env.RENDER_DISK_PATH || path.resolve(__dirname, 'database.db');
+
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        return console.error("Erro ao abrir o banco de dados", err.message);
+    }
+    console.log("Conectado ao banco de dados SQLite em:", dbPath);
+    db.run('PRAGMA foreign_keys = ON;', (err) => {
+        if (err) {
+            console.error("Erro ao ativar chaves estrangeiras", err);
+        } else {
+            console.log("Chaves estrangeiras ativadas.");
+            createTables();
+        }
+    });
+});
+
+function createTables() {
+    // A estrutura das tabelas permanece a mesma
+    const createUnitsTable = `CREATE TABLE IF NOT EXISTS units (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, total_beds INTEGER NOT NULL);`;
+    const createPatientsTable = `CREATE TABLE IF NOT EXISTS patients (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, dob TEXT, age INTEGER, cns TEXT, dih TEXT, unit_id INTEGER, bed_id INTEGER, history TEXT, FOREIGN KEY (unit_id) REFERENCES units (id), FOREIGN KEY (bed_id) REFERENCES beds (id));`;
+    const createBedsTable = `CREATE TABLE IF NOT EXISTS beds (id INTEGER PRIMARY KEY AUTOINCREMENT, unit_id INTEGER NOT NULL, bed_number TEXT NOT NULL, status TEXT DEFAULT 'free', patient_id INTEGER, patient_name TEXT, FOREIGN KEY (unit_id) REFERENCES units (id) ON DELETE CASCADE, FOREIGN KEY (patient_id) REFERENCES patients (id) ON DELETE SET NULL);`;
+
+    db.serialize(() => {
+        db.run(createUnitsTable, (err) => { if (err) console.error("Erro tabela units", err); else console.log("Tabela 'units' pronta."); });
+        db.run(createPatientsTable, (err) => { if (err) console.error("Erro tabela patients", err); else console.log("Tabela 'patients' pronta."); });
+        db.run(createBedsTable, (err) => { 
+            if (err) console.error("Erro tabela beds", err); 
+            else {
+                console.log("Tabela 'beds' pronta.");
+                seedInitialData();
+            }
+        });
+    });
+}
+
+function seedInitialData() {
+    // Lista de todas as unidades que queremos criar
+    const defaultUnits = [
+        { name: 'UTI 3 - Hospital Geral de Roraima', total_beds: 36, type: 'uti3' },
+        { name: 'UTI 1A - Hospital Geral de Roraima', total_beds: 11, type: 'standard' },
+        { name: 'UTI 1B - Hospital Geral de Roraima', total_beds: 11, type: 'standard' },
+        { name: 'UTI 2A - Hospital Geral de Roraima', total_beds: 11, type: 'standard' },
+        { name: 'UTI 2B - Hospital Geral de Roraima', total_beds: 11, type: 'standard' }
+    ];
+
+    db.serialize(() => {
+        defaultUnits.forEach(unit => {
+            // Para cada unidade na lista, verifica se ela já existe
+            db.get('SELECT * FROM units WHERE name = ?', [unit.name], (err, row) => {
+                if (err) return console.error("Erro ao buscar unidade", err);
+                
+                // Se não existir, cria a unidade e seus leitos
+                if (!row) {
+                    console.log(`Unidade '${unit.name}' não encontrada. Criando...`);
+                    db.run('INSERT INTO units (name, total_beds) VALUES (?, ?)', [unit.name, unit.total_beds], function(err) {
+                        if (err) return console.error("Erro ao inserir unidade", err);
+                        
+                        const unitId = this.lastID;
+                        console.log(`Unidade '${unit.name}' criada com ID: ${unitId}. Gerando leitos...`);
+                        
+                        const bedSql = 'INSERT INTO beds (unit_id, bed_number) VALUES (?, ?)';
+                        
+                        // Lógica de nomenclatura dos leitos baseada no tipo da unidade
+                        if (unit.type === 'uti3') {
+                            for (let i = 1; i <= 34; i++) {
+                                db.run(bedSql, [unitId, String(i).padStart(2, '0')]);
+                            }
+                            db.run(bedSql, [unitId, 'Isolamento 01']);
+                            db.run(bedSql, [unitId, 'Isolamento 02']);
+                        } else if (unit.type === 'standard') {
+                            db.run(bedSql, [unitId, 'Isolamento 01']);
+                            for (let i = 1; i <= 10; i++) {
+                                db.run(bedSql, [unitId, String(i).padStart(2, '0')]);
+                            }
+                        }
+                        console.log(`${unit.total_beds} leitos gerados para a unidade '${unit.name}'.`);
+                    });
+                } else {
+                    console.log(`Unidade '${unit.name}' já existe.`);
+                }
+            });
+        });
+    });
+    
+    // Fechamos o banco de dados após um tempo para garantir que todas as operações terminaram
+    setTimeout(closeDb, 2000); 
+}
+
+function closeDb() {
+    db.close((err) => {
+        if (err) console.error("Erro ao fechar o banco de dados", err.message);
+        else console.log("Conexão com o banco de dados fechada.");
+    });
+}

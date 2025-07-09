@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora e Organizador de Exames</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <main>
+        <header class="main-header">
+            <a href="index.html" class="back-button">&larr; Voltar para o Início</a>
+            <h1>Calculadora e Organizador de Exames</h1>
+            <p>Preencha os dados do paciente, faça o upload dos laudos e gere uma análise completa.</p>
+        </header>
+
+        <form id="patientForm">
+            <div class="form-section">
+                <h2>Dados do Paciente</h2>
+                <div class="patient-data-grid">
+                    <div class="input-group"><label for="patientNameInput">Nome Completo:</label><input type="text" id="patientNameInput" placeholder="Ex: João da Silva"></div>
+                    <div class="input-group"><label for="patientDobInput">Data de Nascimento:</label><input type="date" id="patientDobInput"></div>
+                    <div class="input-group"><label for="patientSexInput">Sexo:</label><select id="patientSexInput"><option value="male">Masculino</option><option value="female">Feminino</option></select></div>
+                    <div class="input-group"><label for="patientHeightInput">Altura (cm):</label><input type="number" id="patientHeightInput" placeholder="Ex: 175"></div>
+                    <div class="input-group"><label for="patientWeightInput">Peso (kg):</label><input type="number" id="patientWeightInput" placeholder="Ex: 70"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Parâmetros Clínicos</h2>
+                <div class="patient-data-grid">
+                    <div class="input-group"><label for="hrInput">Frequência Cardíaca (bpm):</label><input type="number" id="hrInput" placeholder="Ex: 80"></div>
+                    <div class="input-group"><label for="pamInput">PAM (mmHg):</label><input type="number"id="pamInput" placeholder="Ex: 90"></div>
+                    <div class="input-group"><label for="pvcInput">PVC (mmHg):</label><input type="number" id="pvcInput" placeholder="Ex: 10"></div>
+                    <div class="input-group"><label for="sao2Input">SaO₂ (%):</label><input type="number" id="sao2Input" placeholder="Ex: 98"></div>
+                    <div class="input-group"><label for="svo2Input">SvO₂ (%):</label><input type="number" id="svo2Input" placeholder="Ex: 75"></div>
+                    <div class="input-group"><label for="fio2Input">FiO₂ (0.21-1.0):</label><input type="number" id="fio2Input" step="0.01" placeholder="Ex: 0.21"></div>
+                    <div class="input-group"><label for="pao2Input">PaO₂ (mmHg):</label><input type="number" id="pao2Input" placeholder="Ex: 95"></div>
+                    <div class="input-group"><label for="pvo2Input">PvO₂ (mmHg) (Opcional):</label><input type="number" id="pvo2Input" placeholder="Ex: 40"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Laudos em PDF</h2>
+                <div class="upload-section">
+                    <input type="file" id="fileInput" multiple accept=".pdf" style="display:none;">
+                    <label for="fileInput" class="custom-file-upload">Escolher Arquivos</label>
+                </div>
+                <div id="fileListContainer" class="file-list"></div>
+            </div>
+            
+            <button type="button" id="analyzeButton">Analisar Exames</button>
+        </form>
+
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            Analisando...
+        </div>
+
+        <div id="calculatedParameters" style="display: none;"></div>
+
+        <div id="printableArea" style="display: none;">
+            </div>
+        
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button id="printButton" class="button-secondary">Imprimir</button>
+            <button id="saveButton" class="button-secondary">Salvar como PDF</button>
+        </div>
+    </main>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

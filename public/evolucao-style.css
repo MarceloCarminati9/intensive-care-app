@@ -1,0 +1,99 @@
+/* Arquivo: evolucao-style.css (VERSÃO FINAL VALIDADA) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-blue: #4a90e2;
+    --dark-blue-text: #2c3e50;
+    --light-bg: #F0F5FA;
+    --white-bg: #FFFFFF;
+    --text-primary: #374151;
+    --text-secondary: #6B7280;
+    --border-color: #D1D5DB;
+    --border-focus-color: var(--primary-blue);
+    --section-bg: #F9FAFB;
+    --report-header-bg: #22577A;
+    --danger-color: #e74c3c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; }
+body { font-family: 'Poppins', sans-serif; background-color: var(--light-bg); color: var(--text-primary); padding: 20px; }
+.hidden { display: none !important; }
+
+/* === ESTRUTURA GERAL === */
+.tool-header { text-align: center; margin: 20px auto 40px; }
+.back-link { display: block; margin-bottom: 20px; color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+main { max-width: 1000px; margin: 0 auto; }
+form { background-color: var(--white-bg); border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07); padding: 20px 30px; border: 1px solid var(--border-color); }
+
+/* === SEÇÕES DO FORMULÁRIO (FIELDSET) === */
+fieldset { border: none; padding: 20px 0; margin-top: 10px; border-top: 1px solid #E5E7EB; }
+fieldset:first-of-type { border-top: none; padding-top: 0; }
+legend { font-size: 1.5rem; font-weight: 600; color: var(--dark-blue-text); padding-right: 20px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
+legend.icon-id::before { content: '👤'; } legend.icon-history::before { content: '📜'; } legend.icon-vitals::before { content: '❤️'; } legend.icon-exam::before { content: '🩺'; } legend.icon-support::before { content: '⚙️'; } legend.icon-diet::before { content: '🍎'; } legend.icon-prophylaxis::before { content: '🛡️'; } legend.icon-care::before { content: '🧼'; } legend.icon-labs::before { content: '🧪'; } legend.icon-imaging::before { content: '🖼️'; } legend.icon-reports::before { content: '📄'; } legend.icon-plan::before { content: '📋'; }
+
+/* === CAMPOS E GRUPOS DO FORMULÁRIO === */
+.form-group { margin-bottom: 20px; }
+.form-group > label, .dynamic-list > label { display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); }
+input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; background-color: var(--white-bg); transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Poppins', sans-serif; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--border-focus-color); box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); }
+.grid-container, .vm-grid, .checkbox-group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px 20px; }
+.radio-group, .checkbox-group, .inline-inputs, .radio-group-inline { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.sub-fieldset { background: var(--section-bg); border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-top: 20px; }
+.legend-2 { font-weight: 600; color: var(--dark-blue-text); margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+.conditional-options { padding: 15px; background-color: #f0f3f7; border-radius: 6px; margin-top: 10px; }
+.vitals-grid { display: grid; grid-template-columns: auto 1fr; gap: 15px 20px; align-items: center; }
+.vitals-grid > label { font-weight: 500; text-align: right; }
+.vitals-grid > div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.prophylaxis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; }
+.prophylaxis-item { background-color: var(--section-bg); border-radius: 8px; padding: 15px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; }
+.prophylaxis-title { font-weight: 600; display: block; }
+.help-text { font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px; }
+
+/* === CAMPOS DINÂMICOS === */
+.dynamic-input-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
+.dynamic-input-group input, .dynamic-input-group textarea { flex: 1; }
+.antibiotic-group input[type="text"] { min-width: 200px; }
+.btn-add, .btn-remove { cursor: pointer; }
+.btn-remove { background: none; border: none; color: var(--danger-color); font-size: 1.5rem; padding: 0 5px; }
+.btn-add { padding: 8px 12px; margin-top: 5px; margin-bottom: 15px; background-color: #eef2f7; color: var(--dark-blue-text); border: 1px dashed var(--border-color); border-radius: 6px; }
+
+/* === LISTA DE ARQUIVOS (UPLOAD) === */
+.file-list { margin-top: 15px; background-color: #fdfdfd; border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; min-height: 40px; }
+.file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border-color); font-size: 0.95em; }
+.file-item:last-child { border-bottom: none; }
+.remove-file-btn { background-color: transparent; color: var(--danger-color); border: none; border-radius: 50%; width: 24px; height: 24px; line-height: 24px; text-align: center; font-weight: bold; transition: background-color 0.2s; }
+.remove-file-btn:hover { background-color: #fbeae8; }
+
+/* === BOTÕES E ÁREA DE RESULTADO === */
+.form-section-actions { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); text-align: center; }
+.button-primary-tool, .button-secondary { display: inline-block; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; transition: background-color 0.3s ease; }
+.button-primary-tool { font-size: 1.1rem; align-self: center; margin-top: 10px; background-color: var(--primary-blue); color: var(--white-bg); }
+.button-secondary { background-color: var(--text-secondary); color: var(--white-bg); }
+#resultadoContainer { background-color: var(--white-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px 30px; margin-top: 20px; box-shadow: var(--card-shadow); }
+.action-buttons { text-align: center; margin-top: 25px; display: flex; gap: 15px; justify-content: center; }
+
+/* === ESTILOS PARA O RELATÓRIO FINAL GERADO === */
+#evolucaoGerada { font-family: 'Poppins', sans-serif; color: #333; background-color: var(--white-bg); }
+.report-title-bar { background-color: var(--report-header-bg); color: var(--white-bg); padding: 10px 15px; font-size: 1.4rem; font-weight: 600; border-radius: 4px; text-align: center; margin-bottom: 20px; }
+.report-data-row { display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; padding: 8px 5px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+.data-item { padding: 0 10px; border-right: 1px solid #ddd; line-height: 1.2; margin: 5px 0; }
+.data-item:first-child { padding-left: 0; }
+.data-item:last-child { border-right: none; }
+.data-label { font-weight: 600; color: var(--dark-blue-text); margin-right: 8px; }
+.report-section-final { margin-top: 25px; }
+.report-section-final h2 { font-size: 1.2rem; color: var(--report-header-bg); border-bottom: 2px solid #e0e0e0; padding-bottom: 5px; margin-bottom: 12px; }
+.report-section-final p, .report-section-final ul { line-height: 1.7; margin-bottom: 10px; padding-left: 5px; }
+.report-section-final ul { list-style-position: inside; padding-left: 10px; }
+.report-section-final li { margin-bottom: 5px; }
+.report-therapies { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+.report-therapies > div { padding: 10px; background: #fdfdfd; border-radius: 4px; border: 1px solid #f0f0f0; }
+#evolucaoGerada table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+#evolucaoGerada th, #evolucaoGerada td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; }
+#evolucaoGerada th { background-color: #f7f9fc; font-weight: 600; }
+#evolucaoGerada h4 { margin-bottom: 10px; color: var(--dark-blue-text); }
+
+/* === ÁREA DE ASSINATURA E RODAPÉ === */
+.signature-area { margin-top: 80px; text-align: center; }
+.signature-line { border-top: 1px solid #333; width: 300px; margin: 0 auto; padding-top: 8px; font-weight: 500; }
+.tool-footer { text-align: center; margin-top: 50px; color: var(--text-secondary); }

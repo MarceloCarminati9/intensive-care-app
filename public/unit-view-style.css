@@ -1,0 +1,322 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-blue: #4a90e2;
+    --dark-blue-text: #2c3e50;
+    --light-bg: #F0F5FA;
+    --white-bg: #FFFFFF;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --border-color: #E5E7EB;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    --danger-red: #EF4444;
+    --success-green: #10B981;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-primary);
+}
+
+.unit-view-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+.unit-view-header {
+    margin-bottom: 40px;
+}
+
+.back-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.unit-view-header h1 {
+    font-size: 2rem;
+    color: var(--dark-blue-text);
+}
+
+.unit-view-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.bed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.bed-card {
+    background-color: var(--white-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+.bed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.bed-header h2 {
+    color: var(--dark-blue-text);
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.bed-header span {
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.status-occupied {
+    background-color: #FEF3C7; /* Amarelo claro */
+    color: #92400E; /* Marrom escuro */
+}
+
+.status-free {
+    background-color: #D1FAE5; /* Verde claro */
+    color: #065F46; /* Verde escuro */
+}
+
+.patient-info {
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.patient-info p {
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.bed-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.bed-actions-free {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 100px;
+}
+
+.action-btn, .action-btn-main, .action-btn-danger {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.action-btn-main {
+    background-color: var(--primary-blue);
+    color: var(--white-bg);
+}
+.action-btn-main:hover {
+    background-color: #3a7ac8;
+}
+
+.action-btn {
+    background-color: #F3F4F6; /* Cinza claro */
+    color: var(--dark-blue-text);
+}
+.action-btn:hover {
+    background-color: #E5E7EB;
+}
+
+.action-btn-danger {
+    background-color: #FEE2E2; /* Vermelho claro */
+    color: var(--danger-red);
+}
+.action-btn-danger:hover {
+    background-color: #FECACA;
+}
+/* ======================= ESTILOS DO MODAL DE PACIENTE ======================= */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none; /* Começa escondido */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--white-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 700px; /* Um pouco maior para caber mais campos */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    color: var(--dark-blue-text);
+    font-size: 1.4rem;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.modal-body {
+    max-height: 60vh; /* Altura máxima para o corpo do modal */
+    overflow-y: auto; /* Adiciona barra de rolagem se o conteúdo for grande */
+    padding-right: 15px; /* Espaço para a barra de rolagem */
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas */
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 0; 
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1; /* Ocupa a largura total */
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+}
+/* ======================= ESTILOS DO AUTOCOMPLETE DE DIAGNÓSTICO ======================= */
+
+.diagnoses-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.diagnosis-tag {
+    background-color: #eef2f7;
+    color: var(--dark-blue-text);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.remove-diag-btn {
+    background: none;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+.remove-diag-btn:hover {
+    color: var(--danger-red);
+}
+
+.autocomplete-container {
+    position: relative;
+}
+
+.autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--white-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+}
+
+.autocomplete-results.active {
+    display: block;
+}
+
+.autocomplete-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover {
+    background-color: #f3f4f6;
+}

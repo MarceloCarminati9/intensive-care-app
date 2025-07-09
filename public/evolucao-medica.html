@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolução Médica Diária - Intensive Care</title>
+    <link rel="stylesheet" href="evolucao-style.css">
+    <link rel="icon" href="intensivecare.jpeg" type="image/jpeg">
+</head>
+<body>
+    <header class="tool-header">
+        <a href="index.html" class="back-link">&larr; Voltar para Ferramentas</a>
+        <h1>Evolução Médica Diária</h1>
+        <p>Preencha os campos abaixo ou carregue uma evolução anterior para começar.</p>
+    </header>
+
+    <main>
+        <div class="form-section-actions">
+            <input type="file" id="loadEvolutionInput" class="hidden" accept=".json">
+            <button type="button" id="loadEvolutionButton" class="button-secondary">Carregar Evolução Anterior</button>
+        </div>
+
+        <form id="evolucaoForm">
+            <fieldset>
+                <legend class="icon-id">Identificação do Paciente</legend>
+                <div class="grid-container">
+                    <div class="form-group full-width"><label for="nomePaciente">Nome do Paciente</label><input type="text" id="nomePaciente" name="nomePaciente" placeholder="Nome completo do paciente"></div>
+                    <div class="form-group"><label for="idade">Idade</label><input type="number" id="idade" name="idade" placeholder="Ex: 65"></div>
+                    <div class="form-group"><label for="dataNascimento">Data de Nascimento</label><input type="date" id="dataNascimento" name="dataNascimento"></div>
+                    <div class="form-group"><label for="sexo">Sexo</label><select id="sexo" name="sexo"><option value="Masculino">Masculino</option><option value="Feminino">Feminino</option></select></div>
+                    <div class="form-group"><label for="nomeUti">Nome da UTI</label><input type="text" id="nomeUti" name="nomeUti" placeholder="Ex: UTI Cardiológica"></div>
+                    <div class="form-group"><label for="leito">Leito</label><input type="text" id="leito" name="leito" placeholder="Ex: 05"></div>
+                    <div class="form-group"><label for="dataInternacaoHospitalar">Data de Internação Hospitalar</label><input type="date" id="dataInternacaoHospitalar" name="dataInternacaoHospitalar"></div>
+                    <div class="form-group"><label for="dataInternacaoUti">Data de Internação na UTI</label><input type="date" id="dataInternacaoUti" name="dataInternacaoUti"></div>
+                    <div class="form-group"><label for="altura">Altura (cm)</label><input type="number" id="altura" name="altura" placeholder="Ex: 175"></div>
+                    <div class="form-group"><label for="peso">Peso (kg)</label><input type="number" id="peso" name="peso" step="0.1" placeholder="Ex: 70"></div>
+                    <div class="form-group"><label for="sofa">SOFA</label><input type="number" id="sofa" name="sofa" placeholder="Score SOFA"></div>
+                    </div>
+            </fieldset>
+
+            <fieldset>
+                <legend class="icon-history">Histórico Clínico</legend>
+                <div class="form-group full-width"><label for="hipoteseDiagnostica">Hipótese Diagnóstica</label><textarea id="hipoteseDiagnostica" name="hipoteseDiagnostica" rows="3" placeholder="Descreva as hipóteses diagnósticas principais."></textarea></div>
+                <div class="form-group full-width"><label for="hpp">História Patológica Pregressa (HPP)</label><textarea id="hpp" name="hpp" rows="3" placeholder="Comorbidades, cirurgias prévias, etc."></textarea></div>
+                <div class="form-group full-width"><label for="alergias">Alergias</label><textarea id="alergias" name="alergias" rows="2" placeholder="Descreva as alergias conhecidas ou 'Nega alergias'."></textarea></div>
+            </fieldset>
+
+            <fieldset>
+                 <legend class="icon-vitals">Sinais Vitais e Balanço (24h)</legend>
+                 <div class="vitals-grid">
+                    <label>PAS (mmHg)</label>
+                    <div><input type="number" name="pasMax" placeholder="Máximo"><input type="number" name="pasMin" placeholder="Mínimo"></div>
+                    <label>PAD (mmHg)</label>
+                    <div><input type="number" name="padMax" placeholder="Máximo"><input type="number" name="padMin" placeholder="Mínimo"></div>
+                    <label>PAM (mmHg)</label>
+                    <div><input type="number" name="pamMax" placeholder="Máximo"><input type="number" name="pamMin" placeholder="Mínimo"></div>
+                    <label>FC (bpm)</label>
+                    <div><input type="number" name="fcMax" placeholder="Máximo"><input type="number" name="fcMin" placeholder="Mínimo"></div>
+                    <label>FR (rpm)</label>
+                    <div><input type="number" name="frMax" placeholder="Máximo"><input type="number" name="frMin" placeholder="Mínimo"></div>
+                    <label>SpO2 (%)</label>
+                    <div><input type="number" name="spo2Max" placeholder="Máximo"><input type="number" name="spo2Min" placeholder="Mínimo"></div>
+                    <label>T. Axilar (°C)</label>
+                    <div><input type="number" name="taxMax" step="0.1" placeholder="Máximo"><input type="number" name="taxMin" step="0.1" placeholder="Mínimo"></div>
+                    <label>Glicemia (mg/dL)</label>
+                    <div><input type="number" name="glicemiaMax" placeholder="Máximo"><input type="number" name="glicemiaMin" placeholder="Mínimo"></div>
+                </div>
+                <hr style="margin-top: 20px; border: 0; border-top: 1px solid #E5E7EB;">
+                <div class="grid-container" style="margin-top: 20px;">
+                    <div class="form-group"><label for="diurese">Diurese (mL)</label><input type="number" id="diurese" name="diurese"></div>
+                    <div class="form-group"><label for="balancoHidrico">Balanço Hídrico (mL)</label><input type="number" id="balancoHidrico" name="balancoHidrico"></div>
+                    <div class="form-group"><label>Diálise</label><div class="radio-group" style="padding-top: 5px;"><label><input type="radio" name="dialise" value="Não" checked>Não</label><label><input type="radio" name="dialise" value="Diária">Diária</label><label><input type="radio" name="dialise" value="Intermitente">Intermitente</label></div></div>
+                    <div class="form-group"><label for="ultimaUf">Última UF (mL)</label><input type="number" id="ultimaUf" name="ultimaUf"></div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend class="icon-exam">Exame Físico</legend>
+                <div class="sub-fieldset">
+                    <div class="legend-2">Neurológico</div>
+                    <div class="form-group"><div class="inline-inputs"><label>Glasgow:</label> <label><input type="checkbox" id="glasgow_na" name="glasgow_na"> Não se aplica</label></div><div class="inline-inputs" id="glasgow_details"><input type="number" name="glasgow_ocular" placeholder="Ocular"> +<input type="number" name="glasgow_verbal" placeholder="Verbal"> +<input type="number" name="glasgow_motor" placeholder="Motor"> =<input type="number" name="glasgow_total" placeholder="Total"></div></div>
+                    <div class="form-group"><div class="inline-inputs"><label for="rass">RASS:</label> <input type="text" id="rass" name="rass" style="width: 80px;"> <label><input type="checkbox" name="rass_na"> Não se aplica</label></div></div>
+                    <div class="form-group"><div class="inline-inputs"><label for="nihss">NIHSS:</label> <input type="number" id="nihss" name="nihss" style="width: 80px;"> <label><input type="checkbox" name="nihss_na"> Não se aplica</label></div></div>
+                    <div class="form-group"><label>CAM-ICU:</label><div class="radio-group"><label><input type="radio" name="camicu" value="Positivo"> Positivo</label><label><input type="radio" name="camicu" value="Negativo"> Negativo</label><label><input type="radio" name="camicu" value="Não se aplica"> Não se aplica</label></div></div>
+                    <div class="form-group"><label>Pupilas:</label><div class="radio-group"><label><input type="radio" name="pupilas_tamanho" value="Isocóricas">Isocóricas</label><label><input type="radio" name="pupilas_tamanho" value="Anisocóricas">Anisocóricas</label><label><input type="radio" name="pupilas_tamanho" value="Mióticas">Mióticas</label><label><input type="radio" name="pupilas_tamanho" value="Midriáticas">Midriáticas</label></div><div class="radio-group" style="margin-top: 10px;"><label><input type="radio" name="pupilas_reatividade" value="Fotorreagentes"> Fotorreagentes</label><label><input type="radio" name="pupilas_reatividade" value="Não fotorreagentes"> Não fotorreagentes</label></div></div>
+                </div>
+                 <div class="sub-fieldset">
+                    <div class="legend-2">Respiratório</div>
+                    <div class="form-group"><label>Ausculta Pulmonar:</label><div class="checkbox-group-grid"><label><input type="checkbox" name="ausculta_pulmonar" value="MV+ bilateralmente"> MV+ bilateralmente</label><label><input type="checkbox" class="ap_conditional_check" name="ausculta_pulmonar" value="MV diminuído/abolido"> MV diminuído/abolido</label><label><input type="checkbox" class="ap_conditional_check" name="ausculta_pulmonar" value="Creptos"> Creptos</label><label><input type="checkbox" class="ap_conditional_check" name="ausculta_pulmonar" value="Roncos"> Roncos</label><label><input type="checkbox" class="ap_conditional_check" name="ausculta_pulmonar" value="Sibilos"> Sibilos</label></div><div id="ap_details_group" class="conditional-options hidden" style="flex-direction: column; align-items: flex-start; gap: 10px;"><div><label>Lado:</label> <label><input type="radio" name="ap_lado" value="D"> D</label> <label><input type="radio" name="ap_lado" value="E"> E</label> <label><input type="radio" name="ap_lado" value="Bilateral"> Bilateral</label></div><div><label>Altura:</label> <label><input type="radio" name="ap_altura" value="Base"> Base</label> <label><input type="radio" name="ap_altura" value="Terço Médio"> Terço Médio</label> <label><input type="radio" name="ap_altura" value="Ápice"> Ápice</label></div></div></div>
+                    <div class="form-group"><label>Secreção Traqueal:</label><div class="radio-group"><label><input type="radio" name="secrecao_presente" value="Presente"> Presente</label><label><input type="radio" name="secrecao_presente" value="Ausente" checked> Ausente</label></div><div id="secrecao_details_group" class="hidden" style="margin-top: 10px;"><label>Aspecto:</label><div class="checkbox-group-grid"><label><input type="checkbox" name="secrecao_aspecto" value="Espessa"> Espessa</label><label><input type="checkbox" name="secrecao_aspecto" value="Fluida"> Fluida</label><label><input type="checkbox" name="secrecao_aspecto" value="Purulenta"> Purulenta</label><label><input type="checkbox" name="secrecao_aspecto" value="Hialina"> Hialina</label><label><input type="checkbox" name="secrecao_aspecto" value="Sanguinolenta"> Sanguinolenta</label></div><div class="radio-group" style="margin-top: 10px;"><label>Quantidade:</label><label><input type="radio" name="secrecao_qtd" value="Pequena"> Pequena</label><label><input type="radio" name="secrecao_qtd" value="Média"> Média</label><label><input type="radio" name="secrecao_qtd" value="Grande"> Grande</label></div></div></div>
+                </div>
+                <div class="sub-fieldset"><div class="legend-2">Cardiovascular</div><div class="form-group"><label>Ausculta Cardíaca:</label><div class="checkbox-group-grid"><label><input type="checkbox" name="ausculta_cardiaca" value="BRNF em 2T"> BRNF em 2T</label><label><input type="checkbox" name="ausculta_cardiaca" value="B3"> B3</label><label><input type="checkbox" name="ausculta_cardiaca" value="B4"> B4</label><label><input type="checkbox" id="sopro_check"> Sopro</label></div><input type="text" id="sopro_desc" name="sopro_desc" placeholder="Descrever foco/irradiação do sopro..." class="hidden" style="margin-top: 10px;"></div><div class="form-group"><label>Pulsos Periféricos:</label><div class="checkbox-group-grid"><label><input type="checkbox" name="pulso" value="Cheios"> Cheios</label><label><input type="checkbox" name="pulso" value="Filiformes"> Filiformes</label><label><input type="checkbox" name="pulso" value="Rítmicos"> Rítmicos</label><label><input type="checkbox" name="pulso" value="Arrítmicos"> Arrítmicos</label></div></div></div>
+                <div class="sub-fieldset"><div class="legend-2">Abdome</div><div class="checkbox-group-grid"><label><input type="checkbox" name="abdome_carac" value="Plano">Plano</label><label><input type="checkbox" name="abdome_carac" value="Globoso">Globoso</label><label><input type="checkbox" name="abdome_carac" value="Distendido">Distendido</label><label><input type="checkbox" name="abdome_carac" value="Flácido">Flácido</label><label><input type="checkbox" name="abdome_carac" value="Tenso">Tenso</label><label><input type="checkbox" name="abdome_carac" value="Indolor à palpação">Indolor</label><label><input type="checkbox" name="abdome_carac" value="Doloroso à palpação">Doloroso</label><label><input type="checkbox" id="abdome_outro_check" name="abdome_carac" value="Outro">Outro</label></div><input type="text" id="abdome_outro_text" name="abdome_outro_desc" placeholder="Descrever outra característica" class="hidden" style="margin-top: 10px;"><div class="form-group" style="margin-top: 15px;"><label>Ruídos Hidroaéreos (RHA):</label><div class="radio-group"><label><input type="radio" name="rha" value="Presentes" checked> Presentes</label><label><input type="radio" name="rha" value="Aumentados"> Aumentados</label><label><input type="radio" name="rha" value="Diminuídos"> Diminuídos</label><label><input type="radio" name="rha" value="Ausentes"> Ausentes</label></div></div></div>
+                <div class="sub-fieldset"><div class="legend-2">Pele e Tegumento</div><div class="form-group full-width"><label for="lesoesPele">Descrição da Pele, Tegumentos e Lesões</label><textarea id="lesoesPele" name="lesoesPele" rows="3" placeholder="Descrever integridade, cor, umidade, presença de LPP, hematomas, etc."></textarea></div></div>
+            </fieldset>
+            <fieldset>
+                <legend class="icon-support">Dispositivos Invasivos</legend>
+                <div id="dispositivos-container" class="dynamic-list"><label>Dispositivos Atuais</label></div><button type="button" class="btn-add" onclick="addDynamicInput('dispositivos-container', 'dispositivo', 'Nome do Dispositivo', '', 'date')">Adicionar Dispositivo</button>
+            </fieldset>
+            <fieldset>
+                <legend class="icon-support">Suporte e Terapias Ativas</legend>
+                <div class="form-group full-width"><label style="font-size: 1.1rem; font-weight: 600; margin-bottom: 15px;">Suporte Ventilatório</label><div class="radio-group-vertical"><div class="radio-option"><input type="radio" id="ventEspontanea" name="ventilacao" value="Espontânea" checked><label for="ventEspontanea">Ventilação Espontânea em ar ambiente</label></div><div class="radio-option"><input type="radio" id="ventCN" name="ventilacao" value="Cateter Nasal"><label for="ventCN">Cateter Nasal (CN)</label></div><div id="ventilacao_cn_options" class="conditional-options hidden"><input type="number" name="cn_lpm" placeholder="L/min"> L/min</div><div class="radio-option"><input type="radio" id="ventMascara" name="ventilacao" value="Máscara"><label for="ventMascara">Máscara (Venturi ou Não Reinalante)</label></div><div id="ventilacao_mascara_options" class="conditional-options hidden"><input type="number" name="mascara_valor" placeholder="Valor"> <select name="mascara_unidade"><option value="%">% (Venturi)</option><option value="L/min">L/min (MNR)</option></select></div><div class="radio-option"><input type="radio" id="ventVNI" name="ventilacao" value="VNI"><label for="ventVNI">Ventilação Não Invasiva (VNI)</label></div><div class="radio-option"><input type="radio" id="ventVMI" name="ventilacao" value="Mecânica"><label for="ventVMI">Ventilação Mecânica Invasiva (VMI)</label></div><div id="ventilacao_vm_options" class="conditional-options hidden"><div class="vm-grid"><div class="input-group"><label for="vm_modo">Modo:</label><input type="text" id="vm_modo" name="vm_modo"></div><div class="input-group"><label for="vm_fio2">FiO₂ (%):</label><input type="number" id="vm_fio2" name="vm_fio2" step="1"></div><div class="input-group"><label for="vm_peep">PEEP:</label><input type="number" id="vm_peep" name="vm_peep"></div><div class="input-group"><label for="vm_psup">P. Sup:</label><input type="number" id="vm_psup" name="vm_psup"></div><div class="input-group"><label for="vm_vt">VT (mL):</label><input type="number" id="vm_vt" name="vm_vt"></div><div class="input-group full-span"><label for="vm_outros">Outros:</label><input type="text" id="vm_outros" name="vm_outros"></div></div></div></div></div>
+                <div class="form-group full-width" style="margin-top: 25px;"><label for="hemodinamico">Suporte Hemodinâmico</label><textarea id="hemodinamico" name="hemodinamico" rows="2" placeholder="Ex: PVC, Delta PP, DC, etc."></textarea></div>
+                <div id="sedacao-container" class="dynamic-list"><label>Sedação</label></div><button type="button" class="btn-add" onclick="addDynamicInput('sedacao-container', 'sedacao', 'Droga', 'Dose')">Adicionar Sedativo</button>
+                <div id="analgesia-container" class="dynamic-list" style="margin-top:15px;"><label>Analgesia</label></div><button type="button" class="btn-add" onclick="addDynamicInput('analgesia-container', 'analgesia', 'Droga', 'Dose')">Adicionar Analgésico</button>
+                <div id="dva-container" class="dynamic-list" style="margin-top:15px;"><label>Drogas Vasoativas (DVA)</label></div><button type="button" class="btn-add" onclick="addDynamicInput('dva-container', 'dva', 'Droga', 'Dose (mcg/kg/min ou mL/h)')">Adicionar DVA</button>
+                <div id="antibiotico-container" class="dynamic-list" style="margin-top:15px;"><label>Antibioticoterapia</label></div><button type="button" class="btn-add" onclick="addAntibiotico()">Adicionar Antibiótico</button>
+                <div id="corticoide-container" class="dynamic-list" style="margin-top:15px;"><label>Corticoides</label></div><button type="button" class="btn-add" onclick="addDynamicInput('corticoide-container', 'corticoide', 'Droga', 'Data de Início', 'date')">Adicionar Corticoide</button>
+                <div id="outras_drogas-container" class="dynamic-list" style="margin-top:15px;"><label>Outras Drogas Relevantes</label></div><button type="button" class="btn-add" onclick="addDynamicInput('outras_drogas-container', 'outras_drogas', 'Droga', 'Observação/Data')">Adicionar Outra Droga</button>
+            </fieldset>
+            <fieldset>
+                <legend class="icon-diet">Dieta e Função Intestinal</legend>
+                <div class="form-group"><label>Meta Calórica (GEB)</label><div class="radio-group"><label><input type="radio" name="gebAlcancado" value="Alcançado" checked> Alcançado</label><label><input type="radio" name="gebAlcancado" value="Não Alcançado"> Não Alcançado</label><label><input type="radio" name="gebAlcancado" value="Não foi possível quantificar"> Não quantificável</label></div></div>
+                <div class="form-group"><label>Intercorrências com a Dieta?</label><div class="radio-group"><label><input type="radio" name="dieta_intercorrencia_check" value="Sim"> Sim</label><label><input type="radio" name="dieta_intercorrencia_check" value="Não" checked> Não</label></div></div>
+                <div class="form-group full-width hidden" id="dieta_intercorrencia_desc_group"><label for="dietaIntercorrencias">Descrever intercorrências</label><textarea id="dietaIntercorrencias" name="dietaIntercorrencias" rows="2" placeholder="Vômitos, resíduo gástrico elevado, etc."></textarea></div>
+                <div class="form-group full-width"><label for="funcaoIntestinal">Função Intestinal</label><input type="number" name="evacuacoes" placeholder="Nº de evacuações/24h" style="width: 200px; margin-right: 10px;"><input type="text" name="evacuacoes_caracteristicas" placeholder="Características das fezes" style="flex-grow: 1;"></div>
+            </fieldset>
+            <fieldset>
+                <legend class="icon-prophylaxis">Profilaxias</legend>
+                <div class="prophylaxis-grid">
+                    <div class="prophylaxis-item"><label class="prophylaxis-title">Profilaxia para TEV</label><div class="radio-group-inline"><label><input type="radio" name="profilaxia_tev_status" value="Ativa" checked> Ativa</label><label><input type="radio" name="profilaxia_tev_status" value="Suspensa"> Suspensa</label><label><input type="radio" name="profilaxia_tev_status" value="Não indicada"> Não indicada</label></div><div class="checkbox-group-grid" style="margin-top: 10px;"><label><input type="checkbox" name="tev_methods" value="Enoxaparina"> Enoxaparina</label><label><input type="checkbox" name="tev_methods" value="Heparina SC"> Heparina SC</label><label><input type="checkbox" name="tev_methods" value="Compressor Pneumático"> Compressor Pneumático</label><label><input type="checkbox" id="tev_outro_check"> Outro</label></div><input type="text" id="tev_outro_desc" name="tev_outro_desc" placeholder="Descrever outro método..." class="hidden" style="margin-top: 10px;"></div>
+                    <div class="prophylaxis-item"><label class="prophylaxis-title">Profilaxia para Lesão Aguda de Mucosa Gástrica (LAMG)</label><div class="radio-group-inline"><label><input type="radio" name="profilaxia_lamg_status" value="Ativa" checked> Ativa</label><label><input type="radio" name="profilaxia_lamg_status" value="Suspensa"> Suspensa</label><label><input type="radio" name="profilaxia_lamg_status" value="Não indicada"> Não indicada</label></div><div class="checkbox-group-grid" style="margin-top: 10px;"><label><input type="checkbox" name="lamg_methods" value="Pantoprazol"> Pantoprazol</label><label><input type="checkbox" name="lamg_methods" value="Omeprazol"> Omeprazol</label><label><input type="checkbox" name="lamg_methods" value="Ranitidina"> Ranitidina</label><label><input type="checkbox" id="lamg_outro_check"> Outro</label></div><input type="text" id="lamg_outro_desc" name="lamg_outro_desc" placeholder="Descrever outro método..." class="hidden" style="margin-top: 10px;"></div>
+                    <div class="prophylaxis-item"><label class="prophylaxis-title">Profilaxia para Lesão de Córnea</label><div class="radio-group-inline"><label><input type="radio" name="profilaxia_cornea_status" value="Ativa" checked> Ativa</label><label><input type="radio" name="profilaxia_cornea_status" value="Suspensa"> Suspensa</label><label><input type="radio" name="profilaxia_cornea_status" value="Não indicada"> Não indicada</label></div><input type="text" name="profilaxia_cornea_desc" placeholder="Descrever tipo (Ex: Oclusão passiva, Lácrima artificial)"></div>
+                    <div class="prophylaxis-item"><label class="prophylaxis-title">Profilaxia para Broncoaspiração</label><div class="radio-group-inline"><label><input type="radio" name="profilaxia_bronco_status" value="Ativa" checked> Ativa</label><label><input type="radio" name="profilaxia_bronco_status" value="Suspensa"> Suspensa</label><label><input type="radio" name="profilaxia_bronco_status" value="Não indicada"> Não indicada</label></div><input type="text" name="profilaxia_bronco_desc" placeholder="Descrever tipo (Ex: Cabeceira elevada 30-45°, jejum para procedimentos)"></div>
+                </div>
+            </fieldset>
+            <fieldset><legend class="icon-care">Cuidados de Enfermagem</legend><div class="form-group"><label>Banho no Leito:</label><div class="radio-group"><label><input type="radio" name="banho" value="Realizado">Realizado</label><label><input type="radio" name="banho" value="Não realizado">Não realizado</label><label><input type="radio" name="banho" value="Não se aplica">Não se aplica</label></div></div><div class="form-group"><label>Higiene Oral:</label><div class="radio-group"><label><input type="radio" name="higiene" value="Realizada">Realizada</label><input type="number" name="higiene_vezes" placeholder="Nº vezes" style="width: 100px;"><label><input type="radio" name="higiene" value="Não realizada">Não realizada</label><label><input type="radio" name="higiene" value="Não se aplica">Não se aplica</label></div></div><div class="form-group"><label>Curativos:</label><div class="radio-group"><label><input type="radio" name="curativo" value="Realizados">Realizados</label><input type="text" name="curativo_desc_sim" placeholder="Quais?"><label><input type="radio" name="curativo" value="Não realizados">Não realizados</label><input type="text" name="curativo_desc_nao" placeholder="Motivo"><label><input type="radio" name="curativo" value="Não se aplica">Não se aplica</label></div></div></fieldset>
+            <fieldset>
+                <legend class="icon-labs">Culturas</legend>
+                <div class="sub-fieldset"><div class="legend-2">Culturas Aguardando Resultado</div><div id="culturas-pendentes-container" class="dynamic-list"></div><button type="button" class="btn-add" onclick="addCulturaPendente()">Adicionar Cultura Pendente</button></div>
+                <div class="sub-fieldset" style="margin-top: 20px;"><div class="legend-2">Resultados de Culturas</div><div id="culturas-realizadas-container" class="dynamic-list"></div><button type="button" class="btn-add" onclick="addResultadoCultura()">Adicionar Resultado de Cultura</button></div>
+            </fieldset>
+            <fieldset><legend class="icon-imaging">Exames de Imagem</legend><textarea name="examesImagem" rows="4" placeholder="Descreva os achados dos exames de imagem recentes."></textarea></fieldset>
+            <fieldset><legend class="icon-reports">Pareceres e Avaliações</legend><textarea name="pareceres" rows="4" placeholder="Resuma as recomendações de pareceres e avaliações de outras equipes."></textarea></fieldset>
+            <fieldset>
+                <legend class="icon-labs">Resultados de Exames Laboratoriais</legend>
+                <div class="form-group">
+                    <label for="espelhoExames">Carregar Laudos de Exames (PDF)</label>
+                    <input type="file" id="espelhoExames" accept=".pdf" multiple>
+                    <p class="help-text">Selecione um ou mais laudos em PDF. A IA irá analisá-los e criar uma tabela com os resultados.</p>
+                </div>
+                <div id="fileListContainer" class="file-list"></div>
+                <div id="processingStatus" class="hidden" style="font-weight: 500; color: var(--primary-blue); margin-top: 15px;">Analisando PDFs com IA...</div>
+            </fieldset>
+            <fieldset>
+                <legend class="icon-plan">Evolução e Impressão Clínica</legend>
+                 <div class="form-group full-width"><label for="evolucaoImpressao">Descrição da Evolução e Impressão</label><textarea id="evolucaoImpressao" name="evolucaoImpressao" rows="6" placeholder="Descreva a evolução do paciente nas últimas 24h, junte os dados e formule sua impressão clínica."></textarea></div>
+            </fieldset>
+            <fieldset>
+                <legend class="icon-plan">Conduta (Plano Terapêutico)</legend>
+                 <div class="form-group full-width"><label for="conduta">Descrição da Conduta</label><textarea id="conduta" name="conduta" rows="6" placeholder="Liste o plano terapêutico para as próximas 24h."></textarea></div>
+            </fieldset>
+            <fieldset>
+                <legend class="icon-plan">Pendências</legend>
+                 <div class="form-group full-width"><label for="pendencias">Descrição das Pendências</label><textarea id="pendencias" name="pendencias" rows="4" placeholder="Exames a coletar, resultados a aguardar, etc."></textarea></div>
+            </fieldset>
+            
+            <button type="submit" class="button-primary-tool">Gerar Evolução</button>
+        </form>
+
+        <div id="resultadoContainer" class="hidden">
+            <div id="evolucaoGerada"></div>
+            <div class="action-buttons">
+                <button type="button" id="btnEditar" class="button-secondary">Editar</button>
+                <button type="button" id="btnImprimir" class="button-secondary">Imprimir</button>
+                <button type="button" id="btnSalvar" class="button-primary-tool">Salvar Relatório</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="tool-footer">
+        <p>&copy; 2025 Intensive Care. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script type="module" src="evolucao-script.js"></script>
+</body>
+</html>

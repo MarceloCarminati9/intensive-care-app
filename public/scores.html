@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Scores Prognósticos</title>
+    <link rel="stylesheet" href="tool-page.css">
+    <style>
+        .tab-buttons { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 30px; flex-wrap: wrap; }
+        .tab-button { padding: 10px 20px; cursor: pointer; background: none; border: none; font-size: 16px; font-weight: 600; color: var(--secondary-text); border-bottom: 3px solid transparent; }
+        .tab-button.active { color: var(--primary-accent); border-bottom-color: var(--primary-accent); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-section h3 { color: var(--primary-text); margin-top: 30px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; font-size: 1.1em; }
+        .result-box .sub-result { font-size: 1rem; color: var(--secondary-text); margin-top: 10px;}
+        .grid-3-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .hidden-question { display: none; } /* Classe para esconder perguntas condicionais */
+    </style>
+</head>
+<body>
+    <div class="tool-container">
+        <header class="tool-header">
+            <a href="index.html" class="back-button">&larr; Início</a>
+            <h1>Scores Prognósticos</h1>
+        </header>
+
+        <nav class="tab-buttons">
+            <button class="tab-button active" data-tab="sepsis">SIRS / Sepse</button> <button class="tab-button" data-tab="sofa">SOFA</button>
+            <button class="tab-button" data-tab="apache">APACHE II</button>
+            <button class="tab-button" data-tab="saps3">SAPS 3</button>
+        </nav>
+
+        <main>
+            <div id="sepsis" class="tab-content active">
+                <form id="sepsisForm">
+                    <div class="form-section">
+                        <h3>Critérios para SIRS</h3>
+                        <div class="grid-2-col">
+                            <div class="input-group">
+                                <label>Temperatura (°C)</label>
+                                <input type="number" step="0.1" name="temp" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Frequência Cardíaca (bpm)</label>
+                                <input type="number" name="hr" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Frequência Respiratória (rpm)</label>
+                                <input type="number" name="rr" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Leucócitos (x10³/mm³)</label>
+                                <input type="number" name="wbc" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3>Diagnóstico Diferencial</h3>
+                        <div class="grid-2-col">
+                            <div class="input-group">
+                                <label>Infecção suspeita ou confirmada?</label>
+                                <select name="infection" required>
+                                    <option value="no">Não</option>
+                                    <option value="yes">Sim</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Sinais de disfunção orgânica?</label>
+                                <p style="font-size:0.8em; margin-top:-5px; color:#888;">(Hipotensão, oligúria, lactato > 2, etc)</p>
+                                <select name="organ_dysfunction" required>
+                                    <option value="no">Não</option>
+                                    <option value="yes">Sim</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group hidden-question" id="shock_question">
+                            <label>Hipotensão refratária a volume?</label>
+                            <select name="refractory_hypotension" required>
+                                <option value="no">Não</option>
+                                <option value="yes">Sim</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="main-button">Avaliar Critérios</button>
+                </form>
+            </div>
+
+            <div id="sofa" class="tab-content">
+                </div>
+
+            <div id="apache" class="tab-content">
+                </div>
+
+            <div id="saps3" class="tab-content">
+                </div>
+
+            <div class="result-box" id="resultBox">
+                <h2 id="resultTitle">Resultado</h2>
+                <p id="resultText">--</p>
+                <div id="subResult" class="sub-result"></div>
+            </div>
+        </main>
+    </div>
+    <script src="scores.js"></script>
+</body>
+</html>

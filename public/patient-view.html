@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prontuário do Paciente - Intensive Care Brasil</title>
+    <link rel="stylesheet" href="patient-view-style.css">
+    <link rel="icon" href="intensivecare.jpeg" type="image/jpeg">
+</head>
+<body>
+    <div class="patient-view-container">
+        <header class="patient-header">
+            <div class="patient-info-header">
+                <a href="dashboard.html" class="back-link">&larr; Voltar para o Dashboard</a>
+                <h1 id="patientNameHeader">Carregando...</h1>
+                <p id="patientDetailsHeader"></p>
+            </div>
+            <div class="patient-alerts" id="patientAlertsHeader"></div>
+        </header>
+
+        <main>
+            <section class="actions-section">
+                <h2>Ações Rápidas</h2>
+                <div class="actions-grid">
+                    <a href="#" class="action-card" id="goToEvolutionBtn">Nova Evolução Médica</a>
+                    <a href="#" class="action-card" id="goToPrescriptionBtn">Novo Receituário</a>
+                    <a href="#" class="action-card" id="goToAdmissionBtn">Resumo de Admissão</a>
+                    <a href="#" class="action-card" id="goToDischargeBtn">Resumo de Alta</a>
+                </div>
+            </section>
+
+            <section class="history-section">
+                <h2>Histórico do Paciente</h2>
+                <div id="historyList" class="history-list">
+                    <p>Nenhum histórico encontrado.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="historyViewerModal" class="modal-overlay">
+        <div class="modal-content wide">
+            <div class="modal-header">
+                <h2 id="viewerTitle">Visualizar Documento</h2>
+                <button id="closeViewerBtn" class="close-button">&times;</button>
+            </div>
+            <div id="viewerContent" class="modal-body">
+                </div>
+            <div class="modal-footer">
+                <button id="printDocumentBtn" class="button-primary">Imprimir</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="patient-view.js"></script>
+</body>
+</html>

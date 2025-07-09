@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Leitos - Intensive Care Brasil</title>
+    <link rel="stylesheet" href="unit-view-style.css">
+    <link rel="icon" href="intensivecare.jpeg" type="image/jpeg">
+</head>
+<body>
+    <div class="unit-view-container">
+        <header class="unit-view-header">
+            <div>
+                <a href="dashboard.html" class="back-link">&larr; Voltar para o Dashboard</a>
+                <h1 id="unitNameTitle">Carregando unidade...</h1>
+                <p id="unitBedCount"></p>
+            </div>
+        </header>
+
+        <main class="bed-grid" id="bedGridContainer">
+            <p>Carregando leitos...</p>
+        </main>
+    </div>
+
+    <div id="addPatientModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cadastrar Paciente no Leito <span id="modalLeitoNum"></span></h2>
+                <button id="closePatientModal" class="close-button">&times;</button>
+            </div>
+            <form id="patientForm" class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="patientName">Nome Completo</label>
+                        <input type="text" id="patientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientDob">Data de Nascimento</label>
+                        <input type="date" id="patientDob">
+                    </div>
+                    <div class="form-group">
+                        <label for="patientAge">Idade</label>
+                        <input type="number" id="patientAge">
+                    </div>
+                    <div class="form-group">
+                        <label for="patientCns">CNS (Cartão Nacional de Saúde)</label>
+                        <input type="text" id="patientCns">
+                    </div>
+                    <div class="form-group">
+                        <label for="hospitalAdmissionDate">Data de Internação Hospitalar</label>
+                        <input type="date" id="hospitalAdmissionDate">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Hipóteses Diagnósticas</label>
+                        <div id="selectedDiagnosesList" class="diagnoses-list"></div>
+                        <div class="autocomplete-container">
+                            <input type="text" id="hdSearchInput" placeholder="Digite o CID ou nome da doença para buscar...">
+                            <div id="autocompleteResults" class="autocomplete-results"></div>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="patientHpp">História Patológica Pregressa (HPP)</label>
+                        <textarea id="patientHpp" rows="3"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="patientAllergies">Alergias</label>
+                        <textarea id="patientAllergies" rows="2" placeholder="Descreva as alergias ou 'Nega alergias'"></textarea>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" id="cancelPatientModal" class="button-secondary">Cancelar</button>
+                <button type="button" id="savePatientButton" class="button-primary">Salvar Paciente</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="unit-view.js"></script>
+</body>
+</html>

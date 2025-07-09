@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Diário da UTI</title>
+    <link rel="stylesheet" href="tool-page.css">
+    <style>
+        .form-section h3 { color: var(--primary-text); margin-top: 30px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 8px; font-size: 1.1em; }
+        .grid-2-col, .grid-3-col, .grid-4-col { display: grid; gap: 20px; }
+        .grid-2-col { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .grid-4-col { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+        textarea { width: 100%; min-height: 80px; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 16px; font-family: var(--font-family); transition: border-color 0.2s, box-shadow 0.2s; }
+        #reportOutput { margin-top: 30px; display: none; }
+        #reportText { background-color: #f8f9fa; border: 1px dashed var(--border-color); padding: 20px; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', Courier, monospace; font-size: 14px; }
+        .copy-button { background-color: var(--secondary-text); }
+        .conditional-field { display: none; margin-top: 10px; padding-left: 15px; border-left: 3px solid var(--primary-accent); }
+        
+        /* --- ESTILOS PARA OS BOTÕES DE AÇÃO DO RELATÓRIO (NOVO) --- */
+        .report-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .report-actions .main-button {
+            margin-top: 0;
+            width: auto;
+            flex-grow: 1;
+        }
+
+        /* --- ESTILOS PARA IMPRESSÃO (NOVO) --- */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #reportOutput, #reportOutput * {
+                visibility: visible;
+            }
+            #reportOutput {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            #reportText {
+                font-size: 12pt;
+                font-family: Arial, sans-serif;
+                border: none;
+                background: none;
+                padding: 0;
+                color: #000;
+            }
+            .report-actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tool-container">
+        <header class="tool-header">
+            <a href="index.html" class="back-button">&larr; Início</a>
+            <h1>Checklist Diário da UTI</h1>
+            <p style="font-size: 0.9em; color: #888;">Preencha os campos para gerar um relatório estruturado do paciente.</p>
+        </header>
+        
+        <main>
+            <form id="dailyReportForm">
+                <div class="form-section"><h3>IDENTIFICAÇÃO</h3><div class="grid-3-col"><div class="input-group"><label>Leito</label><input type="text" data-label="Leito"></div><div class="input-group"><label>Paciente</label><input type="text" data-label="Paciente"></div><div class="input-group"><label>Dia de UTI</label><input type="number" data-label="Dia de UTI"></div></div></div>
+                <div class="form-section"><h3>DIAGNÓSTICOS E ALERGIAS</h3><div class="input-group"><label>Diagnósticos</label><textarea data-label="Diagnósticos" placeholder="1. Choque Séptico Foco Pulmonar&#x0a;2. SARA Grave&#x0a;3. IRA dialítica"></textarea></div><div class="input-group"><label>Alergias</label><input type="text" data-label="Alergias" placeholder="Dipirona, Penicilina"></div></div>
+                <div class="form-section"><h3>NEUROLÓGICO</h3><div class="grid-3-col"><div class="input-group"><label>Sedação</label><input type="text" data-label="Sedação" placeholder="Precedex 0.5, Fentanil 5ml/h"></div><div class="input-group"><label>RASS</label><input type="number" data-label="RASS" min="-5" max="4"></div><div class="input-group"><label>CAM-ICU</label><select data-label="CAM-ICU"><option value="">-</option><option value="Negativo">Negativo</option><option value="Positivo">Positivo</option></select></div></div></div>
+                <div class="form-section"><h3>RESPIRATÓRIO / VENTILAÇÃO</h3><div class="grid-3-col"><div class="input-group"><label>Modo</label><input type="text" data-label="Modo VM" placeholder="PCV"></div><div class="input-group"><label>PEEP</label><input type="number" data-label="PEEP"></div><div class="input-group"><label>FiO₂ (%)</label><input type="number" data-label="FiO₂"></div><div class="input-group"><label>P. Platô</label><input type="number" data-label="P. Platô"></div><div class="input-group"><label>Driving Pressure</label><input type="number" data-label="Driving Pressure"></div><div class="input-group"><label>Relação PaO₂/FiO₂</label><input type="number" data-label="PaO₂/FiO₂"></div></div></div>
+                <div class="form-section"><h3>CARDIOVASCULAR / HEMODINÂMICA</h3><div class="input-group"><label>Drogas Vasoativas (DVA)</label><textarea data-label="DVA" placeholder="Noradrenalina 0.5 mcg/kg/min&#x0a;Vasopressina 0.03 U/min"></textarea></div><div class="grid-3-col"><div class="input-group"><label>PAM</label><input type="number" data-label="PAM"></div><div class="input-group"><label>FC</label><input type="number" data-label="FC"></div><div class="input-group"><label>Lactato</label><input type="number" step="0.1" data-label="Lactato"></div></div></div>
+                <div class="form-section"><h3>RENAL / HIDRATAÇÃO</h3><div class="grid-3-col"><div class="input-group"><label>Diálise</label><select data-label="Diálise"><option value="Não">Não</option><option value="Sim - Contínua">Sim - Contínua</option><option value="Sim - Intermitente">Sim - Intermitente</option></select></div><div class="input-group"><label>Diurese (24h)</label><input type="number" data-label="Diurese 24h"></div><div class="input-group"><label>Balanço Hídrico (24h)</label><input type="text" data-label="BH 24h" placeholder="+1500 ml"></div></div></div>
+                <div class="form-section"><h3>INFECCIOSO</h3><div class="input-group"><label>Antibióticos</label><textarea data-label="Antibióticos" placeholder="Meropenem D5 (febre em investigação)&#x0a;Vancomicina D3"></textarea></div><div class="grid-3-col"><div class="input-group"><label>CVC (dias)</label><input type="number" data-label="CVC (dias)"></div><div class="input-group"><label>PAI (dias)</label><input type="number" data-label="PAI (dias)"></div><div class="input-group"><label>SVD (dias)</label><input type="number" data-label="SVD (dias)"></div></div></div>
+                <div class="form-section"><h3>GASTROINTESTINAL / NUTRIÇÃO</h3><div class="grid-3-col"><div class="input-group"><label>Dieta</label><input type="text" data-label="Dieta" placeholder="Enteral 40 ml/h"></div><div class="input-group"><label>Função Intestinal</label><select data-label="Função Intestinal"><option value="">-</option><option value="Presente">Presente</option><option value="Ausente">Ausente</option></select></div></div></div>
+                <div class="form-section"><h3>METABÓLICO / LABORATÓRIO</h3><div class="grid-3-col"><div class="input-group"><label>Controle Glicêmico</label><select id="glycemic_control" data-label="Controle Glicêmico"><option value="Não">Não</option><option value="Sim - Bomba de Insulina">Sim - Bomba de Insulina</option><option value="Sim - SC">Sim - SC</option></select></div><div class="input-group"><label>Hb / Ht</label><input type="text" data-label="Hb/Ht" placeholder="8.1 / 25.4"></div><div class="input-group"><label>Cr / Ur</label><input type="text" data-label="Cr/Ur" placeholder="3.1 / 154"></div></div></div>
+                <div class="form-section"><h3>PROFILAXIAS</h3><div class="grid-4-col"><div class="input-group"><label>TEV (Tromboembolismo)</label><select id="tev_select" data-label="Profilaxia TEV"><option value="Não indicada">Não indicada</option><option value="Mecânica">Mecânica</option><option value="Farmacológica">Farmacológica</option></select><div id="tev_mechanical_details" class="conditional-field"><div class="input-group"><label>Especifique (Mecânica)</label><input type="text" data-label="↳ Detalhe" placeholder="Ex: Compressor pneumático"></div></div><div id="tev_pharmacological_details" class="conditional-field"><div class="input-group"><label>Especifique (Farmacológica)</label><input type="text" data-label="↳ Detalhe" placeholder="Ex: Enoxaparina 40mg SC"></div></div></div><div class="input-group"><label>LPP (Lesão por Pressão)</label><select id="lpp_select" data-label="Prevenção LPP"><option value="Não">Não</option><option value="Sim">Sim</option></select><div id="lpp_details" class="conditional-field"><div class="input-group"><label>Especifique as Medidas</label><input type="text" data-label="↳ Detalhe" placeholder="Ex: Colchão pneumático, curativo"></div></div></div><div class="input-group"><label>LAMG (Lesão Gástrica)</label><select id="lamg_select" data-label="Profilaxia LAMG"><option value="Não">Não</option><option value="Sim">Sim</option></select><div id="lamg_details" class="conditional-field"><div class="input-group"><label>Especifique o Fármaco</label><input type="text" data-label="↳ Detalhe" placeholder="Ex: Omeprazol 40mg IV"></div></div></div><div class="input-group"><label>Lesão de Córnea</label><select id="cornea_select" data-label="Profilaxia Córnea"><option value="Não">Não</option><option value="Sim">Sim</option></select><div id="cornea_details" class="conditional-field"><div class="input-group"><label>Especifique a Medida</label><input type="text" data-label="↳ Detalhe" placeholder="Ex: Oclusão passiva, colírio"></div></div></div></div></div>
+                <div class="form-section"><h3>PENDÊNCIAS E PLANO DO DIA</h3><div class="grid-2-col" style="margin-bottom: 20px;"><div class="input-group"><label>Dias Evitáveis (Alta da UTI)</label><select id="avoidable_days_select" data-label="Dias Evitáveis"><option value="Não">Não</option><option value="Sim">Sim</option></select><div id="avoidable_days_details" class="conditional-field"><div class="input-group"><label>Número de Dias Evitáveis</label><input type="number" data-label="↳ Detalhe"></div></div></div><div class="input-group"><label>Medicações Indicadas em Falta</label><input type="text" data-label="Medicações em Falta" placeholder="Ex: Albumina, Polimixina B"></div></div><div class="input-group"><label>Plano Terapêutico</label><textarea data-label="Plano do Dia" placeholder="1. Progredir desmame da VM, iniciar TRE pela manhã.&#x0a;2. Manter BH negativo.&#x0a;3. Aguardar resultado de culturas."></textarea></div></div>
+                <button type="submit" class="main-button">Gerar Relatório</button>
+            </form>
+
+            <div id="reportOutput">
+                <h3>Relatório Gerado</h3>
+                <pre id="reportText"></pre>
+                <div class="report-actions">
+                    <button class="main-button copy-button" id="copyBtn">Copiar Relatório</button>
+                    <button class="main-button" id="printBtn">Imprimir Relatório</button> </div>
+            </div>
+        </main>
+    </div>
+    <script src="relatorio-diario.js"></script>
+</body>
+</html>

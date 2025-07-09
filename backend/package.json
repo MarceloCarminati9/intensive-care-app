@@ -1,0 +1,20 @@
+{
+  "name": "intensive-care-backend",
+  "version": "1.0.0",
+  "description": "Backend para o sistema de gestão Intensive Care Brasil.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "author": "",
+  "license": "ISC"
+}
