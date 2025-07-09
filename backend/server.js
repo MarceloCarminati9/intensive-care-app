@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const { Pool } = require('pg');
 
+// CARREGA AS VARIÁVEIS DO ARQUIVO .env PARA O AMBIENTE LOCAL
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -23,7 +26,6 @@ const pool = new Pool({
 app.use(express.json());
 
 // SERVIDOR DE ARQUIVOS ESTÁTICOS
-// Aponta para a pasta 'public' que é irmã da pasta 'backend'
 const publicPath = path.join(__dirname, '..', 'public');
 app.use(express.static(publicPath));
 
@@ -31,6 +33,7 @@ app.use(express.static(publicPath));
 // ================== ROTAS DA API ==================
 const apiRouter = express.Router();
 
+// --- Rotas de Unidades e Leitos (Já existentes) ---
 apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
@@ -70,13 +73,54 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
     }
 });
 
+// --- NOVAS ROTAS ADICIONADAS PARA PACIENTES ---
+
+// ROTA PARA BUSCAR DADOS DE UM PACIENTE ESPECÍFICO
+apiRouter.get('/patients/:id', async (req, res) => {
+    try {
+        const patientId = req.params.id;
+        const sql = `SELECT * FROM patients WHERE id = $1`; 
+        const { rows } = await pool.query(sql, [patientId]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Paciente não encontrado." });
+        }
+        
+        res.json({ data: rows[0] });
+
+    } catch (err) {
+        console.error(`Erro ao buscar paciente ${req.params.id}:`, err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ROTA PARA OBTER AS EVOLUÇÕES DE UM PACIENTE
+apiRouter.get('/patients/:id/evolutions', async (req, res) => {
+    try {
+        const patientId = req.params.id;
+        // Assumindo que você terá uma tabela 'evolutions' com uma coluna 'patient_id'
+        const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
+        const { rows } = await pool.query(sql, [patientId]);
+        res.json({ data: rows });
+    } catch (err) {
+        // Se a tabela 'evolutions' não existir, isso pode dar erro. 
+        // Por enquanto, vamos retornar um array vazio para não quebrar o frontend.
+        if (err.code === '42P01') { // '42P01' é o código de erro para "undefined_table" no PostgreSQL
+            console.warn("A tabela 'evolutions' ainda não existe. Retornando array vazio.");
+            res.json({ data: [] });
+        } else {
+            console.error(`Erro ao buscar evoluções para o paciente ${req.params.id}:`, err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+});
+
+
 // Usa o roteador para todas as rotas que começam com /api
 app.use('/api', apiRouter);
 
 
 // ================== ROTA DE FALLBACK ==================
-// Esta rota deve vir DEPOIS de todas as outras.
-// Ela garante que o servidor entregue a página principal para navegação.
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
