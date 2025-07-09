@@ -21,7 +21,10 @@ const pool = new Pool({
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
-const publicPath = path.join(__dirname, '..');
+
+// SERVIDOR DE ARQUIVOS ESTÁTICOS
+// Aponta para a pasta 'public' que está um nível acima da pasta 'backend'
+const publicPath = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicPath));
 
 // Função de inicialização do Banco de Dados
@@ -93,6 +96,19 @@ app.get('/api/units', async (req, res) => {
     }
 });
 
+app.get('/api/units/:id', async (req, res) => {
+    try {
+        const sql = 'SELECT * FROM units WHERE id = $1';
+        const { rows } = await pool.query(sql, [req.params.id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Unidade não encontrada." });
+        }
+        res.json({ data: rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/units/:id/beds', async (req, res) => {
     try {
         const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
@@ -103,8 +119,38 @@ app.get('/api/units/:id/beds', async (req, res) => {
     }
 });
 
+app.post('/api/units', async (req, res) => {
+    const { name, total_beds } = req.body;
+    if (!name || !total_beds) {
+        return res.status(400).json({ error: "Dados obrigatórios faltando." });
+    }
+    try {
+        const unitInsert = await pool.query('INSERT INTO units (name, total_beds) VALUES ($1, $2) RETURNING id', [name, total_beds]);
+        const unitId = unitInsert.rows[0].id;
+        const bedSql = 'INSERT INTO beds (unit_id, bed_number) VALUES ($1, $2)';
+        for (let i = 1; i <= total_beds; i++) {
+            await pool.query(bedSql, [unitId, String(i).padStart(2, '0')]);
+        }
+        res.status(201).json({ id: unitId, name: name, total_beds: total_beds });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/units/:id', async (req, res) => {
+    try {
+        const result = await pool.query('DELETE FROM units WHERE id = $1', [req.params.id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: "Unidade não encontrada." });
+        }
+        res.status(200).json({ message: "Unidade deletada com sucesso" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.post('/api/patients', async (req, res) => {
-    const { name, bedId, unitId } = req.body;
+    const { name, bedId, unitId } = req.body; 
     if (!name || !bedId || !unitId) {
         return res.status(400).json({ error: "Nome, ID do leito e ID da unidade são obrigatórios." });
     }
@@ -161,8 +207,7 @@ app.post('/api/patients/:id/evolutions', async (req, res) => {
     }
 });
 
-// Rota de Fallback (CORRIGIDA)
-// Esta rota deve vir DEPOIS de todas as rotas da API.
+// Rota de Fallback
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(publicPath, 'index.html'));
 });
@@ -170,5 +215,5 @@ app.get('*', (req, res) => {
 // INICIA O SERVIDOR
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
-    initializeDatabase().catch(console.error);
+    // A inicialização é feita pelo comando Pre-deploy no Render
 });
