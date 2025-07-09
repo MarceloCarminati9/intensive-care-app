@@ -63,11 +63,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Funções auxiliares para organizar o código
-    function updateHeaders(patient) {
-        patientNameHeader.textContent = patient.name;
-        // Assumindo que o backend retorna 'bed_id' e 'age' na rota /api/patients/:id
-        patientDetailsHeader.textContent = `Leito ${patient.bed_id || 'N/A'} - ${patient.age || 'N/A'} anos - CNS: ${patient.cns || 'N/A'}`;
+    // Em public/patient-view.js
+
+function updateHeaders(patient) {
+    // Referências aos novos elementos
+    const patientNameHeader = document.getElementById('patientNameHeader');
+    const patientBed = document.getElementById('patientBed');
+    const patientAge = document.getElementById('patientAge');
+    const patientCns = document.getElementById('patientCns');
+    const patientDih = document.getElementById('patientDih');
+    const patientHpp = document.getElementById('patientHpp');
+    const patientHd = document.getElementById('patientHd'); // Supondo que HD virá como 'history' ou 'hipotese_diagnostica'
+
+    // Preenchendo os dados
+    patientNameHeader.textContent = patient.name || 'Nome não encontrado';
+    patientBed.textContent = patient.bed_id || 'N/A';
+    patientAge.textContent = patient.age ? `${patient.age} anos` : 'N/A';
+    patientCns.textContent = patient.cns || 'N/A';
+    
+    // Formata a data de internação hospitalar (DIH)
+    if (patient.dih) {
+        // new Date() ajusta o fuso horário, somando um dia se necessário
+        const formattedDate = new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+        patientDih.textContent = formattedDate;
+    } else {
+        patientDih.textContent = 'N/A';
     }
+
+    // Preenche campos de texto mais longos
+    if (patient.hpp) {
+        patientHpp.textContent = patient.hpp;
+    }
+    if (patient.hd) { // O nome deste campo depende de como ele está no seu BD
+        patientHd.textContent = patient.hd;
+    }
+}
 
     function updateActionLinks(patientId) {
         // Atualiza o href dos botões para incluir o ID do paciente

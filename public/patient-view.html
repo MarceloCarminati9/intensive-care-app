@@ -9,14 +9,28 @@
 </head>
 <body>
     <div class="patient-view-container">
-        <header class="patient-header">
-            <div class="patient-info-header">
-                <a href="dashboard.html" class="back-link">&larr; Voltar para o Dashboard</a>
-                <h1 id="patientNameHeader">Carregando...</h1>
-                <p id="patientDetailsHeader"></p>
-            </div>
-            <div class="patient-alerts" id="patientAlertsHeader"></div>
-        </header>
+      <header class="patient-header">
+    <div class="patient-info-main">
+        <a href="dashboard.html" class="back-link">&larr; Voltar ao Dashboard</a>
+        <h1 id="patientNameHeader">Carregando...</h1>
+        <div class="patient-details-grid">
+            <p><strong>Leito:</strong> <span id="patientBed">N/A</span></p>
+            <p><strong>Idade:</strong> <span id="patientAge">N/A</span></p>
+            <p><strong>CNS:</strong> <span id="patientCns">N/A</span></p>
+            <p><strong>DIH:</strong> <span id="patientDih">N/A</span></p>
+        </div>
+    </div>
+    <div class="patient-info-secondary">
+        <details>
+            <summary><strong>Ver Histórico Patológico Pregresso (HPP)</strong></summary>
+            <p id="patientHpp">Nenhuma informação de HPP cadastrada.</p>
+        </details>
+        <details>
+            <summary><strong>Ver Hipótese Diagnóstica (HD)</strong></summary>
+            <p id="patientHd">Nenhuma hipótese diagnóstica cadastrada.</p>
+        </details>
+    </div>
+</header>
 
         <main>
             <section class="actions-section">
