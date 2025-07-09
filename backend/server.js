@@ -23,7 +23,7 @@ const pool = new Pool({
 app.use(express.json({ limit: '10mb' }));
 
 // SERVIDOR DE ARQUIVOS ESTÁTICOS
-// Aponta para a pasta 'public', que está um nível acima da pasta 'backend'
+// Aponta para a pasta 'public', que está na raiz do projeto
 const publicPath = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicPath));
 
@@ -79,8 +79,10 @@ async function initializeDatabase() {
 
 
 // ================== API Endpoints Completos ==================
+const apiRouter = express.Router();
 
-app.get('/api/units', async (req, res) => {
+// Endpoints de Unidades
+apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
             SELECT u.id, u.name, u.total_beds, COUNT(b.id) FILTER (WHERE b.status = 'occupied') as occupied_beds
@@ -96,7 +98,30 @@ app.get('/api/units', async (req, res) => {
     }
 });
 
-app.get('/api/units/:id/beds', async (req, res) => {
+apiRouter.delete('/units/:id', async (req, res) => {
+    try {
+        const result = await pool.query('DELETE FROM units WHERE id = $1', [req.params.id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: "Unidade não encontrada." });
+        }
+        res.status(200).json({ message: "Unidade deletada com sucesso" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Endpoints de Leitos e Pacientes
+apiRouter.get('/units/:id', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM units WHERE id = $1', [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ message: "Unidade não encontrada." });
+        res.json({ data: rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+apiRouter.get('/units/:id/beds', async (req, res) => {
     try {
         const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
         const { rows } = await pool.query(sql, [req.params.id]);
@@ -106,16 +131,17 @@ app.get('/api/units/:id/beds', async (req, res) => {
     }
 });
 
-app.post('/api/patients', async (req, res) => {
-    const { name, bedId, unitId } = req.body;
+apiRouter.post('/patients', async (req, res) => {
+    const { name, dob, age, cns, dih, unitId, bedId, history } = req.body;
     if (!name || !bedId || !unitId) {
         return res.status(400).json({ error: "Nome, ID do leito e ID da unidade são obrigatórios." });
     }
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const insertPatientSql = `INSERT INTO patients (name, unit_id, bed_id, history) VALUES ($1, $2, $3, '[]') RETURNING id`;
-        const patientRes = await client.query(insertPatientSql, [name, unitId, bedId]);
+        const insertPatientSql = `INSERT INTO patients (name, dob, age, cns, dih, unit_id, bed_id, history) VALUES ($1, $2, $3, $4, $5, $6, $7, '[]') RETURNING id`;
+        const patientParams = [name, dob, age, cns, dih, unitId, bedId];
+        const patientRes = await client.query(insertPatientSql, patientParams);
         const newPatientId = patientRes.rows[0].id;
         const updateBedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3`;
         await client.query(updateBedSql, [newPatientId, name, bedId]);
@@ -129,7 +155,7 @@ app.post('/api/patients', async (req, res) => {
     }
 });
 
-app.get('/api/patients/:id', async (req, res) => {
+app.get('/patients/:id', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM patients WHERE id = $1', [req.params.id]);
         if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
@@ -141,14 +167,19 @@ app.get('/api/patients/:id', async (req, res) => {
     }
 });
 
-// Rota de Fallback
-// Esta rota deve vir DEPOIS de todas as suas rotas de API.
+
+// Usa o roteador para todas as rotas que começam com /api
+app.use('/api', apiRouter);
+
+
+// ROTA DE FALLBACK
+// Esta rota deve vir DEPOIS de todas as outras.
+// Ela garante que o servidor entregue a página principal (index.html)
+// para qualquer endereço que não seja de API.
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 // INICIA O SERVIDOR
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-    initializeDatabase().catch(console.error);
-});
+    console
