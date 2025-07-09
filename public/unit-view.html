@@ -50,22 +50,6 @@
                         <label for="hospitalAdmissionDate">Data de Internação Hospitalar</label>
                         <input type="date" id="hospitalAdmissionDate">
                     </div>
-                    <div class="form-group full-width">
-                        <label>Hipóteses Diagnósticas</label>
-                        <div id="selectedDiagnosesList" class="diagnoses-list"></div>
-                        <div class="autocomplete-container">
-                            <input type="text" id="hdSearchInput" placeholder="Digite o CID ou nome da doença para buscar...">
-                            <div id="autocompleteResults" class="autocomplete-results"></div>
-                        </div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="patientHpp">História Patológica Pregressa (HPP)</label>
-                        <textarea id="patientHpp" rows="3"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="patientAllergies">Alergias</label>
-                        <textarea id="patientAllergies" rows="2" placeholder="Descreva as alergias ou 'Nega alergias'"></textarea>
-                    </div>
                 </div>
             </form>
             <div class="modal-footer">
@@ -74,35 +58,64 @@
             </div>
         </div>
     </div>
-<div id="dischargeModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Dar Alta ao Paciente</h2>
-            <button id="closeDischargeModal" class="close-button">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p>Você está prestes a dar alta para o paciente <strong id="dischargePatientName"></strong>.</p>
-            <p>Por favor, selecione o motivo da alta:</p>
-            <div class="form-group">
-                <label for="dischargeReason">Motivo da Alta</label>
-                <select id="dischargeReason">
-                    <option value="alta_enfermaria">Alta para Enfermaria</option>
-                    <option value="alta_domiciliar">Alta Domiciliar</option>
-                    <option value="obito">Óbito</option>
-                    <option value="transferencia_externa">Transferência Externa</option>
-                </select>
+
+    <div id="dischargeModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dar Alta ao Paciente</h2>
+                <button id="closeDischargeModal" class="close-button">&times;</button>
             </div>
-             <div class="form-group">
-                <label for="dischargeDate">Data e Hora da Alta</label>
-                <input type="datetime-local" id="dischargeDate">
+            <div class="modal-body">
+                <p>Você está prestes a dar alta para o paciente <strong id="dischargePatientName"></strong>.</p>
+                <div class="form-group">
+                    <label for="dischargeReason">Motivo da Alta</label>
+                    <select id="dischargeReason">
+                        <option value="alta_enfermaria">Alta para Enfermaria</option>
+                        <option value="alta_domiciliar">Alta Domiciliar</option>
+                        <option value="obito">Óbito</option>
+                        <option value="transferencia_externa">Transferência Externa</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="dischargeDate">Data e Hora da Alta</label>
+                    <input type="datetime-local" id="dischargeDate">
+                </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button id="cancelDischargeBtn" class="button-secondary">Cancelar</button>
-            <button id="confirmDischargeBtn" class="button-danger">Confirmar Alta</button>
+            <div class="modal-footer">
+                <button id="cancelDischargeBtn" class="button-secondary">Cancelar</button>
+                <button id="confirmDischargeBtn" class="button-danger">Confirmar Alta</button>
+            </div>
         </div>
     </div>
-</div>
+
+    <div id="transferModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Transferir Paciente</h2>
+                <button id="closeTransferModal" class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Transferindo o paciente <strong id="transferPatientName"></strong>.</p>
+                <div class="form-group">
+                    <label for="destinationUnitSelect">Unidade de Destino</label>
+                    <select id="destinationUnitSelect">
+                        <option value="">Selecione a unidade...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="destinationBedSelect">Leito de Destino</label>
+                    <select id="destinationBedSelect" disabled>
+                        <option value="">Selecione um leito livre...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelTransferBtn" class="button-secondary">Cancelar</button>
+                <button id="confirmTransferBtn" class="button-primary">Confirmar Transferência</button>
+            </div>
+        </div>
+    </div>
+
     <script src="unit-view.js"></script>
 </body>
 </html>
