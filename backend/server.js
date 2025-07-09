@@ -1,19 +1,20 @@
-// VERSÃO ESTÁVEL E COMPLETA DE server.js
+// VERSÃO CORRIGIDA E FINAL DE server.js
 
 const express = require('express');
 const path = require('path');
 const { Pool } = require('pg');
-
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validação crítica da variável de ambiente do banco de dados
 if (!process.env.DATABASE_URL) {
     console.error("ERRO CRÍTICO: A variável de ambiente DATABASE_URL não foi definida.");
     process.exit(1); 
 }
 
+// Configuração da conexão com o banco de dados PostgreSQL
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -21,50 +22,17 @@ const pool = new Pool({
     }
 });
 
-app.use(express.json());
+// Middlewares
+app.use(express.json()); // Para parsear o corpo de requisições JSON
 const publicPath = path.join(__dirname, '..', 'public');
-app.use(express.static(publicPath));
+app.use(express.static(publicPath)); // Para servir os arquivos estáticos (HTML, CSS, JS do cliente)
 
 // ================== ROTAS DA API ==================
 const apiRouter = express.Router();
 
-// Rota para dar alta em um paciente e liberar o leito
-apiRouter.post('/patients/:id/discharge', async (req, res) => {
-    const { id } = req.params;
-    const { bedId, reason, datetime } = req.body;
-
-    if (!bedId || !reason || !datetime) {
-        return res.status(400).json({ error: 'ID do leito, motivo e data são obrigatórios.' });
-    }
-
-    const client = await pool.connect();
-    try {
-        await client.query('BEGIN');
-
-        // 1. Libera o leito
-        const bedSql = 'UPDATE beds SET status = $1, patient_id = $2, patient_name = $3 WHERE id = $4';
-        await client.query(bedSql, ['free', null, null, bedId]);
-
-        // 2. Atualiza o status do paciente para 'discharged' (opcional, mas recomendado)
-        // Você pode precisar adicionar uma coluna 'status' na sua tabela 'patients'
-        // const patientSql = 'UPDATE patients SET status = $1, discharge_date = $2, discharge_reason = $3 WHERE id = $4';
-        // await client.query(patientSql, ['discharged', datetime, reason, id]);
-        
-        console.log(`Paciente ${id} recebeu alta do leito ${bedId}. Motivo: ${reason}`);
-
-        await client.query('COMMIT');
-        res.status(200).json({ message: 'Alta registrada com sucesso!' });
-
-    } catch (err) {
-        await client.query('ROLLBACK');
-        console.error('Erro ao dar alta no paciente:', err);
-        res.status(500).json({ error: 'Erro no servidor ao registrar alta.' });
-    } finally {
-        client.release();
-    }
-});
-
 // --- Rotas de Unidades e Leitos ---
+
+// GET /api/units - Retorna todas as unidades com contagem de leitos ocupados
 apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
@@ -78,10 +46,11 @@ apiRouter.get('/units', async (req, res) => {
         res.json({ data: rows });
     } catch (err) {
         console.error('Erro ao buscar unidades:', err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Erro no servidor ao buscar unidades.' });
     }
 });
 
+// GET /api/units/:id - Retorna uma unidade específica
 apiRouter.get('/units/:id', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM units WHERE id = $1', [req.params.id]);
@@ -89,10 +58,11 @@ apiRouter.get('/units/:id', async (req, res) => {
         res.json({ data: rows[0] });
     } catch (err) {
         console.error(`Erro ao buscar unidade ${req.params.id}:`, err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Erro no servidor ao buscar unidade.' });
     }
 });
 
+// GET /api/units/:id/beds - Retorna todos os leitos de uma unidade
 apiRouter.get('/units/:id/beds', async (req, res) => {
     try {
         const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
@@ -100,43 +70,13 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
         res.json({ data: rows });
     } catch (err) {
         console.error(`Erro ao buscar leitos para unidade ${req.params.id}:`, err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Erro no servidor ao buscar leitos.' });
     }
 });
 
 // --- Rotas de Pacientes ---
-apiRouter.get('/patients/:id', async (req, res) => {
-    try {
-        const patientId = req.params.id;
-        const sql = `SELECT * FROM patients WHERE id = $1`; 
-        const { rows } = await pool.query(sql, [patientId]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Paciente não encontrado." });
-        }
-        res.json({ data: rows[0] });
-    } catch (err) {
-        console.error(`Erro ao buscar paciente ${req.params.id}:`, err);
-        res.status(500).json({ error: err.message });
-    }
-});
 
-apiRouter.get('/patients/:id/evolutions', async (req, res) => {
-    try {
-        const patientId = req.params.id;
-        const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
-        const { rows } = await pool.query(sql, [patientId]);
-        res.json({ data: rows });
-    } catch (err) {
-        if (err.code === '42P01') { 
-            res.json({ data: [] });
-        } else {
-            console.error(`Erro ao buscar evoluções para o paciente ${req.params.id}:`, err);
-            res.status(500).json({ error: err.message });
-        }
-    }
-});
-
-// Rota para criar pacientes novos (necessária para a função de cadastrar)
+// POST /api/patients - Cria um novo paciente e o aloca em um leito
 apiRouter.post('/patients', async (req, res) => {
     const { name, dob, age, cns, dih, unitId, bedId } = req.body;
     if (!name || !unitId || !bedId) {
@@ -163,8 +103,68 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
+// GET /api/patients/:id - Retorna um paciente específico
+apiRouter.get('/patients/:id', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM patients WHERE id = $1', [req.params.id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Paciente não encontrado." });
+        }
+        res.json({ data: rows[0] });
+    } catch (err) {
+        console.error(`Erro ao buscar paciente ${req.params.id}:`, err);
+        res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
+    }
+});
 
-// --- Rotas de Receitas (Prescriptions) ---
+// POST /api/patients/:id/discharge - Dá alta a um paciente, liberando o leito
+apiRouter.post('/patients/:id/discharge', async (req, res) => {
+    const { id } = req.params;
+    const { bedId, reason, datetime } = req.body;
+
+    if (!bedId || !reason || !datetime) {
+        return res.status(400).json({ error: 'ID do leito, motivo e data são obrigatórios.' });
+    }
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const bedSql = 'UPDATE beds SET status = $1, patient_id = $2, patient_name = $3 WHERE id = $4';
+        await client.query(bedSql, ['free', null, null, bedId]);
+        
+        console.log(`Paciente ${id} recebeu alta do leito ${bedId}. Motivo: ${reason}`);
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Alta registrada com sucesso!' });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao dar alta no paciente:', err);
+        res.status(500).json({ error: 'Erro no servidor ao registrar alta.' });
+    } finally {
+        client.release();
+    }
+});
+
+
+// --- Rotas de Histórico (Evoluções e Receitas) ---
+
+// GET /api/patients/:id/evolutions - Retorna todas as evoluções de um paciente
+apiRouter.get('/patients/:id/evolutions', async (req, res) => {
+    try {
+        const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
+        const { rows } = await pool.query(sql, [req.params.id]);
+        res.json({ data: rows });
+    } catch (err) {
+        if (err.code === '42P01') { // Código de erro para "tabela não existe"
+            console.warn("Aviso: A tabela 'evolutions' parece não existir. Retornando array vazio.");
+            res.json({ data: [] });
+        } else {
+            console.error(`Erro ao buscar evoluções para o paciente ${req.params.id}:`, err);
+            res.status(500).json({ error: 'Erro no servidor ao buscar evoluções.' });
+        }
+    }
+});
+
+// POST /api/prescriptions - Cria uma nova receita
 apiRouter.post('/prescriptions', async (req, res) => {
     const { patient_id, medicamento, posologia, via, quantidade } = req.body;
     if (!patient_id || !medicamento || !posologia) {
@@ -184,11 +184,10 @@ apiRouter.post('/prescriptions', async (req, res) => {
     }
 });
 
+// GET /api/patients/:id/prescriptions - Retorna todas as receitas de um paciente
 apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
     try {
-        const { id } = req.params;
-        const sql = 'SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC';
-        const { rows } = await pool.query(sql, [id]);
+        const { rows } = await pool.query('SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC', [req.params.id]);
         res.json({ data: rows });
     } catch (err) {
         console.error(`Erro ao buscar receitas para o paciente ${req.params.id}:`, err);
@@ -197,9 +196,12 @@ apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
 });
 
 
+// Middleware para usar o roteador da API com o prefixo /api
 app.use('/api', apiRouter);
 
 // ================== ROTA DE FALLBACK ==================
+// Qualquer requisição GET que não corresponda a uma rota da API servirá o index.html
+// Isso é essencial para que o roteamento do lado do cliente (SPA) funcione corretamente
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
