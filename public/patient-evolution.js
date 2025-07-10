@@ -1,4 +1,4 @@
-// VERSÃO FINAL, COMPLETA E CORRIGIDA
+// VERSÃO FINAL, COMPLETA E VALIDADA (Corrige todos os problemas)
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // INICIALIZAÇÃO E SELEÇÃO DE ELEMENTOS
     // =================================================================================
     const params = new URLSearchParams(window.location.search);
-    // [CORREÇÃO] Buscando o parâmetro correto 'patientId'
     const patientId = params.get('patientId'); 
 
     const patientNameHeader = document.getElementById('patientNameHeader');
@@ -17,14 +16,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveButton = document.getElementById('saveEvolutionButton');
     const cancelEditButton = document.getElementById('cancelEditButton');
 
+    // Modais
     const printConfirmModal = document.getElementById('printConfirmModal');
-    const printConfirmYes = document.getElementById('printConfirmYes');
-    const printConfirmNo = document.getElementById('printConfirmNo');
+    const goToPatientViewBtn = document.getElementById('goToPatientViewBtn'); // Botão OK do modal de confirmação
     
     const historyViewerModal = document.getElementById('historyViewerModal');
     const viewerTitle = document.getElementById('viewerTitle');
     const viewerContent = document.getElementById('viewerContent');
     const closeViewerBtn = document.getElementById('closeViewerBtn');
+    const closeViewerModalBtn = document.getElementById('closeViewerModalBtn');
+    const printDocumentBtn = document.getElementById('printDocumentBtn');
     
     let patient = null;
     let editingEvolutionId = null;
@@ -32,28 +33,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!patientId) {
         patientNameHeader.textContent = "ERRO: ID do Paciente não encontrado na URL.";
         patientNameHeader.style.color = 'red';
-        evolutionForm.style.display = 'none'; // Esconde o formulário se não houver ID
+        if (evolutionForm) evolutionForm.style.display = 'none';
         return;
     }
     
     // =================================================================================
-    // LÓGICA DE DADOS E RENDERIZAÇÃO (REFEITA PARA USAR A API)
+    // LÓGICA DE DADOS E RENDERIZAÇÃO
     // =================================================================================
 
     async function loadPatientAndHistory() {
         try {
-            // 1. Busca os dados do paciente
             const patientResponse = await fetch(`/api/patients/${patientId}`);
             if (!patientResponse.ok) throw new Error("Não foi possível carregar os dados do paciente.");
             const patientResult = await patientResponse.json();
             patient = patientResult.data;
 
-            // 2. Atualiza o cabeçalho e o link de voltar
             patientNameHeader.textContent = patient.name;
-            // [CORREÇÃO] Garantindo que o link de voltar use 'patientId'
             backToPatientViewLink.href = `patient-view.html?patientId=${patientId}`;
             
-            // 3. Busca e renderiza o histórico de evoluções separadamente
             await renderEvolutionHistory();
         } catch (error) {
             console.error("Erro ao carregar dados:", error);
@@ -63,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function renderEvolutionHistory() {
         try {
-            // Lógica de busca refatorada para chamar a API de evoluções
             const response = await fetch(`/api/patients/${patientId}/evolutions`);
             if (!response.ok) throw new Error("Falha ao buscar histórico de evoluções.");
             
@@ -75,8 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 evolutionHistoryList.innerHTML = '<p>Nenhuma evolução anterior encontrada para este paciente.</p>';
                 return;
             }
-
-            // A ordenação já vem do backend, mas podemos garantir aqui
             evolutions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             evolutions.forEach(evo => {
@@ -84,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const formattedTime = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                 const previewText = evo.content?.impressao24h ? evo.content.impressao24h.substring(0, 150) + '...' : 'Sem resumo.';
-
+                
                 const historyItemDiv = document.createElement('div');
                 historyItemDiv.className = 'history-item';
                 historyItemDiv.dataset.evolutionId = evo.id; 
@@ -95,6 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span><strong>Evolução de ${formattedDate} às ${formattedTime}</strong></span>
                         <div class="history-item-actions">
                             <button type="button" class="button-secondary" data-action="print">Visualizar/Imprimir</button>
+                            <button type="button" class="button-secondary" data-action="copy">Copiar para Nova</button>
                             <button type="button" class="button-secondary" data-action="edit">Editar</button>
                         </div>
                     </div>
@@ -109,6 +104,75 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // =================================================================================
+    // GERAÇÃO DO RELATÓRIO FORMATADO
+    // =================================================================================
+    function generateEvolutionReportHTML(patientData, evolutionData) {
+        if (!patientData || !evolutionData) return '<p>Dados insuficientes para gerar o relatório.</p>';
+
+        const getField = (field) => evolutionData[field] || 'N/A';
+        
+        const patientDIH = patientData.dih ? new Date(patientData.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
+        const patientDOB = patientData.dob ? new Date(patientData.dob).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
+        
+        // Cabeçalho com todos os dados do paciente
+        const header = `
+            <div class="report-header">
+                <h3>Evolução Médica Diária</h3>
+                <p>Intensive Care Brasil</p>
+            </div>
+            <div class="report-id-section">
+                <h4>Identificação do Paciente</h4>
+                <div class="report-id-grid">
+                    <p><strong>Nome:</strong> ${patientData.name || 'N/A'}</p>
+                    <p><strong>Idade:</strong> ${patientData.age || 'N/A'} anos</p>
+                    <p><strong>DN:</strong> ${patientDOB}</p>
+                    <p><strong>CNS:</strong> ${patientData.cns || 'N/A'}</p>
+                    <p><strong>Unidade:</strong> ${patientData.unit_name || 'N/A'}</p>
+                    <p><strong>Leito:</strong> ${patientData.bed_number || 'N/A'}</p>
+                    <p><strong>DIH:</strong> ${patientDIH}</p>
+                    <p><strong>Alergias:</strong> ${patientData.allergies || 'Não informado'}</p>
+                </div>
+                <div class="report-id-grid" style="grid-template-columns: 1fr; margin-top: 10px;">
+                    <p><strong>HPP:</strong> ${patientData.hpp || 'Não informado'}</p>
+                    <p><strong>Hipótese Diagnóstica:</strong> ${patientData.hd || 'Não informado'}</p>
+                </div>
+            </div>`;
+
+        // Corpo do relatório
+        const body = `
+            <div class="print-container">
+                <div class="print-column">
+                    <div class="report-section">
+                        <h4>Impressão 24h</h4>
+                        <p>${getField('impressao24h')}</p>
+                    </div>
+                     <div class="report-section">
+                        <h4>Exame Físico</h4>
+                        <p><strong>Neurológico:</strong> Glasgow ${getField('glasgow_total')}, RASS ${getField('rass')}</p>
+                        <p><strong>Pupilas:</strong> ${getField('pupilas_tamanho')}, ${getField('pupilas_reatividade')}</p>
+                    </div>
+                </div>
+                <div class="print-column">
+                    <div class="report-section">
+                        <h4>Condutas e Plano Terapêutico</h4>
+                        <p>${getField('condutas')}</p>
+                    </div>
+                </div>
+            </div>`;
+
+        // Rodapé com assinatura
+        const footer = `
+            <div class="signature-area">
+                <div class="signature-line">
+                    ${getField('medico_responsavel')}<br>
+                    CRM: ${getField('crm_medico')}
+                </div>
+            </div>`;
+
+        return header + body + footer;
+    }
+
+    // =================================================================================
     // EVENTOS E LÓGICA DA UI
     // =================================================================================
 
@@ -117,69 +181,75 @@ document.addEventListener('DOMContentLoaded', function() {
         const evolutionData = collectFormData(); 
         
         try {
-            // Lógica de salvamento refatorada para usar a API
             const response = await fetch(`/api/patients/${patientId}/evolutions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(evolutionData),
             });
-
             if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || 'Falha ao salvar evolução.');
+                const err = await response.json(); throw new Error(err.error || 'Falha ao salvar evolução.');
             }
-            
-            // Sucesso!
             resetFormAndState();
             await renderEvolutionHistory(); 
             printConfirmModal.classList.add('active'); 
-            
         } catch (error) {
             console.error("Erro ao salvar:", error);
             alert(`Não foi possível salvar a evolução: ${error.message}`);
         }
     });
 
-    // [CORREÇÃO] Lógica simplificada e corrigida para os botões do modal de impressão
     const redirectToPatientView = () => {
         window.location.href = `patient-view.html?patientId=${patientId}`;
     };
 
-    if (printConfirmYes) printConfirmYes.addEventListener('click', redirectToPatientView);
-    if (printConfirmNo) printConfirmNo.addEventListener('click', redirectToPatientView);
+    if (goToPatientViewBtn) goToPatientViewBtn.addEventListener('click', redirectToPatientView);
     if (closeViewerBtn) closeViewerBtn.addEventListener('click', () => historyViewerModal.classList.remove('active'));
+    if (closeViewerModalBtn) closeViewerModalBtn.addEventListener('click', () => historyViewerModal.classList.remove('active'));
 
-    // Lógica para os botões do histórico (Editar, Visualizar, etc.)
+    if (printDocumentBtn) {
+        printDocumentBtn.addEventListener('click', () => {
+            const printWindow = window.open('', '_blank');
+            const styles = document.querySelector('link[href="patient-view-style.css"]').outerHTML;
+            printWindow.document.write(`<html><head><title>Evolução Médica</title>${styles}</head><body>${viewerContent.innerHTML}</body></html>`);
+            printWindow.document.close();
+            setTimeout(() => printWindow.print(), 500);
+        });
+    }
+
     evolutionHistoryList.addEventListener('click', function(event) {
         const button = event.target.closest('button[data-action]');
         if (!button) return;
         
         const action = button.dataset.action;
         const historyItem = button.closest('.history-item');
-        const evolutionId = historyItem.dataset.evolutionId;
         const evolutionContent = JSON.parse(historyItem.dataset.evolutionContent);
-
-        if (action === 'edit') {
+        
+        if (action === 'edit' || action === 'copy') {
             populateForm(evolutionContent);
-            editingEvolutionId = evolutionId;
-            formTitle.textContent = `Editando Evolução`;
-            saveButton.textContent = "Atualizar Evolução";
-            cancelEditButton.classList.remove('hidden');
+            if (action === 'copy') {
+                formTitle.textContent = "Nova Evolução (Copiada)";
+                saveButton.textContent = "Salvar Nova Evolução";
+                editingEvolutionId = null; 
+            } else { // Edit
+                editingEvolutionId = historyItem.dataset.evolutionId;
+                formTitle.textContent = `Editando Evolução`;
+                saveButton.textContent = "Atualizar Evolução";
+                cancelEditButton.classList.remove('hidden');
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'print') {
-            openHistoryViewer(evolutionContent, historyItem.querySelector('.history-item-header span').textContent);
+            const title = historyItem.querySelector('.history-item-header span').textContent;
+            viewerTitle.textContent = title;
+            viewerContent.innerHTML = generateEvolutionReportHTML(patient, evolutionContent);
+            historyViewerModal.classList.add('active');
         }
     });
 
-    function openHistoryViewer(data, title) {
-        viewerTitle.textContent = title;
-        // Função para gerar um HTML bonito para a visualização/impressão
-        viewerContent.innerHTML = `<h4>Impressão 24h:</h4><p>${data.impressao24h || 'N/A'}</p><h4>Condutas:</h4><p>${data.condutas || 'N/A'}</p>`;
-        historyViewerModal.classList.add('active');
+    if(cancelEditButton) {
+        cancelEditButton.addEventListener('click', resetFormAndState);
     }
 
     function collectFormData() {
-        // Esta função coleta todos os dados do seu formulário e retorna um objeto JSON
         const formData = new FormData(evolutionForm);
         const data = {};
         for(const [key, value] of formData.entries()) {
@@ -195,23 +265,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function populateForm(data) {
-        // Função para preencher o formulário com dados de uma evolução existente para edição
         resetFormAndState();
         for (const key in data) {
             const value = data[key];
             const element = evolutionForm.elements[key];
             if (element) {
-                if (element.type === 'checkbox' || element.type === 'radio') {
-                    // Lógica para marcar radios e checkboxes
-                    if (Array.isArray(value)) {
-                        document.querySelectorAll(`input[name="${key}"]`).forEach(el => {
-                            if (value.includes(el.value)) el.checked = true;
-                        });
-                    } else {
-                        const el = document.querySelector(`input[name="${key}"][value="${value}"]`);
-                        if (el) el.checked = true;
-                    }
-                } else {
+                if (element.type === 'radio') {
+                     const el = document.querySelector(`input[name="${key}"][value="${value}"]`);
+                     if(el) el.checked = true;
+                } else if (element.type === 'checkbox') {
+                    element.checked = !!value;
+                }
+                else {
                     element.value = value;
                 }
             }

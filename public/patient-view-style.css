@@ -10,6 +10,7 @@
     --text-secondary: #6B7280;
     --border-color: #E5E7EB;
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    --danger-red: #EF4444;
 }
 
 body {
@@ -55,11 +56,36 @@ h2 {
     margin: 0;
 }
 
-.patient-header p {
+.patient-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px 25px;
+    margin-top: 15px;
     color: var(--text-secondary);
-    font-size: 1.1rem;
-    margin-top: 5px;
 }
+
+.patient-info-secondary {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.patient-info-secondary details {
+    margin-bottom: 10px;
+}
+
+.patient-info-secondary summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--dark-blue-text);
+}
+
+.patient-info-secondary p {
+    padding: 10px 0 0 15px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
 
 .actions-section, .history-section {
     margin-bottom: 40px;
@@ -96,6 +122,17 @@ h2 {
     color: var(--primary-blue);
 }
 
+.action-card.disabled {
+    background-color: #f9fafb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+.action-card.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+
 .history-list {
     display: flex;
     flex-direction: column;
@@ -107,12 +144,7 @@ h2 {
     border: 1px solid var(--border-color);
     padding: 15px 20px;
     border-radius: 12px;
-    cursor: pointer;
     transition: background-color 0.2s ease;
-}
-
-.history-item:hover {
-    background-color: #f9fafb;
 }
 
 .history-item-header {
@@ -126,6 +158,11 @@ h2 {
 
 .history-item-header strong {
     color: var(--dark-blue-text);
+}
+
+.history-item-actions {
+    display: flex;
+    gap: 10px;
 }
 
 .history-item-preview {
@@ -170,7 +207,7 @@ h2 {
 }
 
 .modal-content.wide {
-    max-width: 900px;
+    max-width: 1000px; /* Aumentado para o relatório */
 }
 
 .modal-header {
@@ -184,6 +221,8 @@ h2 {
 
 .modal-header h2 {
     font-size: 1.4rem;
+    margin: 0;
+    border: none;
 }
 
 .close-button {
@@ -195,7 +234,7 @@ h2 {
 }
 
 .modal-body {
-    max-height: 70vh;
+    max-height: 75vh;
     overflow-y: auto;
     padding: 5px 15px 5px 5px;
 }
@@ -209,82 +248,6 @@ h2 {
     padding-top: 20px;
 }
 
-/* ======================= ESTILOS OTIMIZADOS PARA VISUALIZADOR/IMPRESSÃO ======================= */
-#viewerContent {
-    background-color: #fff;
-    padding: 20px;
-}
-.print-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-.print-header h3 {
-    margin: 0;
-    font-size: 16pt;
-}
-.print-header p {
-    margin: 5px 0 0 0;
-    font-size: 11pt;
-}
-.print-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    font-family: 'Times New Roman', Times, serif;
-    color: #000;
-    line-height: 1.5;
-}
-.print-column {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-.print-section {
-    break-inside: avoid;
-}
-.print-section h4 {
-    font-family: 'Poppins', sans-serif;
-    color: var(--dark-blue-text);
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 5px;
-    margin: 0 0 8px 0;
-    font-size: 13pt;
-}
-.print-section p {
-    margin: 0 0 8px 0;
-    font-size: 11pt;
-    white-space: pre-wrap; /* Mantém as quebras de linha das textareas */
-}
-.print-section p strong {
-    font-family: 'Poppins', sans-serif;
-    color: #333;
-}
-
-/* ======================= REGRAS DE IMPRESSÃO ======================= */
-@media print {
-    body {
-        background-color: #fff;
-    }
-    body * {
-        visibility: hidden;
-    }
-    #viewerContent, #viewerContent * {
-        visibility: visible;
-    }
-    #viewerContent {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 20px; /* Margem da página */
-        margin: 0;
-        border: none;
-    }
-    .print-container {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
 /* ======================= BOTÕES ======================= */
 .button-primary, .button-secondary, .button-danger {
     padding: 10px 20px;
@@ -294,8 +257,8 @@ h2 {
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    transition: background-color 0.3s;
-    font-family: 'Poppins', sans-serif;
+    transition: all 0.2s;
+    font-size: 0.9rem;
 }
 .button-primary { background-color: var(--primary-blue); color: var(--white-bg); }
 .button-primary:hover { background-color: #3a7ac8; }
@@ -303,3 +266,145 @@ h2 {
 .button-secondary:hover { background-color: #e1e8f0; }
 .button-danger { background-color: #FEE2E2; color: var(--danger-red); }
 .button-danger:hover { background-color: #FECACA; }
+
+
+/* === [NOVO] ESTILOS PARA O RELATÓRIO FORMATADO NO MODAL E IMPRESSÃO === */
+
+#viewerContent {
+    font-size: 11pt; /* Tamanho base para impressão */
+}
+
+.report-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.report-header h3 {
+    font-size: 16pt;
+    margin: 0;
+}
+
+.report-header p {
+    font-size: 10pt;
+    color: #555;
+    margin: 4px 0 0 0;
+}
+
+.report-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.report-id-section {
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #f9fafb;
+}
+
+.report-id-section h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+.report-id-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 8px 15px;
+    font-size: 10pt;
+}
+
+.report-section {
+    margin-top: 20px;
+    break-inside: avoid; /* Tenta evitar quebrar a seção no meio da página ao imprimir */
+}
+
+.report-section h4 {
+    font-size: 1.2rem;
+    color: var(--dark-blue-text);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 5px;
+    margin-bottom: 12px;
+}
+
+.report-section p, .report-section li {
+    line-height: 1.6;
+    margin-bottom: 8px;
+    white-space: pre-wrap; /* Mantém as quebras de linha das textareas */
+    word-wrap: break-word;
+}
+
+.report-section ul {
+    list-style-position: inside;
+    padding-left: 10px;
+}
+
+.signature-area {
+    margin-top: 60px;
+    text-align: center;
+}
+
+.signature-line {
+    border-top: 1px solid #333;
+    width: 350px;
+    margin: 0 auto;
+    padding-top: 8px;
+    font-weight: 500;
+}
+
+/* ======================= REGRAS DE IMPRESSÃO ======================= */
+@media print {
+    body {
+        background-color: #fff;
+        font-family: 'Times New Roman', Times, serif;
+    }
+    .modal-overlay, .patient-view-container {
+        display: none !important; /* Esconde tudo fora do modal de impressão */
+    }
+
+    /* Garante que o modal de visualização e seu conteúdo sejam visíveis */
+    #historyViewerModal, #historyViewerModal * {
+        visibility: visible !important;
+    }
+    
+    #historyViewerModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: auto;
+        background: none;
+        overflow: visible;
+        display: block !important;
+    }
+
+    #historyViewerModal .modal-content {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: none;
+    }
+
+    #historyViewerModal .modal-header, #historyViewerModal .modal-footer {
+        display: none; /* Esconde cabeçalho e rodapé do modal ao imprimir */
+    }
+    
+    #historyViewerModal .modal-body {
+        max-height: none;
+        overflow: visible;
+        padding: 10mm; /* Margem da página de impressão */
+        font-size: 10pt; /* Ajusta o tamanho da fonte para impressão */
+    }
+
+    .report-section h4 {
+        font-size: 12pt;
+    }
+}

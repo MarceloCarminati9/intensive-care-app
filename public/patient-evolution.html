@@ -49,57 +49,24 @@
                                 <div style="margin-top: 10px;">Reatividade: <div class="radio-group"><label><input type="radio" name="pupilas_reatividade" value="Fotorreagentes">Fotorreagentes</label><label><input type="radio" name="pupilas_reatividade" value="Não Fotorreagentes">Não Fotorreagentes</label></div></div>
                             </div>
                         </div>
-                        <div class="sub-fieldset"><div class="legend-2">Respiratório</div>
-                            <div class="form-group"><label>Ausculta Pulmonar</label><div class="checkbox-group-grid"><label><input type="checkbox" name="ap_base" value="MV+ bilateralmente"> MV+ bilateralmente</label><label><input type="checkbox" class="ap_conditional_check" name="ap_achados" value="Creptos"> Creptos</label><label><input type="checkbox" class="ap_conditional_check" name="ap_achados" value="Roncos"> Roncos</label><label><input type="checkbox" class="ap_conditional_check" name="ap_achados" value="Sibilos"> Sibilos</label></div><div id="ap_details" class="conditional-options hidden">Local: <label><input type="radio" name="ap_local" value="Base D"> Base D</label> <label><input type="radio" name="ap_local" value="Base E"> Base E</label> <label><input type="radio" name="ap_local" value="Bases"> Bases</label></div></div>
-                            <div class="form-group"><label for="fr">Frequência Respiratória (rpm)</label><input type="number" id="fr" name="fr"></div>
-                        </div>
-                         <div class="sub-fieldset"><div class="legend-2">Cardiovascular</div>
-                            <div class="form-group"><label>Ausculta Cardíaca</label><div class="checkbox-group-grid"><label><input type="checkbox" name="ac" value="BRNF 2T"> BRNF 2T</label><label><input type="checkbox" name="ac" value="B3"> B3</label><label><input type="checkbox" id="ac_sopro_check" name="ac" value="Sopro"> Sopro</label><label><input type="checkbox" id="ac_outro_check" name="ac" value="Outro"> Outro</label></div><input type="text" id="ac_outro_text" name="ac_outro_text" placeholder="Descrever..." class="hidden"></div>
-                            <div class="form-group"><label>Pulsos Periféricos</label><div>Amplitude: <label><input type="checkbox" name="pulso_amp" value="Cheios"> Cheios</label> <label><input type="checkbox" name="pulso_amp" value="Filiformes"> Filiformes</label></div><div>Ritmo: <label><input type="checkbox" name="pulso_ritmo" value="Rítmicos"> Rítmicos</label> <label><input type="checkbox" name="pulso_ritmo" value="Arrítmicos"> Arrítmicos</label></div></div>
-                            <div class="form-group"><label for="tec">Tempo de Enchimento Capilar (s)</label><input type="text" id="tec" name="tec"></div>
-                        </div>
-                        <div class="sub-fieldset"><div class="legend-2">Abdome e Dieta</div>
-                             <div class="form-group"><label>Exame Abdominal</label><div class="checkbox-group-grid"><label><input type="checkbox" name="abd" value="Plano">Plano</label><label><input type="checkbox" name="abd" value="Globoso">Globoso</label><label><input type="checkbox" name="abd" value="Flácido">Flácido</label><label><input type="checkbox" name="abd" value="Tenso">Tenso</label><label><input type="checkbox" name="abd" value="Doloroso">Doloroso</label><label><input type="checkbox" name="abd" value="RHA+">RHA+</label><label><input type="checkbox" name="abd" value="RHA-">RHA-</label></div></div>
-                            <div class="form-group"><label for="dieta">Dieta</label><textarea id="dieta" name="dieta" rows="2" placeholder="Tipo, progressão, aceitação..."></textarea></div>
-                        </div>
-                         <div class="sub-fieldset"><div class="legend-2">Outras Observações do Exame Físico</div>
-                            <textarea id="exameFisicoOutros" name="exameFisicoOutros" rows="2" placeholder="Pele, extremidades, etc..."></textarea>
-                        </div>
-                    </fieldset>
+                        </fieldset>
     
-                    <fieldset><legend>3. Suporte Ventilatório</legend>
-                        <div class="radio-group-vertical">
-                            <label><input type="radio" name="ventilacao" value="AA" checked> Ar Ambiente</label>
-                            <label><input type="radio" name="ventilacao" value="CN"> Cateter Nasal</label>
-                            <div class="form-group conditional-options hidden" data-ventilacao="CN"><label for="cn_lpm">Fluxo (L/min)</label><input type="number" id="cn_lpm" name="cn_lpm"></div>
-                            <label><input type="radio" name="ventilacao" value="VNI"> VNI</label>
-                            <label><input type="radio" name="ventilacao" value="VMI"> VMI</label>
-                            <div class="vm-grid conditional-options hidden" data-ventilacao="VMI">
-                                <div class="form-group"><label>Modo</label><input type="text" name="vm_modo"></div>
-                                <div class="form-group"><label>FiO₂(%)</label><input type="number" name="vm_fio2"></div>
-                                <div class="form-group"><label>PEEP</label><input type="number" name="vm_peep"></div>
-                                <div class="form-group"><label>VT</label><input type="number" name="vm_vt"></div>
-                                <div class="form-group"><label>P. Sup</label><input type="number" name="vm_psup"></div>
-                                <div class="form-group"><label>FR</label><input type="number" name="vm_fr"></div>
-                                <div class="form-group"><label>P. Pico</label><input type="number" name="vm_ppico"></div>
-                                <div class="form-group"><label>DP</label><input type="number" name="vm_dp"></div>
+                    <fieldset><legend>3. Suporte Ventilatório</legend> ... </fieldset>
+                    <fieldset><legend>4. Diurese e Balanço Hídrico</legend> ... </fieldset>
+                    <fieldset><legend>13. Condutas</legend><textarea id="condutas" name="condutas" rows="3" placeholder="Plano terapêutico..."></textarea></fieldset>
+
+                    <fieldset><legend>14. Identificação do Profissional</legend>
+                        <div class="grid-container" style="grid-template-columns: 2fr 1fr;">
+                            <div class="form-group">
+                                <label for="medico_responsavel">Nome do Médico</label>
+                                <input type="text" id="medico_responsavel" name="medico_responsavel" placeholder="Seu nome completo">
+                            </div>
+                             <div class="form-group">
+                                <label for="crm_medico">CRM</label>
+                                <input type="text" id="crm_medico" name="crm_medico" placeholder="CRM/UF 123456">
                             </div>
                         </div>
                     </fieldset>
-    
-                    <fieldset><legend>4. Diurese e Balanço Hídrico</legend>
-                         <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"><div class="form-group"><label for="diurese">Diurese (mL)</label><input type="number" id="diurese" name="diurese"></div><div class="form-group"><label for="balancoHidrico">Balanço Hídrico (mL)</label><input type="number" id="balancoHidrico" name="balancoHidrico"></div><div class="form-group"><label>Diálise</label><div class="radio-group"><label><input type="radio" name="dialise" value="Não" checked>Não</label><label><input type="radio" name="dialise" value="Sim">Sim</label></div><input type="text" name="dialise_uf" placeholder="Última UF (mL)..." class="hidden"></div></div>
-                    </fieldset>
-                    
-                    <fieldset><legend>5. Drogas Vasoativas</legend><textarea id="drogas" name="drogas" rows="2" placeholder="Nome da droga e vazão..."></textarea></fieldset>
-                    <fieldset><legend>6. Sedoanalgesia</legend><textarea id="sedoanalgesia" name="sedoanalgesia" rows="2" placeholder="Nome da droga e vazão..."></textarea></fieldset>
-                    <fieldset><legend>7. Antibioticoterapia</legend><textarea id="antibioticos" name="antibioticos" rows="2" placeholder="Nome, dose e D..."></textarea></fieldset>
-                    <fieldset><legend>8. Culturas</legend><textarea id="culturas" name="culturas" rows="2" placeholder="Pendentes e resultados..."></textarea></fieldset>
-                    <fieldset><legend>9. Dispositivos</legend><textarea id="dispositivos" name="dispositivos" rows="2" placeholder="Cateteres, sondas, drenos com datas..."></textarea></fieldset>
-                    <fieldset><legend>10. Exames de Imagem</legend><textarea id="imagem" name="imagem" rows="2" placeholder="Resultados recentes..."></textarea></fieldset>
-                    <fieldset><legend>11. Pareceres</legend><textarea id="pareceres" name="pareceres" rows="2" placeholder="Resumo de pareceres..."></textarea></fieldset>
-                    <fieldset><legend>12. Pendências</legend><textarea id="pendencias" name="pendencias" rows="2" placeholder="Exames a aguardar, procedimentos a agendar..."></textarea></fieldset>
-                    <fieldset><legend>13. Condutas</legend><textarea id="condutas" name="condutas" rows="3" placeholder="Plano terapêutico..."></textarea></fieldset>
 
                     <button type="submit" id="saveEvolutionButton" class="button-primary" style="padding: 12px 30px; font-size: 1.1rem; margin-top: 20px;">Salvar Evolução</button>
                     <button type="button" id="cancelEditButton" class="button-secondary hidden" style="margin-top: 20px;">Cancelar Edição</button>
@@ -118,11 +85,10 @@
     </div>
 
     <div id="printConfirmModal" class="modal-overlay">
-        <div class="confirm-modal-content">
-            <p>Deseja imprimir a evolução que acabou de salvar?</p>
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <p style="font-size: 1.1rem; margin-bottom: 25px;">Evolução salva com sucesso!</p>
             <div class="modal-footer" style="justify-content: center;">
-                <button id="printConfirmNo" class="button-secondary">Não</button>
-                <button id="printConfirmYes" class="button-primary">Sim</button>
+                <button id="goToPatientViewBtn" class="button-primary">OK, Voltar ao Prontuário</button>
             </div>
         </div>
     </div>
@@ -130,13 +96,14 @@
     <div id="historyViewerModal" class="modal-overlay">
         <div class="modal-content wide">
             <div class="modal-header">
-                <h2 id="viewerTitle">Visualizar Documento</h2>
-                <button id="closeViewerModal" class="close-button">&times;</button>
+                <h2 id="viewerTitle">Visualizar Evolução</h2>
+                <button id="closeViewerBtn" class="close-button">&times;</button>
             </div>
             <div id="viewerContent" class="modal-body">
                 </div>
             <div class="modal-footer">
-                 <button id="closeViewerBtn" class="button-secondary">Fechar</button>
+                 <button id="printDocumentBtn" class="button-primary">Imprimir</button>
+                 <button id="closeViewerModalBtn" class="button-secondary">Fechar</button>
             </div>
         </div>
     </div>
