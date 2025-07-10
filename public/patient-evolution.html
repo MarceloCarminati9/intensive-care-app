@@ -22,13 +22,15 @@
                 <h2 id="formTitle">Nova Evolução Médica</h2>
                 <form id="evolutionForm">
                     
-                    <fieldset><legend>1. Impressão das Últimas 24h</legend>
+                    <fieldset>
+                        <legend>1. Impressão das Últimas 24h</legend>
                         <div class="form-group full-width">
                             <textarea id="impressao24h" name="impressao24h" rows="3" placeholder="Resumo objetivo da evolução..."></textarea>
                         </div>
                     </fieldset>
     
-                    <fieldset><legend>2. Exame Físico</legend>
+                    <fieldset>
+                        <legend>2. Exame Físico</legend>
                         <div class="sub-fieldset"><div class="legend-2">Neurológico</div>
                             <div class="form-group">
                                 <label>Glasgow <span class="tooltip" data-tooltip="Use os menus para selecionar as respostas. O total é calculado automaticamente.">&#9432;</span></label>
@@ -49,11 +51,49 @@
                                 <div style="margin-top: 10px;">Reatividade: <div class="radio-group"><label><input type="radio" name="pupilas_reatividade" value="Fotorreagentes">Fotorreagentes</label><label><input type="radio" name="pupilas_reatividade" value="Não Fotorreagentes">Não Fotorreagentes</label></div></div>
                             </div>
                         </div>
-                        </fieldset>
+                    </fieldset>
     
-                    <fieldset><legend>3. Suporte Ventilatório</legend> ... </fieldset>
-                    <fieldset><legend>4. Diurese e Balanço Hídrico</legend> ... </fieldset>
-<fieldset>
+                    <fieldset>
+                        <legend>3. Suporte Ventilatório</legend>
+                        <div class="grid-container">
+                            <div class="form-group">
+                                <label for="vm_modo">Modo Ventilatório</label>
+                                <input type="text" id="vm_modo" name="vm_modo" placeholder="Ex: VCV, PCV, PSV, Espontânea...">
+                            </div>
+                            <div class="form-group">
+                                <label for="vm_fio2">FiO2 (%)</label>
+                                <input type="number" id="vm_fio2" name="vm_fio2" placeholder="Ex: 40">
+                            </div>
+                            <div class="form-group">
+                                <label for="vm_peep">PEEP (cmH2O)</label>
+                                <input type="number" id="vm_peep" name="vm_peep" placeholder="Ex: 8">
+                            </div>
+                            <div class="form-group">
+                                <label for="relacao_po2_fio2">Relação PaO2/FiO2</label>
+                                <input type="number" id="relacao_po2_fio2" name="relacao_po2_fio2" placeholder="Ex: 250">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>4. Diurese e Balanço Hídrico</legend>
+                        <div class="grid-container">
+                            <div class="form-group">
+                                <label for="diurese_24h">Diurese 24h (ml)</label>
+                                <input type="number" id="diurese_24h" name="diurese_24h">
+                            </div>
+                            <div class="form-group">
+                                <label for="balanco_hidrico_24h">Balanço Hídrico 24h (ml)</label>
+                                <input type="number" id="balanco_hidrico_24h" name="balanco_hidrico_24h">
+                            </div>
+                             <div class="form-group">
+                                <label for="balanco_hidrico_total">Balanço Hídrico Total (ml)</label>
+                                <input type="number" id="balanco_hidrico_total" name="balanco_hidrico_total">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
                         <legend>5. Suporte Hemodinâmico e Drogas Vasoativas</legend>
                         <div class="grid-container">
                             <div class="form-group">
@@ -154,9 +194,14 @@
                             <textarea id="pendencias" name="pendencias" rows="3" placeholder="Aguardar resultado de culturas, parecer da cardiologia, etc."></textarea>
                         </div>
                     </fieldset>
-                    <fieldset><legend>13. Condutas</legend><textarea id="condutas" name="condutas" rows="3" placeholder="Plano terapêutico..."></textarea></fieldset>
 
-                    <fieldset><legend>14. Identificação do Profissional</legend>
+                    <fieldset>
+                        <legend>13. Condutas</legend>
+                        <textarea id="condutas" name="condutas" rows="3" placeholder="Plano terapêutico..."></textarea>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>14. Identificação do Profissional</legend>
                         <div class="grid-container" style="grid-template-columns: 2fr 1fr;">
                             <div class="form-group">
                                 <label for="medico_responsavel">Nome do Médico</label>
