@@ -53,6 +53,107 @@
     
                     <fieldset><legend>3. Suporte Ventilatório</legend> ... </fieldset>
                     <fieldset><legend>4. Diurese e Balanço Hídrico</legend> ... </fieldset>
+<fieldset>
+                        <legend>5. Suporte Hemodinâmico e Drogas Vasoativas</legend>
+                        <div class="grid-container">
+                            <div class="form-group">
+                                <label for="pam_meta">PAM Meta (mmHg)</label>
+                                <input type="text" id="pam_meta" name="pam_meta" placeholder="Ex: > 65 mmHg">
+                            </div>
+                            <div class="form-group">
+                                <label for="diurese_meta">Diurese Meta (ml/kg/h)</label>
+                                <input type="text" id="diurese_meta" name="diurese_meta" placeholder="Ex: > 0.5 ml/kg/h">
+                            </div>
+                            <div class="form-group">
+                                <label for="pvc_meta">PVC Meta (mmHg)</label>
+                                <input type="text" id="pvc_meta" name="pvc_meta" placeholder="Ex: 8-12 mmHg">
+                            </div>
+                             <div class="form-group">
+                                <label for="satura_venosa_meta">Sat. Venosa Central Meta (%)</label>
+                                <input type="text" id="satura_venosa_meta" name="satura_venosa_meta" placeholder="Ex: > 70%">
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="dva">Drogas Vasoativas (DVA) em uso</label>
+                            <textarea id="dva" name="dva" rows="2" placeholder="Ex: Noradrenalina 0.5mcg/kg/min"></textarea>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>6. Metas Terapêuticas</legend>
+                         <div class="form-group">
+                            <label for="metas_terapeuticas">Descrição das Metas</label>
+                            <textarea id="metas_terapeuticas" name="metas_terapeuticas" rows="2" placeholder="Descrever as metas para o dia. Ex: Desmame da VM, manter balanço hídrico negativo, etc."></textarea>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>7. Dieta e Função Intestinal</legend>
+                        <div class="grid-container">
+                             <div class="form-group">
+                                <label for="dieta_tipo">Tipo de Dieta</label>
+                                <input type="text" id="dieta_tipo" name="dieta_tipo" placeholder="Ex: Enteral, NPO, Oral livre">
+                            </div>
+                            <div class="form-group">
+                                <label for="dieta_volume">Volume / Kcal</label>
+                                <input type="text" id="dieta_volume" name="dieta_volume" placeholder="Ex: 40ml/h, 1600 Kcal/dia">
+                            </div>
+                            <div class="form-group">
+                                <label for="funcao_intestinal">Função Intestinal</label>
+                                <input type="text" id="funcao_intestinal" name="funcao_intestinal" placeholder="Ex: Presente, ausente, diarreia...">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>8. Profilaxias</legend>
+                        <div class="grid-container">
+                            <div class="form-group">
+                                <label for="profilaxia_tev">Profilaxia para TEV</label>
+                                <input type="text" id="profilaxia_tev" name="profilaxia_tev" value="Enoxaparina 40mg SC 1x/dia">
+                            </div>
+                            <div class="form-group">
+                                <label for="profilaxia_ulcera">Profilaxia para Úlcera de Estresse</label>
+                                <input type="text" id="profilaxia_ulcera" name="profilaxia_ulcera" value="Pantoprazol 40mg IV 1x/dia">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>9. Dispositivos Invasivos</legend>
+                        <div class="form-group">
+                            <label for="dispositivos">Descrição dos Dispositivos</label>
+                            <textarea id="dispositivos" name="dispositivos" rows="3" placeholder="Ex: CVC em subclávia D (D5), SVD (D3), TOT nº 7.5 (D10)..."></textarea>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>10. Culturas e Exames de Imagem</legend>
+                        <div class="form-group">
+                            <label for="culturas">Culturas Pendentes</label>
+                            <textarea id="culturas" name="culturas" rows="2" placeholder="Ex: Hemocultura (coletada em DD/MM), Urocultura..."></textarea>
+                        </div>
+                         <div class="form-group">
+                            <label for="imagem">Resultados de Exames de Imagem</label>
+                            <textarea id="imagem" name="imagem" rows="3" placeholder="Resumo dos achados da última TC de tórax, RX, etc."></textarea>
+                        </div>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>11. Exames Laboratoriais</legend>
+                        <div class="form-group">
+                            <label for="laboratorio">Resultados Relevantes</label>
+                            <textarea id="laboratorio" name="laboratorio" rows="4" placeholder="Hb: 8.5, Leucócitos: 12.500, Plaquetas: 98.000, PCR: 150, Cr: 2.3, Ur: 120..."></textarea>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>12. Pendências</legend>
+                         <div class="form-group">
+                            <label for="pendencias">Pendências para o dia</label>
+                            <textarea id="pendencias" name="pendencias" rows="3" placeholder="Aguardar resultado de culturas, parecer da cardiologia, etc."></textarea>
+                        </div>
+                    </fieldset>
                     <fieldset><legend>13. Condutas</legend><textarea id="condutas" name="condutas" rows="3" placeholder="Plano terapêutico..."></textarea></fieldset>
 
                     <fieldset><legend>14. Identificação do Profissional</legend>
