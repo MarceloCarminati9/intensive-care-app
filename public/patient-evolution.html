@@ -6,6 +6,16 @@
     <title>Evoluções do Paciente - Intensive Care Brasil</title>
     <link rel="stylesheet" href="patient-view-style.css"> 
     <link rel="icon" href="intensivecare.jpeg" type="image/jpeg">
+    <style>
+        /* Estilos adicionais para o novo formulário */
+        .sub-fieldset { border: 1px solid #E5E7EB; border-radius: 8px; padding: 20px; margin-top: 20px; background-color: #F9FAFB; }
+        .legend-2 { font-weight: 600; color: var(--dark-blue-text); margin-bottom: 15px; font-size: 1.1rem; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .checkbox-group, .radio-group { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; padding-top: 5px; }
+        .checkbox-group label, .radio-group label { font-weight: normal; }
+        .conditional-options { display: none; margin-top: 10px; padding: 15px; border-left: 3px solid var(--primary-blue); background-color: #F0F5FA; }
+        .form-group.full-width { grid-column: 1 / -1; }
+    </style>
 </head>
 <body>
     <div class="patient-view-container">
@@ -24,184 +34,170 @@
                     
                     <fieldset>
                         <legend>1. Impressão das Últimas 24h</legend>
-                        <div class="form-group full-width">
-                            <textarea id="impressao24h" name="impressao24h" rows="3" placeholder="Resumo objetivo da evolução..."></textarea>
+                        <div class="form-group">
+                            <textarea id="impressao24h" name="impressao24h" rows="4" placeholder="Descreva aqui o resumo objetivo da evolução do paciente nas últimas 24 horas..."></textarea>
                         </div>
                     </fieldset>
     
                     <fieldset>
                         <legend>2. Exame Físico</legend>
-                        <div class="sub-fieldset"><div class="legend-2">Neurológico</div>
-                            <div class="form-group">
-                                <label>Glasgow <span class="tooltip" data-tooltip="Use os menus para selecionar as respostas. O total é calculado automaticamente.">&#9432;</span></label>
-                                <div class="glasgow-grid" id="glasgow_details">
-                                    <select name="glasgow_ocular"><option value="0">Ocular</option><option value="4">4 - Abertura espontânea</option><option value="3">3 - Ao chamado</option><option value="2">2 - À dor</option><option value="1">1 - Nenhuma</option></select>
-                                    <select name="glasgow_verbal"><option value="0">Verbal</option><option value="5">5 - Orientado</option><option value="4">4 - Confuso</option><option value="3">3 - Palavras</option><option value="2">2 - Sons</option><option value="1">1 - Nenhuma</option></select>
-                                    <select name="glasgow_motor"><option value="0">Motor</option><option value="6">6 - Obedece comandos</option><option value="5">5 - Localiza dor</option><option value="4">4 - Retirada inespecífica</option><option value="3">3 - Flexão anormal</option><option value="2">2 - Extensão anormal</option><option value="1">1 - Nenhuma</option></select>
-                                    <input type="text" name="glasgow_total" placeholder="Total" disabled style="font-weight: bold; text-align: center; background-color: #f0f0f0;">
+                        <div class="sub-fieldset">
+                            <h3 class="legend-2">Neurológico</h3>
+                            <div class="grid-container">
+                                <div class="form-group">
+                                    <label>Glasgow</label>
+                                    <select name="glasgow_ocular"><option value="0">Ocular</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                                    <select name="glasgow_verbal"><option value="0">Verbal</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
+                                    <select name="glasgow_motor"><option value="0">Motor</option><option value="6">6</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select>
                                 </div>
-                                <label class="checkbox-inline"><input type="checkbox" id="glasgow_na"> N/A</label>
+                                <div class="form-group"><label>RASS</label><input type="text" name="rass"></div>
+                                <div class="form-group"><label>NIHSS</label><input type="text" name="nihss"></div>
+                                <div class="form-group"><label>CAM-ICU</label><div class="radio-group"><label><input type="radio" name="camicu" value="Positivo"> Positivo</label><label><input type="radio" name="camicu" value="Negativo"> Negativo</label></div></div>
+                                <div class="form-group"><label>Avaliação Pupilar</label><input type="text" name="pupilas" placeholder="Ex: Isocóricas e fotorreagentes"></div>
                             </div>
-                            <div class="form-group"><label>RASS <span class="tooltip" data-tooltip="+4 Combativo&#10;+3 Muito agitado&#10;+2 Agitado&#10;+1 Inquieto&#10;0 Alerta e calmo&#10;-1 Sonolento&#10;-2 Sedação leve&#10;-3 Sedação moderada&#10;-4 Sedação profunda&#10;-5 Não desperta">&#9432;</span></label><input type="text" id="rass" name="rass" style="width: 80px;"><label class="checkbox-inline"><input type="checkbox" id="rass_na"> N/A</label></div>
-                            <div class="form-group"><label>CAM-ICU <span class="tooltip" data-tooltip="Confusion Assessment Method for the ICU (Avaliação de Delirium)">&#9432;</span></label><div class="radio-group"><label><input type="radio" name="camicu" value="Positivo"> Positivo</label><label><input type="radio" name="camicu" value="Negativo"> Negativo</label></div><label class="checkbox-inline"><input type="checkbox" id="camicu_na"> N/A</label></div>
-                            <div class="form-group"><label>NIHSS <span class="tooltip" data-tooltip="National Institutes of Health Stroke Scale (Escala de AVC)">&#9432;</span></label><input type="number" id="nihss" name="nihss" style="width: 80px;"><label class="checkbox-inline"><input type="checkbox" id="nihss_na"> N/A</label></div>
-                            <div class="form-group"><label>Pupilas</label>
-                                <div>Tamanho: <div class="radio-group"><label><input type="radio" name="pupilas_tamanho" value="Isocóricas">Isocóricas</label><label><input type="radio" id="pupilas_anisocoricas" name="pupilas_tamanho" value="Anisocóricas">Anisocóricas</label><label><input type="radio" name="pupilas_tamanho" value="Mióticas">Mióticas</label><label><input type="radio" name="pupilas_tamanho" value="Midriáticas">Midriáticas</label></div></div>
-                                <div class="inline-inputs hidden" id="anisocoria_details"><input type="text" placeholder="Esq (mm)" name="pupila_esq"><input type="text" placeholder="Dir (mm)" name="pupila_dir"></div>
-                                <div style="margin-top: 10px;">Reatividade: <div class="radio-group"><label><input type="radio" name="pupilas_reatividade" value="Fotorreagentes">Fotorreagentes</label><label><input type="radio" name="pupilas_reatividade" value="Não Fotorreagentes">Não Fotorreagentes</label></div></div>
+                        </div>
+
+                        <div class="sub-fieldset">
+                            <h3 class="legend-2">Respiratório</h3>
+                            <div class="form-group">
+                                <label>Ausculta Pulmonar - Achados</label>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="ap_achado" value="MV+ bilateralmente"> MV+ bilateralmente</label>
+                                    <label><input type="checkbox" name="ap_achado" value="Creptos"> Creptos</label>
+                                    <label><input type="checkbox" name="ap_achado" value="Roncos"> Roncos</label>
+                                    <label><input type="checkbox" name="ap_achado" value="Sibilos"> Sibilos</label>
+                                    <label><input type="checkbox" name="ap_achado" value="MV abolido"> MV abolido</label>
+                                </div>
                             </div>
+                            <div class="form-group">
+                                <label>Localização dos Achados</label>
+                                <div class="grid-container" style="gap: 10px;">
+                                    <div>Lado: <div class="radio-group"><label><input type="radio" name="ap_lado" value="D"> D</label><label><input type="radio" name="ap_lado" value="E"> E</label><label><input type="radio" name="ap_lado" value="Bilateral"> Bilateral</label></div></div>
+                                    <div>Altura: <div class="radio-group"><label><input type="radio" name="ap_altura" value="Bases"> Bases</label><label><input type="radio" name="ap_altura" value="Terço Médio"> Terço Médio</label><label><input type="radio" name="ap_altura" value="Ápices"> Ápices</label></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sub-fieldset">
+                             <h3 class="legend-2">Cardiovascular</h3>
+                             <div class="form-group"><label>Ausculta Cardíaca</label><div class="checkbox-group"><label><input type="checkbox" name="ac_achado" value="BRNF 2T"> BRNF 2T</label><label><input type="checkbox" name="ac_achado" value="B3"> B3</label><label><input type="checkbox" name="ac_achado" value="B4"> B4</label><label><input type="checkbox" name="ac_achado" value="Sopro"> Sopro</label></div></div>
+                             <div class="form-group"><label>Avaliação do Pulso</label><div class="checkbox-group"><label><input type="checkbox" name="pulso_achado" value="Cheios"> Cheios</label><label><input type="checkbox" name="pulso_achado" value="Filiformes"> Filiformes</label><label><input type="checkbox" name="pulso_achado" value="Rítmicos"> Rítmicos</label><label><input type="checkbox" name="pulso_achado" value="Arrítmicos"> Arrítmicos</label></div></div>
+                             <div class="form-group"><label>Tempo de Enchimento Capilar (s)</label><input type="text" name="tec" placeholder="Ex: < 2s"></div>
+                        </div>
+
+                        <div class="sub-fieldset">
+                            <h3 class="legend-2">Abdominal</h3>
+                            <div class="form-group"><label>Exame Físico Abdominal</label><div class="checkbox-group"><label><input type="checkbox" name="abd_achado" value="Plano"> Plano</label><label><input type="checkbox" name="abd_achado" value="Globoso"> Globoso</label><label><input type="checkbox" name="abd_achado" value="Flácido"> Flácido</label><label><input type="checkbox" name="abd_achado" value="Tenso"> Tenso</label><label><input type="checkbox" name="abd_achado" value="Indolor"> Indolor</label><label><input type="checkbox" name="abd_achado" value="Doloroso"> Doloroso</label><label><input type="checkbox" name="abd_achado" value="RHA+"> RHA+</label><label><input type="checkbox" name="abd_achado" value="RHA-"> RHA-</label></div></div>
+                            <div class="form-group"><label>Dieta Ofertada e Observações</label><textarea name="dieta_obs" rows="2" placeholder="Ex: Dieta enteral 40ml/h, bem tolerada..."></textarea></div>
+                            <div class="form-group"><label>Hábitos Intestinais</label><textarea name="habitos_intestinais" rows="2" placeholder="Ex: 1 evacuação, pastosa, sem melena..."></textarea></div>
+                        </div>
+
+                        <div class="sub-fieldset">
+                            <h3 class="legend-2">Extremidades e Pele</h3>
+                            <div class="form-group"><textarea name="pele_extremidades" rows="3" placeholder="Descreva achados como edema, lesões, cianose, etc..."></textarea></div>
                         </div>
                     </fieldset>
     
                     <fieldset>
                         <legend>3. Suporte Ventilatório</legend>
-                        <div class="grid-container">
-                            <div class="form-group">
-                                <label for="vm_modo">Modo Ventilatório</label>
-                                <input type="text" id="vm_modo" name="vm_modo" placeholder="Ex: VCV, PCV, PSV, Espontânea...">
+                        <div class="form-group">
+                            <label>Tipo de Suporte</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="suporte_vm_tipo" value="Ar Ambiente" checked> Ar Ambiente</label>
+                                <label><input type="radio" name="suporte_vm_tipo" value="Cateter Nasal"> Cateter Nasal</label>
+                                <label><input type="radio" name="suporte_vm_tipo" value="VNI"> VNI</label>
+                                <label><input type="radio" name="suporte_vm_tipo" value="VMI"> VMI</label>
                             </div>
-                            <div class="form-group">
-                                <label for="vm_fio2">FiO2 (%)</label>
-                                <input type="number" id="vm_fio2" name="vm_fio2" placeholder="Ex: 40">
+                        </div>
+                        <div id="cn_options" class="conditional-options form-group">
+                            <label for="cn_litragem">Litragem (L/min)</label>
+                            <input type="number" id="cn_litragem" name="cn_litragem" placeholder="Ex: 2">
+                        </div>
+                        <div id="vmi_options" class="conditional-options">
+                            <div class="grid-container">
+                                <div class="form-group"><label>Modo</label><input type="text" name="vmi_modo" placeholder="PCV, VCV..."></div>
+                                <div class="form-group"><label>FiO2 (%)</label><input type="number" name="vmi_fio2"></div>
+                                <div class="form-group"><label>PEEP</label><input type="number" name="vmi_peep"></div>
+                                <div class="form-group"><label>Outro Parâmetro</label><input type="text" name="vmi_param1_nome" placeholder="Nome (Ex: Pressão de Suporte)"><input type="text" name="vmi_param1_valor" placeholder="Valor"></div>
+                                <div class="form-group"><label>Outro Parâmetro</label><input type="text" name="vmi_param2_nome" placeholder="Nome (Ex: Volume Corrente)"><input type="text" name="vmi_param2_valor" placeholder="Valor"></div>
                             </div>
-                            <div class="form-group">
-                                <label for="vm_peep">PEEP (cmH2O)</label>
-                                <input type="number" id="vm_peep" name="vm_peep" placeholder="Ex: 8">
-                            </div>
-                            <div class="form-group">
-                                <label for="relacao_po2_fio2">Relação PaO2/FiO2</label>
-                                <input type="number" id="relacao_po2_fio2" name="relacao_po2_fio2" placeholder="Ex: 250">
-                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label for="fr">Frequência Respiratória (rpm)</label>
+                            <input type="number" id="fr" name="fr" placeholder="Ex: 16">
                         </div>
                     </fieldset>
 
                     <fieldset>
                         <legend>4. Diurese e Balanço Hídrico</legend>
                         <div class="grid-container">
-                            <div class="form-group">
-                                <label for="diurese_24h">Diurese 24h (ml)</label>
-                                <input type="number" id="diurese_24h" name="diurese_24h">
-                            </div>
-                            <div class="form-group">
-                                <label for="balanco_hidrico_24h">Balanço Hídrico 24h (ml)</label>
-                                <input type="number" id="balanco_hidrico_24h" name="balanco_hidrico_24h">
-                            </div>
-                             <div class="form-group">
-                                <label for="balanco_hidrico_total">Balanço Hídrico Total (ml)</label>
-                                <input type="number" id="balanco_hidrico_total" name="balanco_hidrico_total">
-                            </div>
+                            <div class="form-group"><label>Diurese 24h (ml)</label><input type="number" name="diurese_24h"></div>
+                            <div class="form-group"><label>Balanço Hídrico 24h (ml)</label><input type="number" name="balanco_hidrico_24h"></div>
                         </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>5. Suporte Hemodinâmico e Drogas Vasoativas</legend>
-                        <div class="grid-container">
-                            <div class="form-group">
-                                <label for="pam_meta">PAM Meta (mmHg)</label>
-                                <input type="text" id="pam_meta" name="pam_meta" placeholder="Ex: > 65 mmHg">
-                            </div>
-                            <div class="form-group">
-                                <label for="diurese_meta">Diurese Meta (ml/kg/h)</label>
-                                <input type="text" id="diurese_meta" name="diurese_meta" placeholder="Ex: > 0.5 ml/kg/h">
-                            </div>
-                            <div class="form-group">
-                                <label for="pvc_meta">PVC Meta (mmHg)</label>
-                                <input type="text" id="pvc_meta" name="pvc_meta" placeholder="Ex: 8-12 mmHg">
-                            </div>
-                             <div class="form-group">
-                                <label for="satura_venosa_meta">Sat. Venosa Central Meta (%)</label>
-                                <input type="text" id="satura_venosa_meta" name="satura_venosa_meta" placeholder="Ex: > 70%">
-                            </div>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="dva">Drogas Vasoativas (DVA) em uso</label>
-                            <textarea id="dva" name="dva" rows="2" placeholder="Ex: Noradrenalina 0.5mcg/kg/min"></textarea>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>6. Metas Terapêuticas</legend>
-                         <div class="form-group">
-                            <label for="metas_terapeuticas">Descrição das Metas</label>
-                            <textarea id="metas_terapeuticas" name="metas_terapeuticas" rows="2" placeholder="Descrever as metas para o dia. Ex: Desmame da VM, manter balanço hídrico negativo, etc."></textarea>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>7. Dieta e Função Intestinal</legend>
-                        <div class="grid-container">
-                             <div class="form-group">
-                                <label for="dieta_tipo">Tipo de Dieta</label>
-                                <input type="text" id="dieta_tipo" name="dieta_tipo" placeholder="Ex: Enteral, NPO, Oral livre">
-                            </div>
-                            <div class="form-group">
-                                <label for="dieta_volume">Volume / Kcal</label>
-                                <input type="text" id="dieta_volume" name="dieta_volume" placeholder="Ex: 40ml/h, 1600 Kcal/dia">
-                            </div>
-                            <div class="form-group">
-                                <label for="funcao_intestinal">Função Intestinal</label>
-                                <input type="text" id="funcao_intestinal" name="funcao_intestinal" placeholder="Ex: Presente, ausente, diarreia...">
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>8. Profilaxias</legend>
-                        <div class="grid-container">
-                            <div class="form-group">
-                                <label for="profilaxia_tev">Profilaxia para TEV</label>
-                                <input type="text" id="profilaxia_tev" name="profilaxia_tev" value="Enoxaparina 40mg SC 1x/dia">
-                            </div>
-                            <div class="form-group">
-                                <label for="profilaxia_ulcera">Profilaxia para Úlcera de Estresse</label>
-                                <input type="text" id="profilaxia_ulcera" name="profilaxia_ulcera" value="Pantoprazol 40mg IV 1x/dia">
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>9. Dispositivos Invasivos</legend>
                         <div class="form-group">
-                            <label for="dispositivos">Descrição dos Dispositivos</label>
-                            <textarea id="dispositivos" name="dispositivos" rows="3" placeholder="Ex: CVC em subclávia D (D5), SVD (D3), TOT nº 7.5 (D10)..."></textarea>
+                            <label>Realizando Diálise?</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="dialise_status" value="Não" checked> Não</label>
+                                <label><input type="radio" name="dialise_status" value="Sim"> Sim</label>
+                            </div>
+                        </div>
+                        <div id="dialise_options" class="conditional-options">
+                            <div class="form-group">
+                                <label>Tipo de Diálise</label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="dialise_tipo" value="Intermitente"> Intermitente</label>
+                                    <label><input type="radio" name="dialise_tipo" value="Contínua"> Contínua</label>
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <label>Última UF (ml)</label>
+                                <input type="number" name="dialise_uf" placeholder="Volume da última ultrafiltração">
+                            </div>
                         </div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>10. Culturas e Exames de Imagem</legend>
-                        <div class="form-group">
-                            <label for="culturas">Culturas Pendentes</label>
-                            <textarea id="culturas" name="culturas" rows="2" placeholder="Ex: Hemocultura (coletada em DD/MM), Urocultura..."></textarea>
-                        </div>
-                         <div class="form-group">
-                            <label for="imagem">Resultados de Exames de Imagem</label>
-                            <textarea id="imagem" name="imagem" rows="3" placeholder="Resumo dos achados da última TC de tórax, RX, etc."></textarea>
-                        </div>
+                        <legend>5. Drogas em Uso</legend>
+                        <div class="form-group"><label>Drogas Vasoativas (DVA)</label><textarea name="drogas_dva" rows="2" placeholder="Ex: Noradrenalina 0.5 mcg/kg/min..."></textarea></div>
+                        <div class="form-group"><label>Sedação</label><textarea name="drogas_sedacao" rows="2" placeholder="Ex: Precedex 1.0 mcg/kg/h..."></textarea></div>
+                        <div class="form-group"><label>Analgesia</label><textarea name="drogas_analgesia" rows="2" placeholder="Ex: Fentanil 5 ml/h..."></textarea></div>
+                        <div class="form-group"><label>Antibioticoterapia</label><textarea name="drogas_atb" rows="3" placeholder="Ex: Meropenem 1g 8/8h (D5/D10)..."></textarea></div>
+                        <div class="form-group"><label>Corticoterapia</label><textarea name="drogas_corticoide" rows="2" placeholder="Ex: Hidrocortisona 50mg 6/6h (D2/D7)..."></textarea></div>
+                        <div class="form-group"><label>Outras Drogas Relevantes</label><textarea name="drogas_outras" rows="3" placeholder="Liste outras drogas importantes aqui..."></textarea></div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>6. Dispositivos Invasivos</legend>
+                        <div class="form-group"><textarea name="dispositivos" rows="3" placeholder="Ex: CVC em subclávia D (inserido DD/MM, retirado DD/MM), SVD (D3)..."></textarea></div>
                     </fieldset>
                     
                     <fieldset>
-                        <legend>11. Exames Laboratoriais</legend>
-                        <div class="form-group">
-                            <label for="laboratorio">Resultados Relevantes</label>
-                            <textarea id="laboratorio" name="laboratorio" rows="4" placeholder="Hb: 8.5, Leucócitos: 12.500, Plaquetas: 98.000, PCR: 150, Cr: 2.3, Ur: 120..."></textarea>
-                        </div>
+                        <legend>7. Culturas</legend>
+                        <div class="form-group"><textarea name="culturas" rows="3" placeholder="Descreva as culturas solicitadas e seus respectivos resultados..."></textarea></div>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>8. Exames de Imagem e Laboratoriais</legend>
+                        <div class="form-group"><textarea name="exames_gerais" rows="5" placeholder="Descreva os resultados relevantes dos principais exames de imagem e laboratoriais..."></textarea></div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>12. Pendências</legend>
-                         <div class="form-group">
-                            <label for="pendencias">Pendências para o dia</label>
-                            <textarea id="pendencias" name="pendencias" rows="3" placeholder="Aguardar resultado de culturas, parecer da cardiologia, etc."></textarea>
-                        </div>
+                        <legend>9. ECG / ECOTT</legend>
+                        <div class="form-group"><textarea name="ecg_ecott" rows="3" placeholder="Descreva os achados do ECG e/ou Ecocardiograma Transtorácico, caso realizados..."></textarea></div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>13. Condutas</legend>
-                        <textarea id="condutas" name="condutas" rows="3" placeholder="Plano terapêutico..."></textarea>
+                        <legend>10. Pendências</legend>
+                         <div class="form-group"><textarea name="pendencias" rows="3" placeholder="Aguardar resultado de culturas, parecer da cardiologia, etc..."></textarea></div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>14. Identificação do Profissional</legend>
+                        <legend>11. Condutas</legend>
+                        <textarea name="condutas" rows="4" placeholder="Descreva o plano terapêutico e as condutas tomadas..."></textarea>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>12. Identificação do Médico</legend>
                         <div class="grid-container" style="grid-template-columns: 2fr 1fr;">
                             <div class="form-group">
                                 <label for="medico_responsavel">Nome do Médico</label>
@@ -230,30 +226,41 @@
         </main>
     </div>
 
-    <div id="printConfirmModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 450px; text-align: center;">
-            <p style="font-size: 1.1rem; margin-bottom: 25px;">Evolução salva com sucesso!</p>
-            <div class="modal-footer" style="justify-content: center;">
-                <button id="goToPatientViewBtn" class="button-primary">OK, Voltar ao Prontuário</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="historyViewerModal" class="modal-overlay">
-        <div class="modal-content wide">
-            <div class="modal-header">
-                <h2 id="viewerTitle">Visualizar Evolução</h2>
-                <button id="closeViewerBtn" class="close-button">&times;</button>
-            </div>
-            <div id="viewerContent" class="modal-body">
-                </div>
-            <div class="modal-footer">
-                 <button id="printDocumentBtn" class="button-primary">Imprimir</button>
-                 <button id="closeViewerModalBtn" class="button-secondary">Fechar</button>
-            </div>
-        </div>
-    </div>
+    <div id="printConfirmModal" class="modal-overlay"> ... </div>
+    <div id="historyViewerModal" class="modal-overlay"> ... </div>
 
     <script src="patient-evolution.js"></script>
+    <script>
+        // Script para a lógica dos campos condicionais
+        document.addEventListener('DOMContentLoaded', function() {
+            const dialiseSim = document.querySelector('input[name="dialise_status"][value="Sim"]');
+            const dialiseNao = document.querySelector('input[name="dialise_status"][value="Não"]');
+            const dialiseOptions = document.getElementById('dialise_options');
+
+            function toggleDialise() {
+                if (dialiseSim.checked) {
+                    dialiseOptions.style.display = 'block';
+                } else {
+                    dialiseOptions.style.display = 'none';
+                }
+            }
+            dialiseSim.addEventListener('change', toggleDialise);
+            dialiseNao.addEventListener('change', toggleDialise);
+            
+            const vmTipoRadios = document.querySelectorAll('input[name="suporte_vm_tipo"]');
+            const cnOptions = document.getElementById('cn_options');
+            const vmiOptions = document.getElementById('vmi_options');
+
+            function toggleVmOptions() {
+                const selected = document.querySelector('input[name="suporte_vm_tipo"]:checked').value;
+                cnOptions.style.display = selected === 'Cateter Nasal' ? 'block' : 'none';
+                vmiOptions.style.display = selected === 'VMI' ? 'block' : 'none';
+            }
+            vmTipoRadios.forEach(radio => radio.addEventListener('change', toggleVmOptions));
+
+            toggleDialise();
+            toggleVmOptions();
+        });
+    </script>
 </body>
 </html>
