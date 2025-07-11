@@ -1,4 +1,4 @@
-// VERSÃO FINAL, COMPLETA E UNIFICADA
+// VERSÃO FINAL, COMPLETA E UNIFICADA - CORRIGIDO EM 11/07/2025
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get('patientId'); 
-    // [NOVO] Captura os parâmetros para edição e cópia vindos de outras páginas
     const evolutionIdToEdit = params.get('evolutionId');
     const evolutionIdToCopy = params.get('copyFromId');
 
@@ -30,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeViewerModalBtn = document.getElementById('closeViewerModalBtn');
     const printDocumentBtn = document.getElementById('printDocumentBtn');
     
-    let patient = null; // Armazena os dados do paciente
-    let editingEvolutionId = null; // Guarda o ID da evolução sendo editada
+    let patient = null; 
+    let editingEvolutionId = null; 
 
     if (!patientId) {
         patientNameHeader.textContent = "ERRO: ID do Paciente não encontrado na URL.";
@@ -54,14 +53,12 @@ document.addEventListener('DOMContentLoaded', function() {
             patientNameHeader.textContent = patient.name;
             backToPatientViewLink.href = `patient-view.html?patientId=${patientId}`;
             
-            // [LÓGICA UNIFICADA] Verifica se a página deve carregar uma evolução para edição ou cópia
             if (evolutionIdToEdit) {
                 await loadEvolutionAndSetupForm(evolutionIdToEdit, 'edit');
             } else if (evolutionIdToCopy) {
                 await loadEvolutionAndSetupForm(evolutionIdToCopy, 'copy');
             }
 
-            // Sempre renderiza o histórico de evoluções na parte inferior da página
             await renderEvolutionHistory();
 
         } catch (error) {
@@ -77,17 +74,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             const evolutionContent = result.data.content;
             
-            populateForm(evolutionContent); // Preenche o formulário com os dados
+            populateForm(evolutionContent);
 
             if (mode === 'edit') {
                 editingEvolutionId = evolutionId;
                 formTitle.textContent = `Editando Evolução`;
                 saveButton.textContent = "Atualizar Evolução";
                 cancelEditButton.classList.remove('hidden');
-            } else { // modo 'copy'
+            } else { 
                 formTitle.textContent = "Nova Evolução (Copiada)";
             }
-
         } catch (error) {
             console.error(`Erro ao carregar evolução para ${mode}:`, error);
             alert(`Não foi possível carregar os dados da evolução selecionada.`);
@@ -95,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function renderEvolutionHistory() {
-        // (Código de renderização do histórico permanece o mesmo da sua versão)
         try {
             const response = await fetch(`/api/patients/${patientId}/evolutions`);
             if (!response.ok) throw new Error("Falha ao buscar histórico de evoluções.");
@@ -141,7 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function generateEvolutionReportHTML(patientData, evolutionData) {
-        // (Sua função completa para gerar o relatório em HTML)
         if (!patientData || !evolutionData) return '<p>Dados insuficientes para gerar o relatório.</p>';
         const getField = (field) => evolutionData[field] || 'N/A';
         const patientDIH = patientData.dih ? new Date(patientData.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
@@ -169,9 +163,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     evolutionForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-        const evolutionData = collectFormData(); 
+        const evolutionData = collectFormData(); // Usa a função corrigida
         
-        // [LÓGICA UNIFICADA] Decide se deve criar (POST) ou atualizar (PUT)
         const method = editingEvolutionId ? 'PUT' : 'POST';
         const url = editingEvolutionId 
             ? `/api/evolutions/${editingEvolutionId}` 
@@ -184,16 +177,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(evolutionData),
             });
             if (!response.ok) {
-                const err = await response.json(); throw new Error(err.error || `Falha ao ${method === 'POST' ? 'salvar' : 'atualizar'} evolução.`);
+                const err = await response.json(); 
+                throw new Error(err.error || `Falha ao ${method === 'POST' ? 'salvar' : 'atualizar'} evolução.`);
             }
 
             if (method === 'POST') {
                 resetFormAndState();
                 await renderEvolutionHistory(); 
-                printConfirmModal.classList.add('active'); // Mostra o modal de sucesso apenas ao criar
+                printConfirmModal.classList.add('active');
             } else {
                 alert('Evolução atualizada com sucesso!');
-                window.location.href = `patient-view.html?patientId=${patientId}`; // Redireciona após editar
+                window.location.href = `patient-view.html?patientId=${patientId}`;
             }
 
         } catch (error) {
@@ -209,10 +203,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (goToPatientViewBtn) goToPatientViewBtn.addEventListener('click', redirectToPatientView);
     if (closeViewerBtn) closeViewerBtn.addEventListener('click', () => historyViewerModal.classList.remove('active'));
     if (closeViewerModalBtn) closeViewerModalBtn.addEventListener('click', () => historyViewerModal.classList.remove('active'));
-    if (printDocumentBtn) { /* ... (lógica de impressão sem alterações) ... */ }
+    if (printDocumentBtn) { /* ... lógica de impressão ... */ }
 
-    // Evento de clique na lista de histórico permanece o mesmo,
-    // agora ele controla as ações DENTRO da própria página.
     evolutionHistoryList.addEventListener('click', function(event) {
         const button = event.target.closest('button[data-action]');
         if (!button) return;
@@ -223,17 +215,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (action === 'edit' || action === 'copy') {
             populateForm(evolutionContent);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             if (action === 'copy') {
+                resetFormAndState();
+                populateForm(evolutionContent); // Repopula após resetar para manter os dados
                 formTitle.textContent = "Nova Evolução (Copiada)";
-                saveButton.textContent = "Salvar Nova Evolução";
-                editingEvolutionId = null; 
             } else { // Edit
                 editingEvolutionId = historyItem.dataset.evolutionId;
                 formTitle.textContent = `Editando Evolução`;
                 saveButton.textContent = "Atualizar Evolução";
                 cancelEditButton.classList.remove('hidden');
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (action === 'print') {
             const title = historyItem.querySelector('.history-item-header span').textContent;
             viewerTitle.textContent = title;
@@ -246,28 +238,54 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelEditButton.addEventListener('click', resetFormAndState);
     }
 
+    // [CORREÇÃO PRINCIPAL] Função que coleta os dados do formulário corretamente.
     function collectFormData() {
         const formData = new FormData(evolutionForm);
         const data = {};
-        for(const [key, value] of formData.entries()) { data[key] = value; }
+        const keys = new Set(Array.from(formData.keys()));
+
+        for (const key of keys) {
+            const allValues = formData.getAll(key);
+            data[key] = allValues.length > 1 ? allValues : allValues[0];
+        }
         return data;
     }
 
+    // [FUNÇÃO MELHORADA] Preenche o formulário, lidando com arrays para checkboxes.
     function populateForm(data) {
         resetFormAndState();
         for (const key in data) {
-            if (evolutionForm.elements[key]) {
-                evolutionForm.elements[key].value = data[key];
+            const elements = evolutionForm.elements[key];
+            if (!elements) continue;
+
+            const value = data[key];
+
+            if (NodeList.prototype.isPrototypeOf(elements) && elements[0]?.type === 'radio') {
+                const elToSelect = document.querySelector(`input[name="${key}"][value="${value}"]`);
+                if (elToSelect) elToSelect.checked = true;
+            } else if (NodeList.prototype.isPrototypeOf(elements) && elements[0]?.type === 'checkbox') {
+                if (Array.isArray(value)) {
+                    elements.forEach(chk => {
+                        chk.checked = value.includes(chk.value);
+                    });
+                }
+            } else if (elements.type === 'checkbox') {
+                 elements.checked = !!value; // Para checkboxes únicos
+            } else {
+                elements.value = value;
             }
         }
+        // Dispara o evento change para que a UI de campos condicionais se atualize
+        document.querySelectorAll('input[type="radio"], input[type="checkbox"], select').forEach(el => el.dispatchEvent(new Event('change', { bubbles: true })));
     }
 
     function resetFormAndState() {
         evolutionForm.reset();
         editingEvolutionId = null;
         formTitle.textContent = "Nova Evolução Médica";
-        saveButton.textContent = "Salvar Nova Evolução";
+        saveButton.textContent = "Salvar Evolução";
         cancelEditButton.classList.add('hidden');
+        document.querySelectorAll('.conditional-options').forEach(el => el.style.display = 'none');
     }
 
     // --- INICIALIZAÇÃO DA PÁGINA ---
