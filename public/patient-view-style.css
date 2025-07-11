@@ -426,3 +426,11 @@ h2 {
     display: flex;
     gap: 10px;
 }
+/* [NOVO] Estilo para o status de edição no histórico */
+.edited-status {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    font-style: italic;
+    font-weight: 400;
+    margin-left: 8px;
+}

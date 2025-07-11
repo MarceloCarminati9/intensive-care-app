@@ -90,50 +90,62 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    async function renderEvolutionHistory() {
-        try {
-            const response = await fetch(`/api/patients/${patientId}/evolutions`);
-            if (!response.ok) throw new Error("Falha ao buscar histórico de evoluções.");
-            
-            const result = await response.json();
-            const evolutions = result.data || [];
+    // [SUBSTITUIR ESTA FUNÇÃO]
+async function renderEvolutionHistory() {
+    try {
+        const response = await fetch(`/api/patients/${patientId}/evolutions`);
+        if (!response.ok) throw new Error("Falha ao buscar histórico de evoluções.");
+        
+        const result = await response.json();
+        const evolutions = result.data || [];
 
-            evolutionHistoryList.innerHTML = '';
-            if (evolutions.length === 0) {
-                evolutionHistoryList.innerHTML = '<p>Nenhuma evolução anterior encontrada para este paciente.</p>';
-                return;
-            }
-            evolutions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-            evolutions.forEach(evo => {
-                const date = new Date(evo.created_at);
-                const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                const formattedTime = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                const previewText = evo.content?.impressao24h ? evo.content.impressao24h.substring(0, 150) + '...' : 'Sem resumo.';
-                
-                const historyItemDiv = document.createElement('div');
-                historyItemDiv.className = 'history-item';
-                historyItemDiv.dataset.evolutionId = evo.id; 
-                historyItemDiv.dataset.evolutionContent = JSON.stringify(evo.content);
-
-                historyItemDiv.innerHTML = `
-                    <div class="history-item-header">
-                        <span><strong>Evolução de ${formattedDate} às ${formattedTime}</strong></span>
-                        <div class="history-item-actions">
-                            <button type="button" class="button-secondary" data-action="print">Visualizar/Imprimir</button>
-                            <button type="button" class="button-secondary" data-action="copy">Copiar para Nova</button>
-                            <button type="button" class="button-secondary" data-action="edit">Editar</button>
-                        </div>
-                    </div>
-                    <div class="history-item-preview">${previewText}</div>
-                `;
-                evolutionHistoryList.appendChild(historyItemDiv);
-            });
-        } catch(error) {
-            console.error("Erro ao renderizar histórico:", error);
-            evolutionHistoryList.innerHTML = `<p style="color: red;">${error.message}</p>`;
+        evolutionHistoryList.innerHTML = '';
+        if (evolutions.length === 0) {
+            evolutionHistoryList.innerHTML = '<p>Nenhuma evolução anterior encontrada para este paciente.</p>';
+            return;
         }
+        evolutions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        evolutions.forEach(evo => {
+            const historyItemDiv = document.createElement('div');
+            historyItemDiv.className = 'history-item';
+            historyItemDiv.dataset.evolutionId = evo.id; 
+            historyItemDiv.dataset.evolutionContent = JSON.stringify(evo.content);
+            
+            // --- INÍCIO DA LÓGICA DE EXIBIÇÃO DA EDIÇÃO (IDÊNTICA À ANTERIOR) ---
+            const createdAt = new Date(evo.created_at);
+            const updatedAt = evo.updated_at ? new Date(evo.updated_at) : null;
+            let editedText = '';
+            
+            if (updatedAt && (updatedAt.getTime() - createdAt.getTime() > 60000)) {
+                const formattedEditDate = updatedAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const formattedEditTime = updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                editedText = `<span class="edited-status">(editada em ${formattedEditDate} às ${formattedEditTime})</span>`;
+            }
+
+            const formattedCreationDate = createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const formattedCreationTime = createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const previewText = evo.content?.impressao24h ? evo.content.impressao24h.substring(0, 150) + '...' : 'Sem resumo.';
+            // --- FIM DA LÓGICA DE EXIBIÇÃO DA EDIÇÃO ---
+
+            historyItemDiv.innerHTML = `
+                <div class="history-item-header">
+                    <span><strong>Evolução de ${formattedCreationDate} às ${formattedCreationTime}${editedText}</strong></span>
+                    <div class="history-item-actions">
+                        <button type="button" class="button-secondary" data-action="print">Visualizar/Imprimir</button>
+                        <button type="button" class="button-secondary" data-action="copy">Copiar para Nova</button>
+                        <button type="button" class="button-secondary" data-action="edit">Editar</button>
+                    </div>
+                </div>
+                <div class="history-item-preview">${previewText}</div>
+            `;
+            evolutionHistoryList.appendChild(historyItemDiv);
+        });
+    } catch(error) {
+        console.error("Erro ao renderizar histórico:", error);
+        evolutionHistoryList.innerHTML = `<p style="color: red;">${error.message}</p>`;
     }
+}
     
     function generateEvolutionReportHTML(patientData, evolutionData) {
         if (!patientData || !evolutionData) return '<p>Dados insuficientes para gerar o relatório.</p>';

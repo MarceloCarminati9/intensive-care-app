@@ -117,48 +117,61 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // [ALTERAÇÃO PRINCIPAL] Função para renderizar o histórico na tela com botões
-    function renderHistory(history, patientData) {
-        historyList.innerHTML = '';
-        if (!history || history.length === 0) {
-            historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';
-            return;
-        }
-
-        history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        
-        history.forEach(item => {
-            const date = new Date(item.created_at);
-            const formattedDate = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const formattedTime = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            
-            const historyItemDiv = document.createElement('div');
-            historyItemDiv.className = 'history-item';
-            historyItemDiv.dataset.item = JSON.stringify(item); 
-            historyItemDiv.dataset.patient = JSON.stringify(patientData);
-
-            let buttonsHTML = '';
-            if (item.type === 'Evolução Médica') {
-                buttonsHTML = `
-                    <button class="button-secondary" data-action="view">Visualizar/Imprimir</button>
-                    <button class="button-secondary" data-action="copy">Copiar para Nova</button>
-                    <button class="button-secondary" data-action="edit">Editar</button>
-                `;
-            } else if (item.type === 'Receituário') {
-                buttonsHTML = `
-                    <button class="button-secondary" data-action="view">Visualizar/Imprimir</button>
-                `;
-            }
-
-            historyItemDiv.innerHTML = `
-                <div class="history-item-content">
-                    <div class="history-item-title">${item.type} - ${formattedDate} às ${formattedTime}</div>
-                    <div class="history-item-actions">${buttonsHTML}</div>
-                </div>
-            `;
-            historyList.appendChild(historyItemDiv);
-        });
+    // [SUBSTITUIR ESTA FUNÇÃO]
+function renderHistory(history, patientData) {
+    historyList.innerHTML = '';
+    if (!history || history.length === 0) {
+        historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';
+        return;
     }
 
+    history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    history.forEach(item => {
+        const historyItemDiv = document.createElement('div');
+        historyItemDiv.className = 'history-item';
+        historyItemDiv.dataset.item = JSON.stringify(item); 
+        historyItemDiv.dataset.patient = JSON.stringify(patientData);
+
+        // --- INÍCIO DA LÓGICA DE EXIBIÇÃO DA EDIÇÃO ---
+        const createdAt = new Date(item.created_at);
+        const updatedAt = item.updated_at ? new Date(item.updated_at) : null;
+        let editedText = '';
+
+        // Compara se 'updated_at' existe e é significativamente diferente de 'created_at'
+        // (usamos um buffer de 1 minuto para evitar mostrar "editado" em itens recém-criados)
+        if (item.type === 'Evolução Médica' && updatedAt && (updatedAt.getTime() - createdAt.getTime() > 60000)) {
+            const formattedEditDate = updatedAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const formattedEditTime = updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            editedText = `<span class="edited-status">(editada em ${formattedEditDate} às ${formattedEditTime})</span>`;
+        }
+        
+        const formattedCreationDate = createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const formattedCreationTime = createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        // --- FIM DA LÓGICA DE EXIBIÇÃO DA EDIÇÃO ---
+
+        let buttonsHTML = '';
+        if (item.type === 'Evolução Médica') {
+            buttonsHTML = `
+                <button class="button-secondary" data-action="view">Visualizar/Imprimir</button>
+                <button class="button-secondary" data-action="copy">Copiar para Nova</button>
+                <button class="button-secondary" data-action="edit">Editar</button>
+            `;
+        } else if (item.type === 'Receituário') {
+            buttonsHTML = `
+                <button class="button-secondary" data-action="view">Visualizar/Imprimir</button>
+            `;
+        }
+
+        historyItemDiv.innerHTML = `
+            <div class="history-item-content">
+                <div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div>
+                <div class="history-item-actions">${buttonsHTML}</div>
+            </div>
+        `;
+        historyList.appendChild(historyItemDiv);
+    });
+}
     // [ALTERAÇÃO PRINCIPAL] Lógica de Eventos para os novos botões
     historyList.addEventListener('click', function(event) {
         const button = event.target.closest('button[data-action]');
