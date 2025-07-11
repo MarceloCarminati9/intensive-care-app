@@ -434,3 +434,21 @@ h2 {
     font-weight: 400;
     margin-left: 8px;
 }
+/* [NOVO] Estilos para itens do histórico marcados como excluídos */
+.history-item.deleted {
+    background-color: #f3f4f6; /* Cinza mais claro */
+    opacity: 0.7;
+}
+
+.history-item.deleted .history-item-title,
+.history-item.deleted .history-item-preview {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.history-item.deleted .history-item-actions .button-secondary {
+    cursor: not-allowed;
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    pointer-events: none; /* Desabilita completamente a interação */
+}

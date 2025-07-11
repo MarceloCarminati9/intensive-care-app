@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // [SUBSTITUIR ESTA FUNÇÃO]
+// [SUBSTITUIR ESTA FUNÇÃO]
 async function renderEvolutionHistory() {
     try {
         const response = await fetch(`/api/patients/${patientId}/evolutions`);
@@ -108,11 +108,11 @@ async function renderEvolutionHistory() {
 
         evolutions.forEach(evo => {
             const historyItemDiv = document.createElement('div');
-            historyItemDiv.className = 'history-item';
+            // [ALTERAÇÃO] Adiciona a classe 'deleted' se o item foi excluído
+            historyItemDiv.className = `history-item ${evo.deleted_at ? 'deleted' : ''}`;
             historyItemDiv.dataset.evolutionId = evo.id; 
             historyItemDiv.dataset.evolutionContent = JSON.stringify(evo.content);
             
-            // --- INÍCIO DA LÓGICA DE EXIBIÇÃO DA EDIÇÃO (IDÊNTICA À ANTERIOR) ---
             const createdAt = new Date(evo.created_at);
             const updatedAt = evo.updated_at ? new Date(evo.updated_at) : null;
             let editedText = '';
@@ -126,15 +126,17 @@ async function renderEvolutionHistory() {
             const formattedCreationDate = createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const formattedCreationTime = createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             const previewText = evo.content?.impressao24h ? evo.content.impressao24h.substring(0, 150) + '...' : 'Sem resumo.';
-            // --- FIM DA LÓGICA DE EXIBIÇÃO DA EDIÇÃO ---
+            
+            // [ALTERAÇÃO] Botões desabilitados se o item foi excluído
+            const isDisabled = !!evo.deleted_at;
 
             historyItemDiv.innerHTML = `
                 <div class="history-item-header">
                     <span><strong>Evolução de ${formattedCreationDate} às ${formattedCreationTime}${editedText}</strong></span>
                     <div class="history-item-actions">
-                        <button type="button" class="button-secondary" data-action="print">Visualizar/Imprimir</button>
-                        <button type="button" class="button-secondary" data-action="copy">Copiar para Nova</button>
-                        <button type="button" class="button-secondary" data-action="edit">Editar</button>
+                        <button type="button" class="button-secondary" data-action="print" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button>
+                        <button type="button" class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button>
+                        <button type="button" class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button>
                     </div>
                 </div>
                 <div class="history-item-preview">${previewText}</div>
