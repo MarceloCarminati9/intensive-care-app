@@ -57,11 +57,55 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
 
     async function loadUnitAndBeds() {
-        // ... (código da sua versão para carregar unidade e leitos, sem alterações)
+        try {
+            const unitResponse = await fetch(`/api/units/${unitId}`);
+            if (!unitResponse.ok) throw new Error('Unidade não encontrada.');
+            const unitResult = await unitResponse.json();
+            const unit = unitResult.data;
+
+            unitNameTitle.textContent = unit.name;
+            if(unitBedCount) unitBedCount.textContent = `Total de ${unit.total_beds} Leitos`;
+
+            const bedsResponse = await fetch(`/api/units/${unitId}/beds`);
+            if (!bedsResponse.ok) throw new Error('Não foi possível carregar os leitos.');
+            const bedsResult = await bedsResponse.json();
+            renderBeds(bedsResult.data);
+        } catch (error) {
+            console.error('Erro ao carregar dados da unidade:', error);
+            bedGridContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+        }
     }
 
     function renderBeds(beds) {
-        // ... (código da sua versão para renderizar os leitos, sem alterações)
+        bedGridContainer.innerHTML = '';
+        if (beds.length === 0) {
+            bedGridContainer.innerHTML = '<p>Nenhum leito encontrado para esta unidade.</p>';
+            return;
+        }
+        beds.forEach(bed => {
+            const bedCard = document.createElement('div');
+            bedCard.dataset.bedId = bed.id;
+
+            if (bed.status === 'free') {
+                bedCard.className = 'bed-card free';
+                bedCard.innerHTML = `
+                    <div class="bed-header"><h2>Leito ${bed.bed_number}</h2><span class="status-free">Livre</span></div>
+                    <div class="bed-actions-free"><button class="action-btn-main cadastrar-paciente-btn">[+] Cadastrar Paciente</button></div>`;
+            } else { 
+                bedCard.className = 'bed-card occupied';
+                bedCard.dataset.patientId = bed.patient_id;
+                const patientName = bed.patient_name || 'Paciente não informado';
+                bedCard.innerHTML = `
+                    <div class="bed-header"><h2>Leito ${bed.bed_number}</h2><span class="status-occupied">Ocupado</span></div>
+                    <div class="patient-info"><p><strong>Paciente:</strong> ${patientName}</p></div>
+                    <div class="bed-actions">
+                        <button class="action-btn-main acessar-paciente-btn">Acessar Prontuário</button>
+                        <button class="action-btn transferir-paciente-btn">Transferir</button>
+                        <button class="action-btn-danger dar-alta-btn">Dar Alta</button>
+                    </div>`;
+            }
+            bedGridContainer.appendChild(bedCard);
+        });
     }
 
     // =================================================================================
@@ -69,16 +113,68 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     bedGridContainer.addEventListener('click', async function(event) {
-        // ... (código da sua versão para ABRIR os modais, sem alterações)
+        const target = event.target;
+        const bedCard = target.closest('.bed-card');
+        if (!bedCard) return;
+
+        if (target.closest('.cadastrar-paciente-btn')) {
+            document.getElementById('modalLeitoNum').textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
+            patientModal.dataset.bedId = bedCard.dataset.bedId;
+            patientModal.classList.add('active');
+        }
+        
+        if (target.closest('.acessar-paciente-btn')) {
+            const patientId = bedCard.dataset.patientId;
+            if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
+        }
+
+        if (target.closest('.dar-alta-btn')) {
+            dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+            dischargeModal.dataset.patientId = bedCard.dataset.patientId;
+            dischargeModal.dataset.bedId = bedCard.dataset.bedId;
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            dischargeDateInput.value = now.toISOString().slice(0, 16);
+            dischargeModal.classList.add('active');
+        }
+
+        if (target.closest('.transferir-paciente-btn')) {
+            transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+            transferModal.dataset.patientId = bedCard.dataset.patientId;
+            transferModal.dataset.oldBedId = bedCard.dataset.bedId;
+            
+            try {
+                const response = await fetch('/api/units-with-free-beds');
+                const result = await response.json();
+                unitsWithFreeBeds = result.data;
+
+                destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
+                unitsWithFreeBeds.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit.id;
+                    option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
+                    option.disabled = !unit.free_beds || unit.free_beds.length === 0;
+                    destinationUnitSelect.appendChild(option);
+                });
+                destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+                destinationBedSelect.disabled = true;
+                transferModal.classList.add('active');
+            } catch(error) {
+                console.error("Erro ao carregar dados para transferência:", error);
+                alert("Não foi possível carregar as unidades de destino.");
+            }
+        }
     });
 
     const closeModal = (modal) => { if(modal) modal.classList.remove('active'); };
     if(closePatientModal) closePatientModal.addEventListener('click', () => { closeModal(patientModal); patientForm.reset(); });
-    // ... (outros close/cancel sem alterações) ...
+    if(cancelPatientModal) cancelPatientModal.addEventListener('click', () => { closeModal(patientModal); patientForm.reset(); });
+    if(closeDischargeModal) closeDischargeModal.addEventListener('click', () => closeModal(dischargeModal));
+    if(cancelDischargeBtn) cancelDischargeBtn.addEventListener('click', () => closeModal(dischargeModal));
+    if(closeTransferModal) closeTransferModal.addEventListener('click', () => closeModal(transferModal));
+    if(cancelTransferBtn) cancelTransferBtn.addEventListener('click', () => closeModal(transferModal));
 
-    // --- LÓGICA COMPLETA E CORRIGIDA DOS BOTÕES DE AÇÃO ---
-    
-    // Salvar Paciente
+    // [LÓGICA CORRIGIDA E COMPLETA] Event listener para Salvar Paciente
     savePatientButton.addEventListener('click', async () => {
         const bedId = patientModal.dataset.bedId;
         const patientData = {
@@ -97,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         if (!patientData.name || !patientData.dob) {
-            alert('Por favor, preencha pelo menos o Nome e a Data de Nascimento.');
+            alert('Por favor, preencha pelo menos o Nome e a Data de Nascimento do paciente.');
             return;
         }
 
@@ -121,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Dar Alta
+    // [LÓGICA CORRIGIDA E COMPLETA] Event listener para Dar Alta
     confirmDischargeBtn.addEventListener('click', async () => {
         const patientId = dischargeModal.dataset.patientId;
         const bedId = dischargeModal.dataset.bedId;
@@ -143,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Lógica de Transferência
+    // [LÓGICA CORRIGIDA E COMPLETA] Event listeners para Transferência
     destinationUnitSelect.addEventListener('change', () => {
         const selectedUnitId = destinationUnitSelect.value;
         const selectedUnit = unitsWithFreeBeds.find(u => u.id == selectedUnitId);
@@ -185,8 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- LÓGICA PARA BUSCA AUTOMÁTICA DE CID ---
-    async function searchCid(query, resultsContainer) {
+    // [NOVO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID
+    async function searchCid(query, resultsContainer, cidInput) {
         if (query.length < 3) {
             resultsContainer.innerHTML = '';
             resultsContainer.classList.remove('active');
@@ -214,12 +310,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     hdPrimaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);
-        cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults), 300);
+        cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults, hdPrimaryCid), 300);
     });
 
     hdSecondaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);
-        cidTimeout = setTimeout(() => searchCid(hdSecondaryDesc.value, hdSecondaryResults), 300);
+        cidTimeout = setTimeout(() => searchCid(hdSecondaryDesc.value, hdSecondaryResults, hdSecondaryCid), 300);
     });
 
     document.addEventListener('click', function(e) {

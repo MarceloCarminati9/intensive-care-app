@@ -1,4 +1,4 @@
-// VERSÃO FINAL CORRIGIDA - COM ROTAS POST PARA EVOLUÇÃO E RECEITA
+// VERSÃO FINAL, COMPLETA E CORRIGIDA - 11/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -26,8 +26,7 @@ app.use(express.static(publicPath));
 
 const apiRouter = express.Router();
 
-// --- Rotas de Unidades e Leitos ---
-// (Sem alterações nesta seção)
+// --- ROTAS DE UNIDADES E LEITOS ---
 apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
@@ -44,6 +43,48 @@ apiRouter.get('/units', async (req, res) => {
     }
 });
 
+apiRouter.post('/units', async (req, res) => {
+    const { name, total_beds } = req.body;
+    if (!name || !total_beds || total_beds <= 0) {
+        return res.status(400).json({ error: 'Nome e número de leitos (maior que zero) são obrigatórios.' });
+    }
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const unitResult = await client.query('INSERT INTO units (name, total_beds) VALUES ($1, $2) RETURNING id', [name, total_beds]);
+        const unitId = unitResult.rows[0].id;
+        for (let i = 1; i <= total_beds; i++) {
+            await client.query('INSERT INTO beds (unit_id, bed_number, status) VALUES ($1, $2, $3)', [unitId, String(i), 'free']);
+        }
+        await client.query('COMMIT');
+        res.status(201).json({ message: 'Unidade e leitos criados com sucesso!', unitId });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error("Erro ao criar unidade", err);
+        res.status(500).json({ error: 'Erro no servidor ao criar unidade.' });
+    } finally {
+        client.release();
+    }
+});
+
+apiRouter.delete('/units/:id', async (req, res) => {
+    const { id } = req.params;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        await client.query('DELETE FROM beds WHERE unit_id = $1', [id]);
+        await client.query('DELETE FROM units WHERE id = $1', [id]);
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Unidade e leitos associados deletados com sucesso!' });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao deletar unidade:', err);
+        res.status(500).json({ error: 'Erro no servidor ao deletar unidade.' });
+    } finally {
+        client.release();
+    }
+});
+
 apiRouter.get('/units-with-free-beds', async (req, res) => {
     try {
         const sql = `
@@ -52,9 +93,9 @@ apiRouter.get('/units-with-free-beds', async (req, res) => {
                 u.name,
                 json_agg(
                     json_build_object('id', b.id, 'bed_number', b.bed_number)
-                ) FILTER (WHERE b.id IS NOT NULL) as free_beds
+                ) FILTER (WHERE b.id IS NOT NULL AND b.status = 'free') as free_beds
             FROM units u
-            LEFT JOIN beds b ON u.id = b.unit_id AND b.status = 'free'
+            LEFT JOIN beds b ON u.id = b.unit_id
             GROUP BY u.id
             ORDER BY u.name;
         `;
@@ -85,10 +126,10 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
     }
 });
 
-// --- Rotas de Pacientes ---
-// (Sem alterações nesta seção)
+
+// --- ROTAS DE PACIENTES ---
+
 apiRouter.post('/patients', async (req, res) => {
-    // [CORREÇÃO] Atualizado para pegar os novos nomes dos campos
     const { 
         bed_id, name, mother_name, dob, cns, dih, 
         hd_primary_desc, hd_primary_cid, secondary_diagnoses_desc, secondary_diagnoses_cid, hpp, allergies
@@ -101,8 +142,6 @@ apiRouter.post('/patients', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-
-        // [CORREÇÃO] SQL atualizado para usar as colunas corretas, incluindo as de diagnóstico secundário
         const patientSql = `
             INSERT INTO patients (
                 name, mother_name, dob, cns, dih, 
@@ -126,7 +165,6 @@ apiRouter.post('/patients', async (req, res) => {
 
         await client.query('COMMIT');
         res.status(201).json({ message: 'Paciente admitido com sucesso!', patientId: newPatientId });
-
     } catch (err) {
         await client.query('ROLLBACK');
         console.error('Erro ao admitir paciente:', err);
@@ -134,19 +172,19 @@ apiRouter.post('/patients', async (req, res) => {
     } finally {
         client.release();
     }
-});apiRouter.get('/patients/:id', async (req, res) => {
+});
+
+apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const sql = `
             SELECT p.*, b.bed_number, u.name as unit_name
             FROM patients p
-            LEFT JOIN beds b ON p.bed_id = b.id
-            LEFT JOIN units u ON p.unit_id = u.id
+            LEFT JOIN beds b ON p.current_bed_id = b.id
+            LEFT JOIN units u ON b.unit_id = u.id
             WHERE p.id = $1;
         `;
         const { rows } = await pool.query(sql, [req.params.id]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Paciente não encontrado." });
-        }
+        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
         res.json({ data: rows[0] });
     } catch (err) {
         res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
@@ -154,24 +192,55 @@ apiRouter.post('/patients', async (req, res) => {
 });
 
 apiRouter.post('/patients/:id/discharge', async (req, res) => {
-    // Código existente, sem alterações
+    const { id } = req.params;
+    const { bedId, reason, date } = req.body;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        await client.query(`UPDATE patients SET discharge_date = $1, discharge_reason = $2, current_bed_id = NULL WHERE id = $3`, [date, reason, id]);
+        await client.query(`UPDATE beds SET status = 'free', patient_id = NULL, patient_name = NULL WHERE id = $1`, [bedId]);
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Alta registrada com sucesso!' });
+    } catch(err) {
+        await client.query('ROLLBACK');
+        console.error("Erro ao dar alta:", err);
+        res.status(500).json({ error: 'Erro no servidor ao registrar alta.' });
+    } finally {
+        client.release();
+    }
 });
 
 apiRouter.post('/patients/:id/transfer', async (req, res) => {
-    // Código existente, sem alterações
+    const { id } = req.params;
+    const { oldBedId, newBedId } = req.body;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        await client.query(`UPDATE patients SET current_bed_id = $1 WHERE id = $2`, [newBedId, id]);
+        await client.query(`UPDATE beds SET status = 'free', patient_id = NULL, patient_name = NULL WHERE id = $1`, [oldBedId]);
+        const patientResult = await client.query('SELECT name FROM patients WHERE id = $1', [id]);
+        const patientName = patientResult.rows[0].name;
+        await client.query(`UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3`, [id, patientName, newBedId]);
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Paciente transferido com sucesso!' });
+    } catch(err) {
+        await client.query('ROLLBACK');
+        console.error("Erro na transferência:", err);
+        res.status(500).json({ error: 'Erro no servidor ao transferir paciente.' });
+    } finally {
+        client.release();
+    }
 });
 
-// --- Rotas de Histórico ---
 
-// Rota para SALVAR uma nova evolução médica
+// --- ROTAS DE HISTÓRICO ---
+
 apiRouter.post('/patients/:id/evolutions', async (req, res) => {
     const { id } = req.params;
-    const evolutionData = req.body; // O objeto JSON completo da evolução
-    
+    const evolutionData = req.body;
     if (!id || !evolutionData) {
         return res.status(400).json({ error: 'ID do paciente e dados da evolução são obrigatórios.' });
     }
-    
     try {
         const sql = `INSERT INTO evolutions (patient_id, content) VALUES ($1, $2) RETURNING *;`;
         const { rows } = await pool.query(sql, [id, evolutionData]);
@@ -182,14 +251,11 @@ apiRouter.post('/patients/:id/evolutions', async (req, res) => {
     }
 });
 
-// Rota para SALVAR uma nova receita
 apiRouter.post('/prescriptions', async (req, res) => {
     const { patient_id, medicamento, posologia, via, quantidade } = req.body;
-    
     if (!patient_id || !medicamento || !posologia) {
         return res.status(400).json({ message: 'Campos obrigatórios (paciente, medicamento, posologia) estão faltando.' });
     }
-    
     try {
         const sql = `
             INSERT INTO prescriptions (patient_id, medicamento, posologia, via_administracao, quantidade)
@@ -204,10 +270,8 @@ apiRouter.post('/prescriptions', async (req, res) => {
     }
 });
 
-// Rota para BUSCAR TODAS as evoluções de um paciente
 apiRouter.get('/patients/:id/evolutions', async (req, res) => {
     try {
-        // O "SELECT *" já inclui as novas colunas updated_at e deleted_at
         const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
         const { rows } = await pool.query(sql, [req.params.id]);
         res.json({ data: rows });
@@ -216,7 +280,6 @@ apiRouter.get('/patients/:id/evolutions', async (req, res) => {
     }
 });
 
-// Rota para BUSCAR TODAS as receitas de um paciente
 apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC', [req.params.id]);
@@ -226,7 +289,6 @@ apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
     }
 });
 
-// Rota para BUSCAR UMA ÚNICA evolução pelo seu ID (para edição/cópia)
 apiRouter.get('/evolutions/:evolutionId', async (req, res) => {
     try {
         const { evolutionId } = req.params;
@@ -241,17 +303,13 @@ apiRouter.get('/evolutions/:evolutionId', async (req, res) => {
     }
 });
 
-// Rota para ATUALIZAR uma evolução existente
 apiRouter.put('/evolutions/:evolutionId', async (req, res) => {
     const { evolutionId } = req.params;
     const evolutionData = req.body;
-
     if (!evolutionData) {
         return res.status(400).json({ error: 'Dados da evolução são obrigatórios.' });
     }
-    
     try {
-        // Atualiza tanto o conteúdo quanto a data de modificação
         const sql = `UPDATE evolutions SET content = $1, updated_at = NOW() WHERE id = $2 RETURNING *;`;
         const { rows } = await pool.query(sql, [evolutionData, evolutionId]);
          if (rows.length === 0) {
@@ -264,117 +322,25 @@ apiRouter.put('/evolutions/:evolutionId', async (req, res) => {
     }
 });
 
-// [NOVO] Rota para "excluir suavemente" (soft delete) uma evolução
 apiRouter.delete('/evolutions/:evolutionId', async (req, res) => {
     const { evolutionId } = req.params;
-    
     try {
-        // Este comando não apaga a linha, apenas define a data e hora em 'deleted_at'
         const sql = `UPDATE evolutions SET deleted_at = NOW() WHERE id = $1 RETURNING *;`;
-        
         const { rows } = await pool.query(sql, [evolutionId]);
-
         if (rows.length === 0) {
             return res.status(404).json({ message: "Evolução não encontrada para excluir." });
         }
-        
         res.status(200).json({ message: 'Evolução marcada como excluída com sucesso!', data: rows[0] });
-
     } catch (err) {
         console.error('Erro ao marcar evolução como excluída:', err);
         res.status(500).json({ error: 'Erro no servidor ao excluir a evolução.' });
-    }
-});
-// [NOVO] Rota para BUSCAR UMA ÚNICA evolução pelo seu ID
-apiRouter.get('/evolutions/:evolutionId', async (req, res) => {
-    try {
-        const { evolutionId } = req.params;
-        const sql = `SELECT * FROM evolutions WHERE id = $1`;
-        const { rows } = await pool.query(sql, [evolutionId]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Evolução não encontrada." });
-        }
-        res.json({ data: rows[0] });
-    } catch (err) {
-        res.status(500).json({ error: 'Erro no servidor ao buscar a evolução.' });
-    }
-});
-
-// [NOVO] Rota para ATUALIZAR uma evolução existente
-apiRouter.put('/evolutions/:evolutionId', async (req, res) => {
-    const { evolutionId } = req.params;
-    const evolutionData = req.body;
-
-    if (!evolutionData) {
-        return res.status(400).json({ error: 'Dados da evolução são obrigatórios.' });
-    }
-    
-    try {
-        const sql = `UPDATE evolutions SET content = $1, updated_at = NOW() WHERE id = $2 RETURNING *;`;
-        const { rows } = await pool.query(sql, [evolutionData, evolutionId]);
-         if (rows.length === 0) {
-            return res.status(404).json({ message: "Evolução não encontrada para atualizar." });
-        }
-        res.status(200).json({ message: 'Evolução atualizada com sucesso!', data: rows[0] });
-    } catch (err) {
-        console.error('Erro ao atualizar evolução:', err);
-        res.status(500).json({ error: 'Erro no servidor ao atualizar a evolução.' });
-    }
-});
-
-// [NOVO] Rota para SALVAR uma nova receita
-apiRouter.post('/prescriptions', async (req, res) => {
-    const { patient_id, medicamento, posologia, via, quantidade } = req.body;
-    
-    if (!patient_id || !medicamento || !posologia) {
-        return res.status(400).json({ message: 'Campos obrigatórios (paciente, medicamento, posologia) estão faltando.' });
-    }
-    
-    try {
-        const sql = `
-            INSERT INTO prescriptions (patient_id, medicamento, posologia, via_administracao, quantidade)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING *;
-        `;
-        const { rows } = await pool.query(sql, [patient_id, medicamento, posologia, via, quantidade]);
-        res.status(201).json({ message: 'Receita salva com sucesso!', data: rows[0] });
-    } catch (err) {
-        console.error('Erro ao salvar receita:', err);
-        res.status(500).json({ error: 'Falha ao salvar a receita no servidor.' });
-    }
-});
-
-// Rotas GET para buscar histórico (já corrigidas anteriormente)
-apiRouter.get('/patients/:id/evolutions', async (req, res) => {
-    try {
-        const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
-        const { rows } = await pool.query(sql, [req.params.id]);
-        res.json({ data: rows });
-    } catch (err) {
-        if (err.code === '42P01') {
-            res.json({ data: [] });
-        } else {
-            res.status(500).json({ error: 'Erro no servidor ao buscar evoluções.' });
-        }
-    }
-});
-
-apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
-    try {
-        const { rows } = await pool.query('SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC', [req.params.id]);
-        res.json({ data: rows });
-    } catch (err) {
-        if (err.code === '42P01') {
-            res.json({ data: [] });
-        } else {
-            res.status(500).json({ error: 'Falha ao buscar receitas.' });
-        }
     }
 });
 
 
 app.use('/api', apiRouter);
 
+// Rota final para servir o frontend
 app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
 });
