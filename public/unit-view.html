@@ -53,15 +53,24 @@
             </div>
             <hr>
             <div class="form-group">
-                <label for="hd_primary_desc">Hipótese Diagnóstica Primária</label>
-                <textarea id="hd_primary_desc" rows="2" placeholder="Descrição do diagnóstico..."></textarea>
-                <label for="hd_primary_cid" style="margin-top: 8px;">CID-10</label>
-                <input type="text" id="hd_primary_cid" placeholder="Ex: J18.9">
-            </div>
-             <div class="form-group">
-                <label for="secondary_diagnoses">Diagnósticos Secundários (e CID, se houver)</label>
-                <textarea id="secondary_diagnoses" rows="3" placeholder="Liste outros diagnósticos..."></textarea>
-            </div>
+    <label for="hd_primary_desc">Hipótese Diagnóstica Primária</label>
+    <div class="autocomplete-container">
+        <textarea id="hd_primary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+        <div class="autocomplete-results" id="hd_primary_results"></div>
+    </div>
+    <label for="hd_primary_cid" style="margin-top: 8px;">CID-10</label>
+    <input type="text" id="hd_primary_cid" placeholder="Ex: J18.9">
+</div>
+
+<div class="form-group">
+    <label for="secondary_diagnoses_desc">Diagnósticos Secundários (e CID, se houver)</label>
+    <div class="autocomplete-container">
+        <textarea id="secondary_diagnoses_desc" rows="3" placeholder="Comece a digitar o diagnóstico..."></textarea>
+        <div class="autocomplete-results" id="secondary_diagnoses_results"></div>
+    </div>
+    <label for="secondary_diagnoses_cid" style="margin-top: 8px;">CID-10</label>
+    <input type="text" id="secondary_diagnoses_cid" placeholder="Ex: E11.9">
+</div>
             <hr>
             <div class="form-group">
                 <label for="hpp">História Patológica Pregressa (HPP)</label>

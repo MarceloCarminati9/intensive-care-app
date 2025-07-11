@@ -88,9 +88,10 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
 // --- Rotas de Pacientes ---
 // (Sem alterações nesta seção)
 apiRouter.post('/patients', async (req, res) => {
+    // [CORREÇÃO] Atualizado para pegar os novos nomes dos campos
     const { 
         bed_id, name, mother_name, dob, cns, dih, 
-        hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies
+        hd_primary_desc, hd_primary_cid, secondary_diagnoses_desc, secondary_diagnoses_cid, hpp, allergies
     } = req.body;
 
     if (!bed_id || !name || !dob) {
@@ -101,17 +102,27 @@ apiRouter.post('/patients', async (req, res) => {
     try {
         await client.query('BEGIN');
 
+        // [CORREÇÃO] SQL atualizado para usar as colunas corretas, incluindo as de diagnóstico secundário
         const patientSql = `
-            INSERT INTO patients (name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies, current_bed_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            INSERT INTO patients (
+                name, mother_name, dob, cns, dih, 
+                hd_primary_desc, hd_primary_cid, 
+                secondary_diagnoses_desc, secondary_diagnoses_cid, 
+                hpp, allergies, current_bed_id
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             RETURNING id;
         `;
-        const patientParams = [name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies, bed_id];
+        const patientParams = [
+            name, mother_name, dob, cns, dih, 
+            hd_primary_desc, hd_primary_cid, 
+            secondary_diagnoses_desc, secondary_diagnoses_cid, 
+            hpp, allergies, bed_id
+        ];
         const patientResult = await client.query(patientSql, patientParams);
         const newPatientId = patientResult.rows[0].id;
 
-        const bedSql = `UPDATE beds SET status = 'occupied', patient_id = $1 WHERE id = $2;`;
-        await client.query(bedSql, [newPatientId, bed_id]);
+        const bedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3;`;
+        await client.query(bedSql, [newPatientId, name, bed_id]);
 
         await client.query('COMMIT');
         res.status(201).json({ message: 'Paciente admitido com sucesso!', patientId: newPatientId });
@@ -123,8 +134,7 @@ apiRouter.post('/patients', async (req, res) => {
     } finally {
         client.release();
     }
-});
-apiRouter.get('/patients/:id', async (req, res) => {
+});apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const sql = `
             SELECT p.*, b.bed_number, u.name as unit_name
