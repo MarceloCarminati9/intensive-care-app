@@ -361,3 +361,10 @@ body {
     margin-right: 10px;
     font-weight: 600;
 }
+.autocomplete-item.error-item {
+    color: var(--danger-red);
+    cursor: default;
+}
+.autocomplete-item.error-item:hover {
+    background-color: transparent;
+}

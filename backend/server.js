@@ -1,4 +1,4 @@
-// VERSÃO FINAL, COMPLETA E CORRIGIDA - 11/07/2025
+// VERSÃO DEFINITIVA, COMPLETA E CORRIGIDA - 11/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -177,16 +177,25 @@ apiRouter.post('/patients', async (req, res) => {
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const sql = `
-            SELECT p.*, b.bed_number, u.name as unit_name
+            SELECT 
+                p.id, p.name, p.mother_name, p.dob, p.cns, p.dih, 
+                p.hd_primary_desc, p.hd_primary_cid, 
+                p.secondary_diagnoses_desc, p.secondary_diagnoses_cid,
+                p.hpp, p.allergies, p.current_bed_id,
+                b.bed_number, 
+                u.name as unit_name
             FROM patients p
             LEFT JOIN beds b ON p.current_bed_id = b.id
             LEFT JOIN units u ON b.unit_id = u.id
             WHERE p.id = $1;
         `;
         const { rows } = await pool.query(sql, [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Paciente não encontrado." });
+        }
         res.json({ data: rows[0] });
     } catch (err) {
+        console.error("Erro ao buscar paciente:", err);
         res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
     }
 });
@@ -259,9 +268,7 @@ apiRouter.post('/prescriptions', async (req, res) => {
     try {
         const sql = `
             INSERT INTO prescriptions (patient_id, medicamento, posologia, via_administracao, quantidade)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING *;
-        `;
+            VALUES ($1, $2, $3, $4, $5) RETURNING *;`;
         const { rows } = await pool.query(sql, [patient_id, medicamento, posologia, via, quantidade]);
         res.status(201).json({ message: 'Receita salva com sucesso!', data: rows[0] });
     } catch (err) {

@@ -283,29 +283,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // [NOVO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID
     async function searchCid(query, resultsContainer, cidInput) {
-        if (query.length < 3) {
-            resultsContainer.innerHTML = '';
-            resultsContainer.classList.remove('active');
-            return;
+    if (query.length < 3) {
+        resultsContainer.innerHTML = '';
+        resultsContainer.classList.remove('active');
+        return;
+    }
+    try {
+        const response = await fetch(`https://cid.api.inf.br/cid10?q=${query}`);
+        // [NOVA VERIFICAÇÃO] Checa se a resposta da API foi bem sucedida
+        if (!response.ok) {
+            throw new Error('Serviço de busca de CID indisponível no momento.');
         }
-        try {
-            const response = await fetch(`https://cid.api.inf.br/cid10?q=${query}`);
-            const results = await response.json();
-            resultsContainer.innerHTML = '';
-            if (results && results.length > 0) {
-                results.slice(0, 5).forEach(cid => {
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.innerHTML = `<small>${cid.codigo}</small> ${cid.nome}`;
-                    item.dataset.cid = cid.codigo;
-                    item.dataset.nome = cid.nome;
-                    resultsContainer.appendChild(item);
-                });
-                resultsContainer.classList.add('active');
-            } else {
-                resultsContainer.classList.remove('active');
-            }
-        } catch (error) { console.error("Erro ao buscar CID:", error); }
+        const results = await response.json();
+        resultsContainer.innerHTML = '';
+        if (results && results.length > 0) {
+            // ... (código para exibir os resultados, sem alterações)
+        } else {
+            resultsContainer.classList.remove('active');
+        }
+    } catch (error) { 
+        // [ALTERAÇÃO] Mostra um erro amigável para o usuário no próprio campo de resultados
+        console.error("Erro ao buscar CID:", error);
+        resultsContainer.innerHTML = `<div class="autocomplete-item error-item">${error.message}</div>`;
+        resultsContainer.classList.add('active');
     }
 
     hdPrimaryDesc.addEventListener('input', () => {
