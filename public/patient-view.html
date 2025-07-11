@@ -10,44 +10,43 @@
 <body>
     <div class="patient-view-container">
       <header class="patient-header">
-    <div class="patient-info-main">
-        <a href="dashboard.html" class="back-link">&larr; Voltar ao Dashboard</a>
-        <h1 id="patientNameHeader">Carregando...</h1>
-        <div class="patient-details-grid">
-            <p><strong>Leito:</strong> <span id="patientBed">N/A</span></p>
-            <p><strong>Idade:</strong> <span id="patientAge">N/A</span></p>
-            <p><strong>CNS:</strong> <span id="patientCns">N/A</span></p>
-            <p><strong>DIH:</strong> <span id="patientDih">N/A</span></p>
+        <div class="patient-info-main">
+            <a href="dashboard.html" class="back-link">&larr; Voltar ao Dashboard</a>
+            <h1 id="patientNameHeader">Carregando...</h1>
+            <div class="patient-details-grid">
+                <p><strong>Leito:</strong> <span id="patientBed">N/A</span></p>
+                <p><strong>Idade:</strong> <span id="patientAge">N/A</span></p>
+                <p><strong>CNS:</strong> <span id="patientCns">N/A</span></p>
+                <p><strong>DIH:</strong> <span id="patientDih">N/A</span></p>
+            </div>
         </div>
-    </div>
-    <div class="patient-info-secondary">
-        <details>
-            <summary><strong>Ver Histórico Patológico Pregresso (HPP)</strong></summary>
-            <p id="patientHpp">Nenhuma informação de HPP cadastrada.</p>
-        </details>
-        <details>
-            <summary><strong>Ver Hipótese Diagnóstica (HD)</strong></summary>
-            <p id="patientHd">Nenhuma hipótese diagnóstica cadastrada.</p>
-        </details>
-    </div>
-</header>
+        <div class="patient-info-secondary">
+            <details>
+                <summary><strong>Ver Histórico Patológico Pregresso (HPP)</strong></summary>
+                <p id="patientHpp">Nenhuma informação de HPP cadastrada.</p>
+            </details>
+            <details>
+                <summary><strong>Ver Hipótese Diagnóstica (HD)</strong></summary>
+                <p id="patientHd">Nenhuma hipótese diagnóstica cadastrada.</p>
+            </details>
+        </div>
+    </header>
 
         <main>
             <section class="actions-section">
                 <h2>Ações Rápidas</h2>
                 <div class="actions-grid">
-                    <a href="evolucao-medica.html" class="action-card" id="goToEvolutionBtn">Nova Evolução Médica</a>
-                    <a href="receita.html" class="action-card" id="goToPrescriptionBtn">Novo Receituário</a>
-                    
-                    <a href="#" class="action-card disabled" id="goToAdmissionBtn">Resumo de Admissão</a>
-                    <a href="#" class="action-card disabled" id="goToDischargeBtn">Resumo de Alta</a>
+                    <a href="#" class="action-card" id="goToEvolutionBtn">Nova Evolução Médica</a>
+                    <a href="#" class="action-card" id="goToPrescriptionBtn">Novo Receituário</a>
+                    <a href="#" class="action-card disabled">Resumo de Admissão</a>
+                    <a href="#" class="action-card disabled">Resumo de Alta</a>
                 </div>
             </section>
 
             <section class="history-section">
                 <h2>Histórico do Paciente</h2>
                 <div id="historyList" class="history-list">
-                    <p>Nenhum histórico encontrado.</p>
+                    <p>Carregando histórico...</p>
                 </div>
             </section>
         </main>
@@ -60,7 +59,7 @@
                 <button id="closeViewerBtn" class="close-button">&times;</button>
             </div>
             <div id="viewerContent" class="modal-body">
-                </div>
+            </div>
             <div class="modal-footer">
                 <button id="printDocumentBtn" class="button-primary">Imprimir</button>
             </div>
