@@ -1,8 +1,7 @@
-// VERSÃO COMPLETA E CORRIGIDA (1 de 2)
+// VERSÃO ATUALIZADA - COM LÓGICA DE AÇÕES NO HISTÓRICO
 
 document.addEventListener('DOMContentLoaded', function() {
     const params = new URLSearchParams(window.location.search);
-    // [CORREÇÃO] Garantindo que sempre lemos 'patientId' da URL.
     const patientId = params.get('patientId');
 
     // --- Elementos da Página ---
@@ -20,12 +19,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeViewerBtn = document.getElementById('closeViewerBtn');
     const printDocumentBtn = document.getElementById('printDocumentBtn');
 
+    // [ALTERAÇÃO] Função para gerar o HTML do relatório de evolução (movida para cá para ser reutilizável)
+    function generateEvolutionReportHTML(patientData, evolutionContent) {
+        if (!patientData || !evolutionContent) return '<p>Dados insuficientes para gerar o relatório.</p>';
+        const getField = (field) => evolutionContent[field] || 'N/A';
+        const patientDIH = patientData.dih ? new Date(patientData.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
+        
+        let reportHTML = `<div class="report-id-section"><h4>Identificação do Paciente</h4> ... </div>`; // Estrutura simplificada
+        reportHTML = `
+            <div class="report-header"><h3>Evolução Médica Diária</h3><p>Intensive Care Brasil</p></div>
+            <div class="report-id-section">
+                <h4>Identificação do Paciente</h4>
+                <div class="report-id-grid">
+                    <p><strong>Nome:</strong> ${patientData.name || 'N/A'}</p>
+                    <p><strong>Idade:</strong> ${patientData.age || 'N/A'} anos</p>
+                    <p><strong>Leito:</strong> ${patientData.bed_number || 'N/A'}</p>
+                    <p><strong>DIH:</strong> ${patientDIH}</p>
+                </div>
+            </div>
+            <div class="report-section"><h4>Impressão 24h</h4><p>${getField('impressao24h')}</p></div>
+            <div class="report-section"><h4>Condutas</h4><p>${getField('condutas')}</p></div>
+            <div class="signature-area"><div class="signature-line">${getField('medico_responsavel')}<br>CRM: ${getField('crm_medico')}</div></div>
+        `;
+        return reportHTML;
+    }
+    
     // Função principal que carrega todos os dados da página
     async function loadPageData() {
         if (!patientId) {
             patientNameHeader.textContent = "ERRO: ID do Paciente não encontrado na URL.";
             patientNameHeader.style.color = 'red';
-            // Desabilita os botões se não houver ID
             if(goToEvolutionBtn) goToEvolutionBtn.classList.add('disabled');
             if(goToPrescriptionBtn) goToPrescriptionBtn.classList.add('disabled');
             return;
@@ -38,10 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const patient = patientResult.data;
 
             updateHeaders(patient);
-            // Atualiza os links de ação com o ID do paciente
             updateActionLinks(patientId);
 
-            // Busca o histórico de evoluções e receitas em paralelo
             const [evolutionsResponse, prescriptionsResponse] = await Promise.all([
                 fetch(`/api/patients/${patientId}/evolutions`),
                 fetch(`/api/patients/${patientId}/prescriptions`)
@@ -59,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ...(prescriptionsResult.data || []).map(item => ({ ...item, type: 'Receituário' }))
             ];
             
-            renderHistory(combinedHistory);
+            renderHistory(combinedHistory, patient); // Passa o objeto 'patient' para a função
 
         } catch (error) {
             console.error("Erro ao carregar dados da página:", error);
@@ -68,42 +89,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Função para atualizar o cabeçalho com os dados do paciente
     function updateHeaders(patient) {
+        // (Sem alterações aqui, código existente)
         const patientBed = document.getElementById('patientBed');
         const patientAge = document.getElementById('patientAge');
         const patientCns = document.getElementById('patientCns');
         const patientDih = document.getElementById('patientDih');
         const patientHpp = document.getElementById('patientHpp');
         const patientHd = document.getElementById('patientHd');
-
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
         patientBed.textContent = `${patient.unit_name || 'Unidade não informada'} - Leito ${patient.bed_number || 'N/A'}`;
         patientAge.textContent = patient.age ? `${patient.age} anos` : 'N/A';
         patientCns.textContent = patient.cns || 'N/A';
-        
         if (patient.dih) {
             const formattedDate = new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
             patientDih.textContent = formattedDate;
         } else {
             patientDih.textContent = 'N/A';
         }
-        
-        // As informações de HPP e HD podem vir do objeto 'history' da tabela de admissão.
-        // Por enquanto, deixaremos como estava, buscando da tabela 'patients'.
         if (patient.hpp) patientHpp.textContent = patient.hpp;
         if (patient.hd) patientHd.textContent = patient.hd;
     }
 
-    // Função para criar os links corretos e consistentes
     function updateActionLinks(pId) {
-        // [CORREÇÃO] Ambos os links agora usam 'patientId', garantindo consistência.
         if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?patientId=${pId}`;
         if (goToPrescriptionBtn) goToPrescriptionBtn.href = `receita.html?patientId=${pId}`; 
     }
 
-    // Função para renderizar o histórico na tela
-    function renderHistory(history) {
+    // [ALTERAÇÃO PRINCIPAL] Função para renderizar o histórico na tela com botões
+    function renderHistory(history, patientData) {
         historyList.innerHTML = '';
         if (!history || history.length === 0) {
             historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';
@@ -120,67 +134,77 @@ document.addEventListener('DOMContentLoaded', function() {
             const historyItemDiv = document.createElement('div');
             historyItemDiv.className = 'history-item';
             historyItemDiv.dataset.item = JSON.stringify(item); 
+            historyItemDiv.dataset.patient = JSON.stringify(patientData);
 
-            historyItemDiv.innerHTML = `<div class="history-item-header"><strong>${item.type}</strong> - ${formattedDate} às ${formattedTime}</div>`;
+            let buttonsHTML = '';
+            if (item.type === 'Evolução Médica') {
+                buttonsHTML = `
+                    <button class="button-secondary" data-action="view">Visualizar/Imprimir</button>
+                    <button class="button-secondary" data-action="copy">Copiar para Nova</button>
+                    <button class="button-secondary" data-action="edit">Editar</button>
+                `;
+            } else if (item.type === 'Receituário') {
+                buttonsHTML = `
+                    <button class="button-secondary" data-action="view">Visualizar/Imprimir</button>
+                `;
+            }
+
+            historyItemDiv.innerHTML = `
+                <div class="history-item-content">
+                    <div class="history-item-title">${item.type} - ${formattedDate} às ${formattedTime}</div>
+                    <div class="history-item-actions">${buttonsHTML}</div>
+                </div>
+            `;
             historyList.appendChild(historyItemDiv);
         });
     }
 
-    // Função para abrir o modal de visualização
-    function openHistoryViewer(item) {
-        viewerTitle.textContent = `Visualizar ${item.type}`;
-        
-        let contentHtml = '';
-        if (item.type === 'Receituário') {
-            contentHtml = `
-                <h4>Medicamento</h4><p>${item.medicamento}</p>
-                <h4>Posologia</h4><p>${item.posologia}</p>
-                <h4>Via de Administração</h4><p>${item.via_administracao || 'N/A'}</p>
-                <h4>Quantidade</h4><p>${item.quantidade || 'N/A'}</p>
-                <br><small>Emitido em: ${new Date(item.created_at).toLocaleString('pt-BR')}</small>
-            `;
-        } else if (item.type === 'Evolução Médica') {
-            // Aqui você pode montar um HTML formatado para a evolução
-            // Por enquanto, vamos exibir o JSON bruto para visualização
-            contentHtml = `<pre>${JSON.stringify(item.content, null, 2)}</pre>`;
-        }
-
-        viewerContent.innerHTML = contentHtml;
-        historyViewerModal.classList.add('active');
-    }
-
-    // --- Lógica de Eventos ---
+    // [ALTERAÇÃO PRINCIPAL] Lógica de Eventos para os novos botões
     historyList.addEventListener('click', function(event) {
-        const clickedItemDiv = event.target.closest('.history-item');
-        if (clickedItemDiv && clickedItemDiv.dataset.item) {
-            const itemData = JSON.parse(clickedItemDiv.dataset.item);
-            openHistoryViewer(itemData);
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+
+        const action = button.dataset.action;
+        const historyItemDiv = button.closest('.history-item');
+        const itemData = JSON.parse(historyItemDiv.dataset.item);
+        const patientData = JSON.parse(historyItemDiv.dataset.patient);
+
+        switch(action) {
+            case 'view':
+                viewerTitle.textContent = `Visualizar ${itemData.type}`;
+                let contentHtml = '';
+                if (itemData.type === 'Receituário') {
+                    contentHtml = `
+                        <div class="report-section"><h4>Medicamento</h4><p>${itemData.medicamento}</p></div>
+                        <div class="report-section"><h4>Posologia</h4><p>${itemData.posologia}</p></div>
+                    `;
+                } else if (itemData.type === 'Evolução Médica') {
+                    contentHtml = generateEvolutionReportHTML(patientData, itemData.content);
+                }
+                viewerContent.innerHTML = contentHtml;
+                historyViewerModal.classList.add('active');
+                break;
+            
+            case 'edit':
+                window.location.href = `patient-evolution.html?patientId=${patientId}&evolutionId=${itemData.id}`;
+                break;
+
+            case 'copy':
+                 window.location.href = `patient-evolution.html?patientId=${patientId}&copyFromId=${itemData.id}`;
+                break;
         }
     });
 
     if (closeViewerBtn) closeViewerBtn.addEventListener('click', () => historyViewerModal.classList.remove('active'));
-    
     if (printDocumentBtn) {
         printDocumentBtn.addEventListener('click', () => {
-            const contentToPrint = viewerContent.innerHTML;
             const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>${viewerTitle.textContent}</title>
-                        <link rel="stylesheet" href="patient-view-style.css">
-                    </head>
-                    <body>
-                        <div class="print-header"><h3>${viewerTitle.textContent}</h3></div>
-                        ${contentToPrint}
-                    </body>
-                </html>`
-            );
+            const styles = document.querySelector('link[href="patient-view-style.css"]').outerHTML;
+            printWindow.document.write(`<html><head><title>Imprimir</title>${styles}</head><body>${viewerContent.innerHTML}</body></html>`);
             printWindow.document.close();
-            setTimeout(() => { printWindow.print(); }, 500);
+            setTimeout(() => printWindow.print(), 500);
         });
     }
 
-    // --- Inicialização ---
     loadPageData();
 });

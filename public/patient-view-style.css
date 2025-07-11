@@ -408,3 +408,21 @@ h2 {
         font-size: 12pt;
     }
 }
+/* Adicionado para os botões de ação no histórico do paciente */
+.history-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.history-item-title {
+    font-weight: 600;
+    color: var(--dark-blue-text);
+}
+
+.history-item-actions {
+    display: flex;
+    gap: 10px;
+}
