@@ -88,28 +88,42 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
 // --- Rotas de Pacientes ---
 // (Sem alterações nesta seção)
 apiRouter.post('/patients', async (req, res) => {
-    const { name, dob, age, cns, dih, unitId, bedId } = req.body;
-    if (!name || !unitId || !bedId) {
-        return res.status(400).json({ error: 'Nome, ID da unidade e ID do leito são obrigatórios.' });
+    const { 
+        bed_id, name, mother_name, dob, cns, dih, 
+        hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies
+    } = req.body;
+
+    if (!bed_id || !name || !dob) {
+        return res.status(400).json({ error: 'ID do leito, nome e data de nascimento são obrigatórios.' });
     }
+
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const patientSql = 'INSERT INTO patients (name, dob, age, cns, dih, unit_id, bed_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name';
-        const patientResult = await client.query(patientSql, [name, dob, age, cns, dih, unitId, bedId]);
-        const newPatient = patientResult.rows[0];
-        const bedSql = 'UPDATE beds SET status = $1, patient_id = $2, patient_name = $3 WHERE id = $4';
-        await client.query(bedSql, ['occupied', newPatient.id, newPatient.name, bedId]);
+
+        const patientSql = `
+            INSERT INTO patients (name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies, current_bed_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            RETURNING id;
+        `;
+        const patientParams = [name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies, bed_id];
+        const patientResult = await client.query(patientSql, patientParams);
+        const newPatientId = patientResult.rows[0].id;
+
+        const bedSql = `UPDATE beds SET status = 'occupied', patient_id = $1 WHERE id = $2;`;
+        await client.query(bedSql, [newPatientId, bed_id]);
+
         await client.query('COMMIT');
-        res.status(201).json({ message: 'Paciente cadastrado com sucesso!', data: newPatient });
+        res.status(201).json({ message: 'Paciente admitido com sucesso!', patientId: newPatientId });
+
     } catch (err) {
         await client.query('ROLLBACK');
-        res.status(500).json({ error: 'Erro no servidor ao cadastrar paciente.' });
+        console.error('Erro ao admitir paciente:', err);
+        res.status(500).json({ error: 'Erro no servidor ao admitir paciente.' });
     } finally {
         client.release();
     }
 });
-
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const sql = `

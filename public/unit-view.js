@@ -1,7 +1,9 @@
+// VERSÃO FINAL E UNIFICADA - COM TODAS AS FUNCIONALIDADES E CORREÇÕES
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // =================================================================================
-    // INICIALIZAÇÃO E CARREGAMENTO DE DADOS
+    // SELEÇÃO DE ELEMENTOS (COMPLETA)
     // =================================================================================
     const params = new URLSearchParams(window.location.search);
     const unitId = params.get('unitId');
@@ -23,10 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const cancelDischargeBtn = document.getElementById('cancelDischargeBtn');
     const confirmDischargeBtn = document.getElementById('confirmDischargeBtn');
     const dischargePatientName = document.getElementById('dischargePatientName');
-    const dischargeReasonSelect = document.getElementById('dischargeReason');
     const dischargeDateInput = document.getElementById('dischargeDate');
 
-    // [NOVO] Modal de TRANSFERÊNCIA
+    // Modal de TRANSFERÊNCIA
     const transferModal = document.getElementById('transferModal');
     const closeTransferModal = document.getElementById('closeTransferModal');
     const cancelTransferBtn = document.getElementById('cancelTransferBtn');
@@ -34,13 +35,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const transferPatientName = document.getElementById('transferPatientName');
     const destinationUnitSelect = document.getElementById('destinationUnitSelect');
     const destinationBedSelect = document.getElementById('destinationBedSelect');
-    let unitsWithFreeBeds = []; // Armazena dados para o modal
+    let unitsWithFreeBeds = []; // Armazena dados para o modal de transferência
 
     if (!unitId) {
         unitNameTitle.textContent = "ID da Unidade não fornecido.";
         bedGridContainer.innerHTML = '<p style="color: red;">Volte ao dashboard e selecione uma unidade.</p>';
         return;
     }
+
+    // =================================================================================
+    // FUNÇÕES DE CARREGAMENTO E RENDERIZAÇÃO
+    // =================================================================================
 
     async function loadUnitAndBeds() {
         try {
@@ -92,29 +97,28 @@ document.addEventListener('DOMContentLoaded', function() {
             bedGridContainer.appendChild(bedCard);
         });
     }
-    
+
     // =================================================================================
-    // LÓGICA DE EVENTOS DA PÁGINA
+    // LÓGICA DE EVENTOS DA PÁGINA E MODAIS
     // =================================================================================
     
     bedGridContainer.addEventListener('click', async function(event) {
         const target = event.target;
-        
+        const bedCard = target.closest('.bed-card');
+        if (!bedCard) return;
+
         if (target.closest('.cadastrar-paciente-btn')) {
-            const bedCard = target.closest('.bed-card');
-            const bedId = bedCard.dataset.bedId;
             document.getElementById('modalLeitoNum').textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
-            patientModal.dataset.bedId = bedId;
+            patientModal.dataset.bedId = bedCard.dataset.bedId;
             patientModal.classList.add('active');
         }
         
         if (target.closest('.acessar-paciente-btn')) {
-            const patientId = target.closest('.bed-card').dataset.patientId;
+            const patientId = bedCard.dataset.patientId;
             if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
         }
 
         if (target.closest('.dar-alta-btn')) {
-            const bedCard = target.closest('.bed-card');
             dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
             dischargeModal.dataset.patientId = bedCard.dataset.patientId;
             dischargeModal.dataset.bedId = bedCard.dataset.bedId;
@@ -124,9 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dischargeModal.classList.add('active');
         }
 
-        // [NOVO] Lógica para abrir o modal de transferência
         if (target.closest('.transferir-paciente-btn')) {
-            const bedCard = target.closest('.bed-card');
             transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
             transferModal.dataset.patientId = bedCard.dataset.patientId;
             transferModal.dataset.oldBedId = bedCard.dataset.bedId;
@@ -154,29 +156,82 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- Lógica dos Modais ---
     const closeModal = (modal) => { if(modal) modal.classList.remove('active'); };
-
-    if(closePatientModal) closePatientModal.addEventListener('click', () => closeModal(patientModal));
-    if(cancelPatientModal) cancelPatientModal.addEventListener('click', () => closeModal(patientModal));
+    if(closePatientModal) closePatientModal.addEventListener('click', () => { closeModal(patientModal); patientForm.reset(); });
+    if(cancelPatientModal) cancelPatientModal.addEventListener('click', () => { closeModal(patientModal); patientForm.reset(); });
     if(closeDischargeModal) closeDischargeModal.addEventListener('click', () => closeModal(dischargeModal));
     if(cancelDischargeBtn) cancelDischargeBtn.addEventListener('click', () => closeModal(dischargeModal));
     if(closeTransferModal) closeTransferModal.addEventListener('click', () => closeModal(transferModal));
     if(cancelTransferBtn) cancelTransferBtn.addEventListener('click', () => closeModal(transferModal));
 
-    if (savePatientButton) {
-        savePatientButton.addEventListener('click', async () => {
-            // Lógica de salvar paciente (sem alterações)
-        });
-    }
+    // [LÓGICA CORRIGIDA E COMPLETA] Event listener para Salvar Paciente
+    savePatientButton.addEventListener('click', async () => {
+        const bedId = patientModal.dataset.bedId;
+        
+        const patientData = {
+            bed_id: bedId,
+            name: document.getElementById('patientName').value.trim(),
+            mother_name: document.getElementById('motherName').value.trim(),
+            dob: document.getElementById('patientDob').value,
+            cns: document.getElementById('patientCns').value.trim(),
+            dih: document.getElementById('hospitalAdmissionDate').value,
+            hd_primary_desc: document.getElementById('hd_primary_desc').value.trim(),
+            hd_primary_cid: document.getElementById('hd_primary_cid').value.trim(),
+            secondary_diagnoses: document.getElementById('secondary_diagnoses').value.trim(),
+            hpp: document.getElementById('hpp').value.trim(),
+            allergies: document.getElementById('allergies').value.trim(),
+        };
 
-    if(confirmDischargeBtn) {
-        confirmDischargeBtn.addEventListener('click', async () => {
-            // Lógica de dar alta (sem alterações)
-        });
-    }
+        if (!patientData.name || !patientData.dob) {
+            alert('Por favor, preencha pelo menos o Nome e a Data de Nascimento do paciente.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/patients', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(patientData)
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || "Falha ao cadastrar paciente.");
+            }
+            alert("Paciente cadastrado com sucesso!");
+            closeModal(patientModal);
+            patientForm.reset();
+            loadUnitAndBeds();
+        } catch(error) {
+            console.error("Erro ao salvar paciente:", error);
+            alert(`Erro: ${error.message}`);
+        }
+    });
+
+    // [LÓGICA CORRIGIDA E COMPLETA] Event listener para Dar Alta
+    confirmDischargeBtn.addEventListener('click', async () => {
+        const patientId = dischargeModal.dataset.patientId;
+        const bedId = dischargeModal.dataset.bedId;
+        const reason = document.getElementById('dischargeReason').value;
+        const date = dischargeDateInput.value;
+        
+        if (!reason || !date) { alert("Preencha o motivo e a data da alta."); return; }
+
+        try {
+            const response = await fetch(`/api/patients/${patientId}/discharge`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bedId, reason, date })
+            });
+            if (!response.ok) throw new Error("Falha ao dar alta.");
+            alert("Alta registrada com sucesso!");
+            closeModal(dischargeModal);
+            loadUnitAndBeds();
+        } catch (error) {
+            alert(`Erro: ${error.message}`);
+        }
+    });
     
-    // [NOVO] Lógica do modal de transferência
+    // [LÓGICA CORRIGIDA E COMPLETA] Event listeners para Transferência
     destinationUnitSelect.addEventListener('change', () => {
         const selectedUnitId = destinationUnitSelect.value;
         const selectedUnit = unitsWithFreeBeds.find(u => u.id == selectedUnitId);
@@ -198,7 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
     confirmTransferBtn.addEventListener('click', async () => {
         const patientId = transferModal.dataset.patientId;
         const oldBedId = transferModal.dataset.oldBedId;
-        const newUnitId = destinationUnitSelect.value;
         const newBedId = destinationBedSelect.value;
 
         if(!newBedId) {
@@ -210,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`/api/patients/${patientId}/transfer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ oldBedId, newUnitId, newBedId })
+                body: JSON.stringify({ oldBedId, newBedId })
             });
 
             if(!response.ok) {
@@ -220,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("Paciente transferido com sucesso!");
             closeModal(transferModal);
             loadUnitAndBeds();
-
         } catch(error) {
             console.error("Erro ao confirmar transferência:", error);
             alert(`Erro: ${error.message}`);
