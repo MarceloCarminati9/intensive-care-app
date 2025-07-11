@@ -115,9 +115,12 @@ apiRouter.get('/units/:id', async (req, res) => {
     }
 });
 
+// [CORREÇÃO DEFINITIVA] Rota para buscar leitos com ordenação segura
 apiRouter.get('/units/:id/beds', async (req, res) => {
     try {
-        const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY bed_number::int ASC`;
+        // A ordenação por 'LENGTH' primeiro e depois pelo valor textual é uma forma segura de
+        // ordenar numericamente strings, garantindo que '2' venha antes de '10'.
+        const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
         const { rows } = await pool.query(sql, [req.params.id]);
         res.json({ data: rows });
     } catch (err) {
@@ -125,6 +128,7 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
         res.status(500).json({ error: 'Erro no servidor ao buscar leitos.' });
     }
 });
+
 
 // --- ROTAS DE PACIENTES ---
 
