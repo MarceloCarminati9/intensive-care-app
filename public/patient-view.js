@@ -94,7 +94,15 @@ document.addEventListener('DOMContentLoaded', function() {
             patientDih.textContent = patient.dih ? new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
         }
         if (patientHpp) patientHpp.textContent = patient.hpp || 'Nenhuma informação de HPP cadastrada.';
-        if (patientHd) patientHd.textContent = patient.hd || 'Nenhuma hipótese diagnóstica cadastrada.';
+        if (patientHd) {
+    if (patient.hd_primary_desc) {
+        // Se o código CID também existir, mostra ambos
+        const cidCode = patient.hd_primary_cid ? `(${patient.hd_primary_cid})` : '';
+        patientHd.textContent = `${patient.hd_primary_desc} ${cidCode}`.trim();
+    } else {
+        patientHd.textContent = 'Nenhuma hipótese diagnóstica cadastrada.';
+    }
+}
     }
 
     function updateActionLinks(pId) {

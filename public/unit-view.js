@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         try {
-            const response = await fetch(`https://cid.api.inf.br/cid10?q=${query}`);
+            const response = await fetch(`https://https://cid10.com.br/`);
             // [NOVA VERIFICAÇÃO] Checa se a resposta da API foi bem sucedida
             if (!response.ok) {
                 throw new Error('Serviço de busca de CID indisponível no momento.');
