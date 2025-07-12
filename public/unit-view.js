@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const hdPrimaryDesc = document.getElementById('hd_primary_desc');
     const hdPrimaryResults = document.getElementById('hd_primary_results');
     const hdPrimaryCid = document.getElementById('hd_primary_cid');
+    
+    // Múltiplos Diagnósticos Secundários
     const addSecondaryDiagBtn = document.getElementById('add_secondary_diag_btn');
     const secondaryDiagnosesContainer = document.getElementById('secondary_diagnoses_container');
 
@@ -64,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Não foi possível carregar a lista de CIDs local.');
             }
             cid10Data = await response.json();
+            console.log('Banco de dados de CIDs carregado com sucesso.');
         } catch (error) {
             console.error(error);
             hdPrimaryDesc.disabled = true;
@@ -138,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
             (item.display && item.display.toLowerCase().includes(lowerCaseQuery)) || 
             (item.code && item.code.toLowerCase().includes(lowerCaseQuery))
         ).slice(0, 10);
+        
         resultsContainer.innerHTML = '';
         if (results.length > 0) {
             results.forEach(item => {
@@ -346,7 +350,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Lógica para Múltiplos Diagnósticos Secundários
+    // ---- LÓGICA MÚLTIPLOS DIAGNÓSTICOS E BUSCA ----
+
     if (addSecondaryDiagBtn) {
         addSecondaryDiagBtn.addEventListener('click', () => {
             const newEntry = document.createElement('div');
@@ -361,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    if(secondaryDiagnosesContainer) {
+    if (secondaryDiagnosesContainer) {
         secondaryDiagnosesContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('remove-diag-btn')) {
                 e.target.closest('.secondary-diagnosis-entry').remove();
@@ -369,7 +374,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Listener unificado para a busca de CID em todos os campos
     patientForm.addEventListener('input', (e) => {
         const targetInput = e.target;
         let resultsContainer;
@@ -389,17 +393,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Listener unificado para o clique nos resultados do autocomplete
-    document.addEventListener('click', function(e) {
+    patientForm.addEventListener('click', function(e) {
         const item = e.target.closest('.autocomplete-item');
         if (item && !item.classList.contains('error-item')) {
             const container = item.parentElement;
             let descInput, cidInput;
-            
-            const primaryContainer = hdPrimaryDesc.closest('.form-group');
+
+            // Encontra o container pai (seja primário ou uma entrada secundária)
+            const primaryFormGroup = item.closest('.form-group');
             const secondaryEntry = item.closest('.secondary-diagnosis-entry');
 
-            if (primaryContainer && primaryContainer.contains(container)) {
+            if (primaryFormGroup && primaryFormGroup.contains(hdPrimaryDesc)) {
                 descInput = hdPrimaryDesc;
                 cidInput = hdPrimaryCid;
             } else if (secondaryEntry) {
@@ -414,17 +418,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             container.innerHTML = '';
             container.classList.remove('active');
-
-        } else if (!e.target.closest('.form-group')) {
-            document.querySelectorAll('.autocomplete-results').forEach(res => {
-                if (res.classList.contains('active')) {
-                   res.classList.remove('active');
-                }
-            });
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.autocomplete-container') && !e.target.closest('.secondary-diagnosis-entry')) {
+            document.querySelectorAll('.autocomplete-results').forEach(res => res.classList.remove('active'));
         }
     });
 
-    // INICIALIZAÇÃO DA PÁGINA
+    // ---- INICIALIZAÇÃO DA PÁGINA ----
     loadUnitAndBeds();
     loadCidData(); 
 });
