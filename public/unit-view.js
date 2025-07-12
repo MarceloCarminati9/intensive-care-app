@@ -162,7 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     if (bedGridContainer) {
-        bedGridContainer.addEventListener('click', async function(event) {
+        // CORREÇÃO: Removido o 'async' daqui para não pausar a execução do evento.
+        bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
             const bedCard = target.closest('.bed-card');
             if (!bedCard) return;
@@ -197,27 +198,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
+                    // Abre o modal imediatamente
+                    transferModal.classList.add('active'); 
                     
-                    try {
-                        const response = await fetch('/api/units-with-free-beds');
-                        if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
-                        const result = await response.json();
-                        unitsWithFreeBeds = result.data;
-                        destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
-                        unitsWithFreeBeds.forEach(unit => {
-                            const option = document.createElement('option');
-                            option.value = unit.id;
-                            option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
-                            option.disabled = !unit.free_beds || unit.free_beds.length === 0;
-                            destinationUnitSelect.appendChild(option);
-                        });
-                        destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
-                        destinationBedSelect.disabled = true;
-                        transferModal.classList.add('active');
-                    } catch(error) {
-                        console.error("Erro ao carregar dados para transferência:", error);
-                        alert("Não foi possível carregar as unidades de destino.");
-                    }
+                    // CORREÇÃO: A busca de dados agora ocorre depois do modal abrir, de forma assíncrona
+                    (async () => {
+                        try {
+                            const response = await fetch('/api/units-with-free-beds');
+                            if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
+                            const result = await response.json();
+                            unitsWithFreeBeds = result.data;
+                            destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
+                            unitsWithFreeBeds.forEach(unit => {
+                                const option = document.createElement('option');
+                                option.value = unit.id;
+                                option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
+                                option.disabled = !unit.free_beds || unit.free_beds.length === 0;
+                                destinationUnitSelect.appendChild(option);
+                            });
+                            destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+                            destinationBedSelect.disabled = true;
+                        } catch(error) {
+                            console.error("Erro ao carregar dados para transferência:", error);
+                            alert("Não foi possível carregar as unidades de destino.");
+                        }
+                    })();
                 }
             }
         });
@@ -370,7 +375,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // LÓGICA MÚLTIPLOS DIAGNÓSTICOS E BUSCA
     if (addSecondaryDiagBtn) {
         addSecondaryDiagBtn.addEventListener('click', () => {
             const newEntry = document.createElement('div');
@@ -416,7 +420,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const item = e.target.closest('.autocomplete-item');
             if (item && !item.classList.contains('error-item')) {
                 const container = item.parentElement;
-                const parentGroup = container.closest('.form-group, .secondary-diagnosis-entry');
+                const parentGroup = container.closest('.form-group') || container.closest('.secondary-diagnosis-entry');
+                
                 if (parentGroup) {
                     const descInput = parentGroup.querySelector('#hd_primary_desc, .secondary_desc');
                     const cidInput = parentGroup.querySelector('#hd_primary_cid, .secondary_cid');
@@ -432,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.autocomplete-container') && !e.target.closest('.secondary-diagnosis-entry')) {
+        if (!e.target.closest('.form-group') && !e.target.closest('.secondary-diagnosis-entry')) {
             document.querySelectorAll('.autocomplete-results').forEach(res => res.classList.remove('active'));
         }
     });
