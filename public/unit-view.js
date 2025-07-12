@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const hdPrimaryDesc = document.getElementById('hd_primary_desc');
     const hdPrimaryResults = document.getElementById('hd_primary_results');
     const hdPrimaryCid = document.getElementById('hd_primary_cid');
-    // Múltiplos Diagnósticos Secundários
     const addSecondaryDiagBtn = document.getElementById('add_secondary_diag_btn');
     const secondaryDiagnosesContainer = document.getElementById('secondary_diagnoses_container');
 
@@ -65,14 +64,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Não foi possível carregar a lista de CIDs local.');
             }
             cid10Data = await response.json();
-            console.log('Banco de dados de CIDs carregado com sucesso.');
         } catch (error) {
             console.error(error);
             hdPrimaryDesc.disabled = true;
             hdPrimaryDesc.placeholder = 'Erro ao carregar CIDs';
             if (secondaryDiagnosesContainer) {
-                const secondaryInputs = secondaryDiagnosesContainer.querySelectorAll('.secondary_desc');
-                secondaryInputs.forEach(input => {
+                secondaryDiagnosesContainer.querySelectorAll('.secondary_desc').forEach(input => {
                     input.disabled = true;
                     input.placeholder = 'Erro ao carregar CIDs';
                 });
@@ -86,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!unitResponse.ok) throw new Error('Unidade não encontrada.');
             const unitResult = await unitResponse.json();
             const unit = unitResult.data;
-
             unitNameTitle.textContent = unit.name;
             if(unitBedCount) unitBedCount.textContent = `Total de ${unit.total_beds} Leitos`;
 
@@ -102,14 +98,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderBeds(beds) {
         bedGridContainer.innerHTML = '';
-        if (beds.length === 0) {
+        if (!beds || beds.length === 0) {
             bedGridContainer.innerHTML = '<p>Nenhum leito encontrado para esta unidade.</p>';
             return;
         }
         beds.forEach(bed => {
             const bedCard = document.createElement('div');
             bedCard.dataset.bedId = bed.id;
-
             if (bed.status === 'free') {
                 bedCard.className = 'bed-card free';
                 bedCard.innerHTML = `
@@ -132,6 +127,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function searchCid(query, resultsContainer) {
+        if (query.length < 2) {
+            resultsContainer.innerHTML = '';
+            resultsContainer.classList.remove('active');
+            return;
+        }
+        const lowerCaseQuery = query.toLowerCase();
+        const results = cid10Data.filter(item => 
+            (item.display && item.display.toLowerCase().includes(lowerCaseQuery)) || 
+            (item.code && item.code.toLowerCase().includes(lowerCaseQuery))
+        ).slice(0, 10);
+        resultsContainer.innerHTML = '';
+        if (results.length > 0) {
+            results.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                div.textContent = `${item.code} - ${item.display}`;
+                div.dataset.cid = item.code;
+                div.dataset.nome = item.display;
+                resultsContainer.appendChild(div);
+            });
+        } else {
+            resultsContainer.innerHTML = '<div class="autocomplete-item error-item">Nenhum resultado encontrado.</div>';
+        }
+        resultsContainer.classList.add('active');
+    }
+    
     // =================================================================================
     // LÓGICA DE EVENTOS E MODAIS
     // =================================================================================
@@ -169,9 +191,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 const response = await fetch('/api/units-with-free-beds');
+                if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
                 const result = await response.json();
                 unitsWithFreeBeds = result.data;
-
                 destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
                 unitsWithFreeBeds.forEach(unit => {
                     const option = document.createElement('option');
@@ -193,10 +215,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeModal = (modal) => { 
         if(modal) {
             modal.classList.remove('active');
-            // Limpa o formulário apenas do modal de paciente ao fechar
             if (modal.id === 'addPatientModal') {
                 patientForm.reset();
-                // Reseta os campos de diagnóstico secundário para o estado inicial
                 secondaryDiagnosesContainer.innerHTML = `
                     <div class="secondary-diagnosis-entry">
                         <input type="text" class="secondary_desc" placeholder="Comece a digitar o diagnóstico...">
@@ -208,6 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     };
+    
     if(closePatientModal) closePatientModal.addEventListener('click', () => closeModal(patientModal));
     if(cancelPatientModal) cancelPatientModal.addEventListener('click', () => closeModal(patientModal));
     if(closeDischargeModal) closeDischargeModal.addEventListener('click', () => closeModal(dischargeModal));
@@ -324,45 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(`Erro: ${error.message}`);
         }
     });
-
-    // LÓGICA PARA BUSCA AUTOMÁTICA DE CID (LOCAL)
-    function searchCid(query, resultsContainer) {
-        if (query.length < 2) {
-            resultsContainer.innerHTML = '';
-            resultsContainer.classList.remove('active');
-            return;
-        }
-
-        const lowerCaseQuery = query.toLowerCase();
-
-        const results = cid10Data.filter(item => 
-            (item.display && item.display.toLowerCase().includes(lowerCaseQuery)) || 
-            (item.code && item.code.toLowerCase().includes(lowerCaseQuery))
-        ).slice(0, 15);
-
-        resultsContainer.innerHTML = '';
-
-        if (results.length > 0) {
-            results.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'autocomplete-item';
-                div.textContent = `${item.code} - ${item.display}`;
-                div.dataset.cid = item.code;
-                div.dataset.nome = item.display;
-                resultsContainer.appendChild(div);
-            });
-        } else {
-            resultsContainer.innerHTML = '<div class="autocomplete-item error-item">Nenhum resultado encontrado.</div>';
-        }
-        resultsContainer.classList.add('active');
-    }
-
-    // Listener para o diagnóstico primário
-    hdPrimaryDesc.addEventListener('input', () => {
-        clearTimeout(cidTimeout);
-        cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults), 150);
-    });
-
+    
     // Lógica para Múltiplos Diagnósticos Secundários
     if (addSecondaryDiagBtn) {
         addSecondaryDiagBtn.addEventListener('click', () => {
@@ -384,32 +367,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.target.closest('.secondary-diagnosis-entry').remove();
             }
         });
-
-        secondaryDiagnosesContainer.addEventListener('input', (e) => {
-            if (e.target.classList.contains('secondary_desc')) {
-                const inputField = e.target;
-                const parentEntry = inputField.closest('.secondary-diagnosis-entry');
-                
-                if (parentEntry) {
-                    const resultsContainer = parentEntry.querySelector('.autocomplete-results');
-                    if (resultsContainer) {
-                        clearTimeout(cidTimeout);
-                        cidTimeout = setTimeout(() => searchCid(inputField.value, resultsContainer), 150);
-                    }
-                }
-            }
-        });
     }
 
-    // Listener geral para cliques na página (para autocomplete)
+    // Listener unificado para a busca de CID em todos os campos
+    patientForm.addEventListener('input', (e) => {
+        const targetInput = e.target;
+        let resultsContainer;
+
+        if (targetInput.id === 'hd_primary_desc') {
+            resultsContainer = hdPrimaryResults;
+        } else if (targetInput.classList.contains('secondary_desc')) {
+            const parentEntry = targetInput.closest('.secondary-diagnosis-entry');
+            if (parentEntry) {
+                resultsContainer = parentEntry.querySelector('.autocomplete-results');
+            }
+        }
+
+        if (resultsContainer) {
+            clearTimeout(cidTimeout);
+            cidTimeout = setTimeout(() => searchCid(targetInput.value, resultsContainer), 150);
+        }
+    });
+
+    // Listener unificado para o clique nos resultados do autocomplete
     document.addEventListener('click', function(e) {
         const item = e.target.closest('.autocomplete-item');
-        
         if (item && !item.classList.contains('error-item')) {
             const container = item.parentElement;
             let descInput, cidInput;
-
-            const primaryContainer = hdPrimaryDesc.closest('.autocomplete-container');
+            
+            const primaryContainer = hdPrimaryDesc.closest('.form-group');
             const secondaryEntry = item.closest('.secondary-diagnosis-entry');
 
             if (primaryContainer && primaryContainer.contains(container)) {
@@ -428,8 +415,12 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = '';
             container.classList.remove('active');
 
-        } else if (!e.target.closest('.autocomplete-container') && !e.target.closest('.secondary-diagnosis-entry')) {
-            document.querySelectorAll('.autocomplete-results').forEach(res => res.classList.remove('active'));
+        } else if (!e.target.closest('.form-group')) {
+            document.querySelectorAll('.autocomplete-results').forEach(res => {
+                if (res.classList.contains('active')) {
+                   res.classList.remove('active');
+                }
+            });
         }
     });
 
