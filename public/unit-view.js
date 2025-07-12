@@ -283,30 +283,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // [NOVO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID
     async function searchCid(query, resultsContainer, cidInput) {
-    if (query.length < 3) {
-        resultsContainer.innerHTML = '';
-        resultsContainer.classList.remove('active');
-        return;
-    }
-    try {
-        const response = await fetch(`https://cid.api.inf.br/cid10?q=${query}`);
-        // [NOVA VERIFICAÇÃO] Checa se a resposta da API foi bem sucedida
-        if (!response.ok) {
-            throw new Error('Serviço de busca de CID indisponível no momento.');
-        }
-        const results = await response.json();
-        resultsContainer.innerHTML = '';
-        if (results && results.length > 0) {
-            // ... (código para exibir os resultados, sem alterações)
-        } else {
+        if (query.length < 3) {
+            resultsContainer.innerHTML = '';
             resultsContainer.classList.remove('active');
+            return;
         }
-    } catch (error) { 
-        // [ALTERAÇÃO] Mostra um erro amigável para o usuário no próprio campo de resultados
-        console.error("Erro ao buscar CID:", error);
-        resultsContainer.innerHTML = `<div class="autocomplete-item error-item">${error.message}</div>`;
-        resultsContainer.classList.add('active');
-    }
+        try {
+            const response = await fetch(`https://cid.api.inf.br/cid10?q=${query}`);
+            // [NOVA VERIFICAÇÃO] Checa se a resposta da API foi bem sucedida
+            if (!response.ok) {
+                throw new Error('Serviço de busca de CID indisponível no momento.');
+            }
+            const results = await response.json();
+            resultsContainer.innerHTML = '';
+            if (results && results.length > 0) {
+                results.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'autocomplete-item';
+                    div.textContent = `${item.cod} - ${item.nome}`;
+                    div.dataset.cid = item.cod;
+                    div.dataset.nome = `${item.cod} - ${item.nome}`;
+                    resultsContainer.appendChild(div);
+                });
+                resultsContainer.classList.add('active');
+            } else {
+                resultsContainer.classList.remove('active');
+            }
+        } catch (error) { 
+            // [ALTERAÇÃO] Mostra um erro amigável para o usuário no próprio campo de resultados
+            console.error("Erro ao buscar CID:", error);
+            resultsContainer.innerHTML = `<div class="autocomplete-item error-item">${error.message}</div>`;
+            resultsContainer.classList.add('active');
+        }
+    } // <--- CORREÇÃO: Chave de fechamento da função adicionada aqui.
 
     hdPrimaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);

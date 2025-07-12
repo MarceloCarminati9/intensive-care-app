@@ -115,11 +115,8 @@ apiRouter.get('/units/:id', async (req, res) => {
     }
 });
 
-// [CORREÇÃO DEFINITIVA] Rota para buscar leitos com ordenação segura
 apiRouter.get('/units/:id/beds', async (req, res) => {
     try {
-        // A ordenação por 'LENGTH' primeiro e depois pelo valor textual é uma forma segura de
-        // ordenar numericamente strings, garantindo que '2' venha antes de '10'.
         const sql = `SELECT id, bed_number, status, patient_id, patient_name FROM beds WHERE unit_id = $1 ORDER BY LENGTH(bed_number), bed_number ASC`;
         const { rows } = await pool.query(sql, [req.params.id]);
         res.json({ data: rows });
@@ -221,13 +218,105 @@ apiRouter.post('/patients/:id/transfer', async (req, res) => {
 
 
 // --- ROTAS DE HISTÓRICO ---
-apiRouter.post('/patients/:id/evolutions', async (req, res) => { /* ... (código existente sem alterações) ... */ });
-apiRouter.post('/prescriptions', async (req, res) => { /* ... (código existente sem alterações) ... */ });
-apiRouter.get('/patients/:id/evolutions', async (req, res) => { /* ... (código existente sem alterações) ... */ });
-apiRouter.get('/patients/:id/prescriptions', async (req, res) => { /* ... (código existente sem alterações) ... */ });
-apiRouter.get('/evolutions/:evolutionId', async (req, res) => { /* ... (código existente sem alterações) ... */ });
-apiRouter.put('/evolutions/:evolutionId', async (req, res) => { /* ... (código existente sem alterações) ... */ });
-apiRouter.delete('/evolutions/:evolutionId', async (req, res) => { /* ... (código existente sem alterações) ... */ });
+// Estas rotas não foram fornecidas no arquivo `server.js` mais recente, mas existiam no backup.
+// Adicionando as versões corrigidas e completas para garantir a funcionalidade.
+
+// Rota para SALVAR uma nova evolução médica
+apiRouter.post('/patients/:id/evolutions', async (req, res) => {
+    const { id } = req.params;
+    const evolutionData = req.body;
+    if (!id || !evolutionData) {
+        return res.status(400).json({ error: 'ID do paciente e dados da evolução são obrigatórios.' });
+    }
+    try {
+        const sql = `INSERT INTO evolutions (patient_id, content) VALUES ($1, $2) RETURNING *;`;
+        const { rows } = await pool.query(sql, [id, evolutionData]);
+        res.status(201).json({ message: 'Evolução salva com sucesso!', data: rows[0] });
+    } catch (err) {
+        console.error('Erro ao salvar evolução:', err);
+        res.status(500).json({ error: 'Erro no servidor ao salvar a evolução.' });
+    }
+});
+
+// Rota para SALVAR uma nova receita
+apiRouter.post('/prescriptions', async (req, res) => {
+    const { patient_id, medicamento, posologia, via_administracao, quantidade } = req.body;
+    if (!patient_id || !medicamento || !posologia) {
+        return res.status(400).json({ message: 'Campos obrigatórios (paciente, medicamento, posologia) estão faltando.' });
+    }
+    try {
+        const sql = `INSERT INTO prescriptions (patient_id, medicamento, posologia, via_administracao, quantidade) VALUES ($1, $2, $3, $4, $5) RETURNING *;`;
+        const { rows } = await pool.query(sql, [patient_id, medicamento, posologia, via_administracao, quantidade]);
+        res.status(201).json({ message: 'Receita salva com sucesso!', data: rows[0] });
+    } catch (err) {
+        console.error('Erro ao salvar receita:', err);
+        res.status(500).json({ error: 'Falha ao salvar a receita no servidor.' });
+    }
+});
+
+
+// Rotas para BUSCAR histórico
+apiRouter.get('/patients/:id/evolutions', async (req, res) => {
+    try {
+        const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
+        const { rows } = await pool.query(sql, [req.params.id]);
+        res.json({ data: rows });
+    } catch (err) {
+        console.error('Erro ao buscar evoluções:', err);
+        res.status(500).json({ error: 'Erro no servidor ao buscar evoluções.' });
+    }
+});
+
+apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC', [req.params.id]);
+        res.json({ data: rows });
+    } catch (err) {
+        console.error('Erro ao buscar receitas:', err);
+        res.status(500).json({ error: 'Falha ao buscar receitas.' });
+    }
+});
+
+// Rotas para GERENCIAR UMA ÚNICA evolução
+apiRouter.get('/evolutions/:evolutionId', async (req, res) => {
+    try {
+        const { evolutionId } = req.params;
+        const { rows } = await pool.query(`SELECT * FROM evolutions WHERE id = $1`, [evolutionId]);
+        if (rows.length === 0) return res.status(404).json({ message: "Evolução não encontrada." });
+        res.json({ data: rows[0] });
+    } catch (err) {
+        console.error('Erro ao buscar evolução específica:', err);
+        res.status(500).json({ error: 'Erro no servidor ao buscar a evolução.' });
+    }
+});
+
+apiRouter.put('/evolutions/:evolutionId', async (req, res) => {
+    const { evolutionId } = req.params;
+    const evolutionData = req.body;
+    if (!evolutionData) return res.status(400).json({ error: 'Dados da evolução são obrigatórios.' });
+    try {
+        const sql = `UPDATE evolutions SET content = $1, updated_at = NOW() WHERE id = $2 RETURNING *;`;
+        const { rows } = await pool.query(sql, [evolutionData, evolutionId]);
+        if (rows.length === 0) return res.status(404).json({ message: "Evolução não encontrada para atualizar." });
+        res.status(200).json({ message: 'Evolução atualizada com sucesso!', data: rows[0] });
+    } catch (err) {
+        console.error('Erro ao atualizar evolução:', err);
+        res.status(500).json({ error: 'Erro no servidor ao atualizar a evolução.' });
+    }
+});
+
+apiRouter.delete('/evolutions/:evolutionId', async (req, res) => {
+    const { evolutionId } = req.params;
+    try {
+        const sql = `UPDATE evolutions SET deleted_at = NOW() WHERE id = $1 RETURNING *;`;
+        const { rows } = await pool.query(sql, [evolutionId]);
+        if (rows.length === 0) return res.status(404).json({ message: "Evolução não encontrada para excluir." });
+        res.status(200).json({ message: 'Evolução marcada como excluída com sucesso!', data: rows[0] });
+    } catch (err) {
+        console.error('Erro ao marcar evolução como excluída:', err);
+        res.status(500).json({ error: 'Erro no servidor ao excluir a evolução.' });
+    }
+});
 
 
 app.use('/api', apiRouter);
