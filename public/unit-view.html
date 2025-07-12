@@ -63,12 +63,16 @@
 </div>
 
 <div>
-    <label for="secondary_diagnoses_desc">Diagnósticos Secundários (e CID, se houver)</label>
+    <div class="form-group full-width">
+    <label>Diagnósticos Secundários (e CID, se houver)</label>
     <div id="secondary_diagnoses_container">
         <div class="secondary-diagnosis-entry">
-            <input type="text" class="secondary_desc" placeholder="Comece a digitar o diagnóstico...">
-            <input type="hidden" class="secondary_cid">
-            <div class="autocomplete-results"></div>
+            <div class="autocomplete-container">
+                <textarea class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                <div class="autocomplete-results"></div>
+            </div>
+            <label class="cid-label">CID-10</label>
+            <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
             <button type="button" class="remove-diag-btn" disabled>&times;</button>
         </div>
     </div>

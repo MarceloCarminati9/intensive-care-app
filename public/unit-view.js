@@ -43,8 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const hdPrimaryDesc = document.getElementById('hd_primary_desc');
     const hdPrimaryResults = document.getElementById('hd_primary_results');
     const hdPrimaryCid = document.getElementById('hd_primary_cid');
-    
-    // Múltiplos Diagnósticos Secundários
     const addSecondaryDiagBtn = document.getElementById('add_secondary_diag_btn');
     const secondaryDiagnosesContainer = document.getElementById('secondary_diagnoses_container');
 
@@ -62,21 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadCidData() {
         try {
             const response = await fetch('data/cid10.json'); 
-            if (!response.ok) {
-                throw new Error('Não foi possível carregar a lista de CIDs local.');
-            }
+            if (!response.ok) throw new Error('Não foi possível carregar a lista de CIDs local.');
             cid10Data = await response.json();
-            console.log('Banco de dados de CIDs carregado com sucesso.');
         } catch (error) {
             console.error(error);
-            hdPrimaryDesc.disabled = true;
-            hdPrimaryDesc.placeholder = 'Erro ao carregar CIDs';
-            if (secondaryDiagnosesContainer) {
-                secondaryDiagnosesContainer.querySelectorAll('.secondary_desc').forEach(input => {
-                    input.disabled = true;
-                    input.placeholder = 'Erro ao carregar CIDs';
-                });
-            }
+            [hdPrimaryDesc, ...document.querySelectorAll('.secondary_desc')].forEach(input => {
+                input.disabled = true;
+                input.placeholder = 'Erro ao carregar CIDs';
+            });
         }
     }
 
@@ -221,14 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.classList.remove('active');
             if (modal.id === 'addPatientModal') {
                 patientForm.reset();
-                secondaryDiagnosesContainer.innerHTML = `
-                    <div class="secondary-diagnosis-entry">
-                        <input type="text" class="secondary_desc" placeholder="Comece a digitar o diagnóstico...">
-                        <input type="hidden" class="secondary_cid">
-                        <div class="autocomplete-results"></div>
-                        <button type="button" class="remove-diag-btn" disabled>&times;</button>
-                    </div>
-                `;
+                const firstEntry = secondaryDiagnosesContainer.querySelector('.secondary-diagnosis-entry');
+                secondaryDiagnosesContainer.innerHTML = ''; // Limpa todos os campos
+                secondaryDiagnosesContainer.appendChild(firstEntry); // Adiciona o primeiro de volta
             }
         }
     };
@@ -349,17 +335,19 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(`Erro: ${error.message}`);
         }
     });
-    
-    // ---- LÓGICA MÚLTIPLOS DIAGNÓSTICOS E BUSCA ----
 
+    // LÓGICA PARA MÚLTIPLOS DIAGNÓSTICOS E BUSCA
     if (addSecondaryDiagBtn) {
         addSecondaryDiagBtn.addEventListener('click', () => {
             const newEntry = document.createElement('div');
             newEntry.className = 'secondary-diagnosis-entry';
             newEntry.innerHTML = `
-                <input type="text" class="secondary_desc" placeholder="Comece a digitar o diagnóstico...">
-                <input type="hidden" class="secondary_cid">
-                <div class="autocomplete-results"></div>
+                <div class="autocomplete-container">
+                    <textarea class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                    <div class="autocomplete-results"></div>
+                </div>
+                <label class="cid-label">CID-10</label>
+                <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
                 <button type="button" class="remove-diag-btn">&times;</button>
             `;
             secondaryDiagnosesContainer.appendChild(newEntry);
@@ -377,14 +365,10 @@ document.addEventListener('DOMContentLoaded', function() {
     patientForm.addEventListener('input', (e) => {
         const targetInput = e.target;
         let resultsContainer;
-
         if (targetInput.id === 'hd_primary_desc') {
             resultsContainer = hdPrimaryResults;
         } else if (targetInput.classList.contains('secondary_desc')) {
-            const parentEntry = targetInput.closest('.secondary-diagnosis-entry');
-            if (parentEntry) {
-                resultsContainer = parentEntry.querySelector('.autocomplete-results');
-            }
+            resultsContainer = targetInput.closest('.secondary-diagnosis-entry').querySelector('.autocomplete-results');
         }
 
         if (resultsContainer) {
@@ -397,37 +381,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const item = e.target.closest('.autocomplete-item');
         if (item && !item.classList.contains('error-item')) {
             const container = item.parentElement;
-            let descInput, cidInput;
-
-            // Encontra o container pai (seja primário ou uma entrada secundária)
-            const primaryFormGroup = item.closest('.form-group');
-            const secondaryEntry = item.closest('.secondary-diagnosis-entry');
-
-            if (primaryFormGroup && primaryFormGroup.contains(hdPrimaryDesc)) {
-                descInput = hdPrimaryDesc;
-                cidInput = hdPrimaryCid;
-            } else if (secondaryEntry) {
-                descInput = secondaryEntry.querySelector('.secondary_desc');
-                cidInput = secondaryEntry.querySelector('.secondary_cid');
+            const parentGroup = container.closest('.form-group, .secondary-diagnosis-entry');
+            if (parentGroup) {
+                const descInput = parentGroup.querySelector('#hd_primary_desc, .secondary_desc');
+                const cidInput = parentGroup.querySelector('#hd_primary_cid, .secondary_cid');
+                if (descInput && cidInput) {
+                    descInput.value = item.dataset.nome;
+                    cidInput.value = item.dataset.cid;
+                }
             }
-            
-            if(descInput && cidInput) {
-                descInput.value = `${item.dataset.cid} - ${item.dataset.nome}`;
-                cidInput.value = item.dataset.cid;
-            }
-
             container.innerHTML = '';
             container.classList.remove('active');
         }
     });
-    
+
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.autocomplete-container') && !e.target.closest('.secondary-diagnosis-entry')) {
             document.querySelectorAll('.autocomplete-results').forEach(res => res.classList.remove('active'));
         }
     });
 
-    // ---- INICIALIZAÇÃO DA PÁGINA ----
+    // INICIALIZAÇÃO DA PÁGINA
     loadUnitAndBeds();
-    loadCidData(); 
+    loadCidData();
 });

@@ -368,3 +368,48 @@ body {
 .autocomplete-item.error-item:hover {
     background-color: transparent;
 }
+/* Adicione ao final de unit-view-style.css */
+
+.secondary-diagnosis-entry {
+    position: relative;
+    padding-right: 40px; /* Espaço para o botão de remover */
+    margin-bottom: 20px;
+}
+
+.secondary-diagnosis-entry .remove-diag-btn {
+    position: absolute;
+    top: 5px;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background-color: #f8f9fa;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.secondary-diagnosis-entry .remove-diag-btn:hover {
+    background-color: var(--danger-red);
+    color: var(--white-bg);
+    border-color: var(--danger-red);
+}
+
+.secondary-diagnosis-entry .remove-diag-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.secondary-diagnosis-entry .cid-label {
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+.button-secondary.small-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
