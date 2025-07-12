@@ -1,4 +1,4 @@
-// VERSÃO FINAL, COM BUSCA DE CID LOCAL E NOMES DE CHAVE CORRIGIDOS
+// VERSÃO FINAL - MÚLTIPLOS DIAGNÓSTICOS COM BUSCA CID
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadCidData() {
         try {
-            const response = await fetch('data/cid10.json');
+            const response = await fetch('data/cid10.json'); 
             if (!response.ok) {
                 throw new Error('Não foi possível carregar a lista de CIDs local.');
             }
@@ -72,6 +72,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(error);
             hdPrimaryDesc.disabled = true;
             hdPrimaryDesc.placeholder = 'Erro ao carregar CIDs';
+            if (secondaryDiagnosesContainer) {
+                secondaryDiagnosesContainer.querySelector('.secondary_desc').disabled = true;
+                secondaryDiagnosesContainer.querySelector('.secondary_desc').placeholder = 'Erro ao carregar CIDs';
+            }
         }
     }
 
@@ -314,10 +318,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const lowerCaseQuery = query.toLowerCase();
 
-        // **CORREÇÃO AQUI**: Usa 'display' e 'code' para a busca
         const results = cid10Data.filter(item => 
-            item.display.toLowerCase().includes(lowerCaseQuery) || 
-            item.code.toLowerCase().includes(lowerCaseQuery)
+            (item.display && item.display.toLowerCase().includes(lowerCaseQuery)) || 
+            (item.code && item.code.toLowerCase().includes(lowerCaseQuery))
         ).slice(0, 10);
 
         resultsContainer.innerHTML = '';
@@ -327,10 +330,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const div = document.createElement('div');
                 div.className = 'autocomplete-item';
                 
-                // **CORREÇÃO AQUI**: Usa 'code' e 'display' para exibir
                 div.textContent = `${item.code} - ${item.display}`;
                 div.dataset.cid = item.code;
-                div.dataset.nome = item.display;
+                div.dataset.nome = item.display; // Usamos 'nome' no dataset para consistência no click handler
                 
                 resultsContainer.appendChild(div);
             });
@@ -341,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Listener para o diagnóstico primário
     hdPrimaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);
         cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults, hdPrimaryCid), 150);
@@ -380,14 +383,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
+    // Listener geral para cliques na página (para autocomplete)
     document.addEventListener('click', function(e) {
         const item = e.target.closest('.autocomplete-item');
+        
         if (item && !item.classList.contains('error-item')) {
             const container = item.parentElement;
             let descInput, cidInput;
 
-            // Determina se estamos no campo primário ou em um dos secundários
             if (container.id === 'hd_primary_results') {
                 descInput = hdPrimaryDesc;
                 cidInput = hdPrimaryCid;
@@ -408,13 +411,16 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = '';
             container.classList.remove('active');
 
-        } else if (!e.target.closest('.secondary-diagnosis-entry') && !e.target.closest('#hd_primary_desc')) {
-             // Esconde todos os resultados se clicar fora de qualquer campo de diagnóstico
-            document.querySelectorAll('.autocomplete-results').forEach(res => res.classList.remove('active'));
+        } else {
+            let clickedInsideAutocomplete = e.target.closest('.autocomplete-container') || e.target.closest('.secondary-diagnosis-entry');
+            if (!clickedInsideAutocomplete) {
+                 // Esconde todos os resultados se clicar fora de qualquer campo de diagnóstico
+                document.querySelectorAll('.autocomplete-results').forEach(res => res.classList.remove('active'));
+            }
         }
     });
 
     // INICIALIZAÇÃO DA PÁGINA
     loadUnitAndBeds();
-    loadCidData();
+    loadCidData(); 
 });
