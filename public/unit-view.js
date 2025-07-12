@@ -174,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if(closeTransferModal) closeTransferModal.addEventListener('click', () => closeModal(transferModal));
     if(cancelTransferBtn) cancelTransferBtn.addEventListener('click', () => closeModal(transferModal));
 
-    // [LÓGICA CORRIGIDA E COMPLETA] Event listener para Salvar Paciente
     savePatientButton.addEventListener('click', async () => {
         const bedId = patientModal.dataset.bedId;
         const patientData = {
@@ -217,7 +216,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // [LÓGICA CORRIGIDA E COMPLETA] Event listener para Dar Alta
     confirmDischargeBtn.addEventListener('click', async () => {
         const patientId = dischargeModal.dataset.patientId;
         const bedId = dischargeModal.dataset.bedId;
@@ -239,7 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // [LÓGICA CORRIGIDA E COMPLETA] Event listeners para Transferência
     destinationUnitSelect.addEventListener('change', () => {
         const selectedUnitId = destinationUnitSelect.value;
         const selectedUnit = unitsWithFreeBeds.find(u => u.id == selectedUnitId);
@@ -281,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // [NOVO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID
+    // [NOVO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID - CORRIGIDO E FUNCIONAL
     async function searchCid(query, resultsContainer, cidInput) {
         if (query.length < 3) {
             resultsContainer.innerHTML = '';
@@ -289,20 +286,25 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         try {
-            const response = await fetch(`https://https://cid10.com.br/`);
-            // [NOVA VERIFICAÇÃO] Checa se a resposta da API foi bem sucedida
+            // ALTERAÇÃO 1: URL corrigida para a API funcional (BrasilAPI)
+            const response = await fetch(`https://brasilapi.com.br/api/cid/v1?search=${query}`);
+            
             if (!response.ok) {
                 throw new Error('Serviço de busca de CID indisponível no momento.');
             }
             const results = await response.json();
             resultsContainer.innerHTML = '';
+
             if (results && results.length > 0) {
                 results.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'autocomplete-item';
-                    div.textContent = `${item.cod} - ${item.nome}`;
-                    div.dataset.cid = item.cod;
-                    div.dataset.nome = `${item.cod} - ${item.nome}`;
+                    
+                    // ALTERAÇÃO 2: Campos da resposta da API (item.code, item.name)
+                    div.textContent = `${item.code} - ${item.name}`;
+                    div.dataset.cid = item.code;
+                    div.dataset.nome = item.name; // Apenas a descrição para o campo de texto
+                    
                     resultsContainer.appendChild(div);
                 });
                 resultsContainer.classList.add('active');
@@ -310,12 +312,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultsContainer.classList.remove('active');
             }
         } catch (error) { 
-            // [ALTERAÇÃO] Mostra um erro amigável para o usuário no próprio campo de resultados
             console.error("Erro ao buscar CID:", error);
             resultsContainer.innerHTML = `<div class="autocomplete-item error-item">${error.message}</div>`;
             resultsContainer.classList.add('active');
         }
-    } // <--- CORREÇÃO: Chave de fechamento da função adicionada aqui.
+    }
 
     hdPrimaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);
@@ -332,10 +333,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (item) {
             const container = item.parentElement;
             if (container.id === 'hd_primary_results') {
-                hdPrimaryDesc.value = item.dataset.nome;
+                // ALTERAÇÃO 3: Preenche o campo de descrição com nome e código para clareza
+                hdPrimaryDesc.value = `${item.dataset.cid} - ${item.dataset.nome}`;
                 hdPrimaryCid.value = item.dataset.cid;
             } else if (container.id === 'secondary_diagnoses_results') {
-                hdSecondaryDesc.value = item.dataset.nome;
+                hdSecondaryDesc.value = `${item.dataset.cid} - ${item.dataset.nome}`;
                 hdSecondaryCid.value = item.dataset.cid;
             }
             container.innerHTML = '';
