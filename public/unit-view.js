@@ -162,25 +162,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     if (bedGridContainer) {
-        // CORREÇÃO: Removido o 'async' daqui para não pausar a execução do evento.
+        // CORREÇÃO CRÍTICA: A função de clique NÃO é mais 'async'
         bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
             const bedCard = target.closest('.bed-card');
             if (!bedCard) return;
 
+            // Ação de cadastrar paciente (síncrona)
             if (target.closest('.cadastrar-paciente-btn')) {
                 if (patientModal) {
                     document.getElementById('modalLeitoNum').textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
                     patientModal.dataset.bedId = bedCard.dataset.bedId;
                     patientModal.classList.add('active');
                 }
+                return; // Importante para não continuar
             }
             
+            // Ação de acessar prontuário (síncrona)
             if (target.closest('.acessar-paciente-btn')) {
                 const patientId = bedCard.dataset.patientId;
                 if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
+                return;
             }
 
+            // Ação de dar alta (síncrona)
             if (target.closest('.dar-alta-btn')) {
                 if (dischargeModal) {
                     dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
@@ -191,17 +196,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     dischargeDateInput.value = now.toISOString().slice(0, 16);
                     dischargeModal.classList.add('active');
                 }
+                return;
             }
 
+            // Ação de transferir (assíncrona, mas com a correção)
             if (target.closest('.transferir-paciente-btn')) {
                 if (transferModal) {
                     transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
-                    // Abre o modal imediatamente
+                    
+                    // 1. Abre o modal imediatamente
                     transferModal.classList.add('active'); 
                     
-                    // CORREÇÃO: A busca de dados agora ocorre depois do modal abrir, de forma assíncrona
+                    // 2. Busca os dados em segundo plano
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
@@ -224,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     })();
                 }
+                return;
             }
         });
     }
@@ -267,7 +276,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             }
-
             const patientData = {
                 bed_id: patientModal.dataset.bedId,
                 name: document.getElementById('patientName').value.trim(),
@@ -281,12 +289,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 hpp: document.getElementById('hpp').value.trim(),
                 allergies: document.getElementById('allergies').value.trim(),
             };
-
             if (!patientData.name || !patientData.dob) {
                 alert('Por favor, preencha pelo menos o Nome e a Data de Nascimento do paciente.');
                 return;
             }
-
             try {
                 const response = await fetch('/api/patients', {
                     method: 'POST',
