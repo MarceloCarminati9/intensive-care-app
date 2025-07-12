@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     if (!unitId) {
-        unitNameTitle.textContent = "ID da Unidade não fornecido.";
-        bedGridContainer.innerHTML = '<p style="color: red;">Volte ao dashboard e selecione uma unidade.</p>';
+        if (unitNameTitle) unitNameTitle.textContent = "ID da Unidade não fornecido.";
+        if (bedGridContainer) bedGridContainer.innerHTML = '<p style="color: red;">Volte ao dashboard e selecione uma unidade.</p>';
         return;
     }
 
@@ -64,10 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
             cid10Data = await response.json();
         } catch (error) {
             console.error(error);
-            [hdPrimaryDesc, ...document.querySelectorAll('.secondary_desc')].forEach(input => {
-                input.disabled = true;
-                input.placeholder = 'Erro ao carregar CIDs';
-            });
+            if(hdPrimaryDesc) {
+                hdPrimaryDesc.disabled = true;
+                hdPrimaryDesc.placeholder = 'Erro ao carregar CIDs';
+            }
+            if (secondaryDiagnosesContainer) {
+                secondaryDiagnosesContainer.querySelectorAll('.secondary_desc').forEach(input => {
+                    input.disabled = true;
+                    input.placeholder = 'Erro ao carregar CIDs';
+                });
+            }
         }
     }
 
@@ -77,8 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!unitResponse.ok) throw new Error('Unidade não encontrada.');
             const unitResult = await unitResponse.json();
             const unit = unitResult.data;
-            unitNameTitle.textContent = unit.name;
-            if(unitBedCount) unitBedCount.textContent = `Total de ${unit.total_beds} Leitos`;
+            if (unitNameTitle) unitNameTitle.textContent = unit.name;
+            if (unitBedCount) unitBedCount.textContent = `Total de ${unit.total_beds} Leitos`;
 
             const bedsResponse = await fetch(`/api/units/${unitId}/beds`);
             if (!bedsResponse.ok) throw new Error('Não foi possível carregar os leitos.');
@@ -86,11 +92,12 @@ document.addEventListener('DOMContentLoaded', function() {
             renderBeds(bedsResult.data);
         } catch (error) {
             console.error('Erro ao carregar dados da unidade:', error);
-            bedGridContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            if (bedGridContainer) bedGridContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
         }
     }
 
     function renderBeds(beds) {
+        if (!bedGridContainer) return;
         bedGridContainer.innerHTML = '';
         if (!beds || beds.length === 0) {
             bedGridContainer.innerHTML = '<p>Nenhum leito encontrado para esta unidade.</p>';
@@ -122,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function searchCid(query, resultsContainer) {
+        if (!resultsContainer) return;
         if (query.length < 2) {
             resultsContainer.innerHTML = '';
             resultsContainer.classList.remove('active');
@@ -153,68 +161,84 @@ document.addEventListener('DOMContentLoaded', function() {
     // LÓGICA DE EVENTOS E MODAIS
     // =================================================================================
     
-    bedGridContainer.addEventListener('click', async function(event) {
-        const target = event.target;
-        const bedCard = target.closest('.bed-card');
-        if (!bedCard) return;
+    if (bedGridContainer) {
+        bedGridContainer.addEventListener('click', async function(event) {
+            const target = event.target;
+            const bedCard = target.closest('.bed-card');
+            if (!bedCard) return;
 
-        if (target.closest('.cadastrar-paciente-btn')) {
-            document.getElementById('modalLeitoNum').textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
-            patientModal.dataset.bedId = bedCard.dataset.bedId;
-            patientModal.classList.add('active');
-        }
-        
-        if (target.closest('.acessar-paciente-btn')) {
-            const patientId = bedCard.dataset.patientId;
-            if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
-        }
-
-        if (target.closest('.dar-alta-btn')) {
-            dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
-            dischargeModal.dataset.patientId = bedCard.dataset.patientId;
-            dischargeModal.dataset.bedId = bedCard.dataset.bedId;
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            dischargeDateInput.value = now.toISOString().slice(0, 16);
-            dischargeModal.classList.add('active');
-        }
-
-        if (target.closest('.transferir-paciente-btn')) {
-            transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
-            transferModal.dataset.patientId = bedCard.dataset.patientId;
-            transferModal.dataset.oldBedId = bedCard.dataset.bedId;
-            
-            try {
-                const response = await fetch('/api/units-with-free-beds');
-                if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
-                const result = await response.json();
-                unitsWithFreeBeds = result.data;
-                destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
-                unitsWithFreeBeds.forEach(unit => {
-                    const option = document.createElement('option');
-                    option.value = unit.id;
-                    option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
-                    option.disabled = !unit.free_beds || unit.free_beds.length === 0;
-                    destinationUnitSelect.appendChild(option);
-                });
-                destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
-                destinationBedSelect.disabled = true;
-                transferModal.classList.add('active');
-            } catch(error) {
-                console.error("Erro ao carregar dados para transferência:", error);
-                alert("Não foi possível carregar as unidades de destino.");
+            if (target.closest('.cadastrar-paciente-btn')) {
+                if (patientModal) {
+                    document.getElementById('modalLeitoNum').textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
+                    patientModal.dataset.bedId = bedCard.dataset.bedId;
+                    patientModal.classList.add('active');
+                }
             }
-        }
-    });
+            
+            if (target.closest('.acessar-paciente-btn')) {
+                const patientId = bedCard.dataset.patientId;
+                if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
+            }
+
+            if (target.closest('.dar-alta-btn')) {
+                if (dischargeModal) {
+                    dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+                    dischargeModal.dataset.patientId = bedCard.dataset.patientId;
+                    dischargeModal.dataset.bedId = bedCard.dataset.bedId;
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    dischargeDateInput.value = now.toISOString().slice(0, 16);
+                    dischargeModal.classList.add('active');
+                }
+            }
+
+            if (target.closest('.transferir-paciente-btn')) {
+                if (transferModal) {
+                    transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+                    transferModal.dataset.patientId = bedCard.dataset.patientId;
+                    transferModal.dataset.oldBedId = bedCard.dataset.bedId;
+                    
+                    try {
+                        const response = await fetch('/api/units-with-free-beds');
+                        if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
+                        const result = await response.json();
+                        unitsWithFreeBeds = result.data;
+                        destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
+                        unitsWithFreeBeds.forEach(unit => {
+                            const option = document.createElement('option');
+                            option.value = unit.id;
+                            option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
+                            option.disabled = !unit.free_beds || unit.free_beds.length === 0;
+                            destinationUnitSelect.appendChild(option);
+                        });
+                        destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+                        destinationBedSelect.disabled = true;
+                        transferModal.classList.add('active');
+                    } catch(error) {
+                        console.error("Erro ao carregar dados para transferência:", error);
+                        alert("Não foi possível carregar as unidades de destino.");
+                    }
+                }
+            }
+        });
+    }
 
     const closeModal = (modal) => { 
         if(modal) {
             modal.classList.remove('active');
-            if (modal.id === 'addPatientModal') {
+            if (modal.id === 'addPatientModal' && patientForm && secondaryDiagnosesContainer) {
                 patientForm.reset();
-                const firstEntry = secondaryDiagnosesContainer.querySelector('.secondary-diagnosis-entry');
-                secondaryDiagnosesContainer.innerHTML = ''; // Limpa todos os campos
-                secondaryDiagnosesContainer.appendChild(firstEntry); // Adiciona o primeiro de volta
+                const firstEntryHTML = `
+                    <div class="secondary-diagnosis-entry">
+                        <div class="autocomplete-container">
+                            <textarea class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                            <div class="autocomplete-results"></div>
+                        </div>
+                        <label class="cid-label">CID-10</label>
+                        <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
+                        <button type="button" class="remove-diag-btn" disabled>&times;</button>
+                    </div>`;
+                secondaryDiagnosesContainer.innerHTML = firstEntryHTML;
             }
         }
     };
@@ -226,117 +250,127 @@ document.addEventListener('DOMContentLoaded', function() {
     if(closeTransferModal) closeTransferModal.addEventListener('click', () => closeModal(transferModal));
     if(cancelTransferBtn) cancelTransferBtn.addEventListener('click', () => closeModal(transferModal));
 
-    savePatientButton.addEventListener('click', async () => {
-        const secondaryDiagnoses = [];
-        document.querySelectorAll('.secondary-diagnosis-entry').forEach(entry => {
-            const desc = entry.querySelector('.secondary_desc').value.trim();
-            const cid = entry.querySelector('.secondary_cid').value.trim();
-            if (desc) {
-                secondaryDiagnoses.push({ desc, cid });
+    if (savePatientButton) {
+        savePatientButton.addEventListener('click', async () => {
+            const secondaryDiagnoses = [];
+            if (secondaryDiagnosesContainer) {
+                document.querySelectorAll('.secondary-diagnosis-entry').forEach(entry => {
+                    const desc = entry.querySelector('.secondary_desc').value.trim();
+                    const cid = entry.querySelector('.secondary_cid').value.trim();
+                    if (desc) {
+                        secondaryDiagnoses.push({ desc, cid });
+                    }
+                });
+            }
+
+            const patientData = {
+                bed_id: patientModal.dataset.bedId,
+                name: document.getElementById('patientName').value.trim(),
+                mother_name: document.getElementById('motherName').value.trim(),
+                dob: document.getElementById('patientDob').value,
+                cns: document.getElementById('patientCns').value.trim(),
+                dih: document.getElementById('hospitalAdmissionDate').value,
+                hd_primary_desc: hdPrimaryDesc.value.trim(),
+                hd_primary_cid: hdPrimaryCid.value.trim(),
+                secondary_diagnoses: secondaryDiagnoses,
+                hpp: document.getElementById('hpp').value.trim(),
+                allergies: document.getElementById('allergies').value.trim(),
+            };
+
+            if (!patientData.name || !patientData.dob) {
+                alert('Por favor, preencha pelo menos o Nome e a Data de Nascimento do paciente.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/patients', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(patientData)
+                });
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || "Falha ao cadastrar paciente.");
+                }
+                alert("Paciente cadastrado com sucesso!");
+                closeModal(patientModal);
+                loadUnitAndBeds();
+            } catch(error) {
+                console.error("Erro ao salvar paciente:", error);
+                alert(`Erro: ${error.message}`);
             }
         });
+    }
 
-        const patientData = {
-            bed_id: patientModal.dataset.bedId,
-            name: document.getElementById('patientName').value.trim(),
-            mother_name: document.getElementById('motherName').value.trim(),
-            dob: document.getElementById('patientDob').value,
-            cns: document.getElementById('patientCns').value.trim(),
-            dih: document.getElementById('hospitalAdmissionDate').value,
-            hd_primary_desc: hdPrimaryDesc.value.trim(),
-            hd_primary_cid: hdPrimaryCid.value.trim(),
-            secondary_diagnoses: secondaryDiagnoses,
-            hpp: document.getElementById('hpp').value.trim(),
-            allergies: document.getElementById('allergies').value.trim(),
-        };
-
-        if (!patientData.name || !patientData.dob) {
-            alert('Por favor, preencha pelo menos o Nome e a Data de Nascimento do paciente.');
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/patients', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(patientData)
-            });
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || "Falha ao cadastrar paciente.");
+    if (confirmDischargeBtn) {
+        confirmDischargeBtn.addEventListener('click', async () => {
+            const patientId = dischargeModal.dataset.patientId;
+            const bedId = dischargeModal.dataset.bedId;
+            const reason = document.getElementById('dischargeReason').value;
+            const date = dischargeDateInput.value;
+            if (!reason || !date) { alert("Preencha o motivo e a data da alta."); return; }
+            try {
+                const response = await fetch(`/api/patients/${patientId}/discharge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bedId, reason, date })
+                });
+                if (!response.ok) throw new Error("Falha ao dar alta.");
+                alert("Alta registrada com sucesso!");
+                closeModal(dischargeModal);
+                loadUnitAndBeds();
+            } catch (error) {
+                alert(`Erro: ${error.message}`);
             }
-            alert("Paciente cadastrado com sucesso!");
-            closeModal(patientModal);
-            loadUnitAndBeds();
-        } catch(error) {
-            console.error("Erro ao salvar paciente:", error);
-            alert(`Erro: ${error.message}`);
-        }
-    });
-
-    confirmDischargeBtn.addEventListener('click', async () => {
-        const patientId = dischargeModal.dataset.patientId;
-        const bedId = dischargeModal.dataset.bedId;
-        const reason = document.getElementById('dischargeReason').value;
-        const date = dischargeDateInput.value;
-        if (!reason || !date) { alert("Preencha o motivo e a data da alta."); return; }
-        try {
-            const response = await fetch(`/api/patients/${patientId}/discharge`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bedId, reason, date })
-            });
-            if (!response.ok) throw new Error("Falha ao dar alta.");
-            alert("Alta registrada com sucesso!");
-            closeModal(dischargeModal);
-            loadUnitAndBeds();
-        } catch (error) {
-            alert(`Erro: ${error.message}`);
-        }
-    });
+        });
+    }
     
-    destinationUnitSelect.addEventListener('change', () => {
-        const selectedUnitId = destinationUnitSelect.value;
-        const selectedUnit = unitsWithFreeBeds.find(u => u.id == selectedUnitId);
-        destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
-        if(selectedUnit && selectedUnit.free_beds) {
-            selectedUnit.free_beds.forEach(bed => {
-                const option = document.createElement('option');
-                option.value = bed.id;
-                option.textContent = `Leito ${bed.bed_number}`;
-                destinationBedSelect.appendChild(option);
-            });
-            destinationBedSelect.disabled = false;
-        } else {
-            destinationBedSelect.disabled = true;
-        }
-    });
-
-    confirmTransferBtn.addEventListener('click', async () => {
-        const patientId = transferModal.dataset.patientId;
-        const oldBedId = transferModal.dataset.oldBedId;
-        const newBedId = destinationBedSelect.value;
-        if(!newBedId) { alert("Por favor, selecione um leito de destino."); return; }
-        try {
-            const response = await fetch(`/api/patients/${patientId}/transfer`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ oldBedId, newBedId })
-            });
-            if(!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || "Falha ao transferir paciente.");
+    if (destinationUnitSelect) {
+        destinationUnitSelect.addEventListener('change', () => {
+            const selectedUnitId = destinationUnitSelect.value;
+            const selectedUnit = unitsWithFreeBeds.find(u => u.id == selectedUnitId);
+            destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+            if(selectedUnit && selectedUnit.free_beds) {
+                selectedUnit.free_beds.forEach(bed => {
+                    const option = document.createElement('option');
+                    option.value = bed.id;
+                    option.textContent = `Leito ${bed.bed_number}`;
+                    destinationBedSelect.appendChild(option);
+                });
+                destinationBedSelect.disabled = false;
+            } else {
+                destinationBedSelect.disabled = true;
             }
-            alert("Paciente transferido com sucesso!");
-            closeModal(transferModal);
-            loadUnitAndBeds();
-        } catch(error) {
-            console.error("Erro ao confirmar transferência:", error);
-            alert(`Erro: ${error.message}`);
-        }
-    });
+        });
+    }
 
-    // LÓGICA PARA MÚLTIPLOS DIAGNÓSTICOS E BUSCA
+    if (confirmTransferBtn) {
+        confirmTransferBtn.addEventListener('click', async () => {
+            const patientId = transferModal.dataset.patientId;
+            const oldBedId = transferModal.dataset.oldBedId;
+            const newBedId = destinationBedSelect.value;
+            if(!newBedId) { alert("Por favor, selecione um leito de destino."); return; }
+            try {
+                const response = await fetch(`/api/patients/${patientId}/transfer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ oldBedId, newBedId })
+                });
+                if(!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || "Falha ao transferir paciente.");
+                }
+                alert("Paciente transferido com sucesso!");
+                closeModal(transferModal);
+                loadUnitAndBeds();
+            } catch(error) {
+                console.error("Erro ao confirmar transferência:", error);
+                alert(`Erro: ${error.message}`);
+            }
+        });
+    }
+    
+    // LÓGICA MÚLTIPLOS DIAGNÓSTICOS E BUSCA
     if (addSecondaryDiagBtn) {
         addSecondaryDiagBtn.addEventListener('click', () => {
             const newEntry = document.createElement('div');
@@ -362,38 +396,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    patientForm.addEventListener('input', (e) => {
-        const targetInput = e.target;
-        let resultsContainer;
-        if (targetInput.id === 'hd_primary_desc') {
-            resultsContainer = hdPrimaryResults;
-        } else if (targetInput.classList.contains('secondary_desc')) {
-            resultsContainer = targetInput.closest('.secondary-diagnosis-entry').querySelector('.autocomplete-results');
-        }
-
-        if (resultsContainer) {
-            clearTimeout(cidTimeout);
-            cidTimeout = setTimeout(() => searchCid(targetInput.value, resultsContainer), 150);
-        }
-    });
-
-    patientForm.addEventListener('click', function(e) {
-        const item = e.target.closest('.autocomplete-item');
-        if (item && !item.classList.contains('error-item')) {
-            const container = item.parentElement;
-            const parentGroup = container.closest('.form-group, .secondary-diagnosis-entry');
-            if (parentGroup) {
-                const descInput = parentGroup.querySelector('#hd_primary_desc, .secondary_desc');
-                const cidInput = parentGroup.querySelector('#hd_primary_cid, .secondary_cid');
-                if (descInput && cidInput) {
-                    descInput.value = item.dataset.nome;
-                    cidInput.value = item.dataset.cid;
-                }
+    if (patientForm) {
+        patientForm.addEventListener('input', (e) => {
+            const targetInput = e.target;
+            let resultsContainer;
+            if (targetInput.id === 'hd_primary_desc') {
+                resultsContainer = hdPrimaryResults;
+            } else if (targetInput.classList.contains('secondary_desc')) {
+                resultsContainer = targetInput.closest('.secondary-diagnosis-entry').querySelector('.autocomplete-results');
             }
-            container.innerHTML = '';
-            container.classList.remove('active');
-        }
-    });
+
+            if (resultsContainer) {
+                clearTimeout(cidTimeout);
+                cidTimeout = setTimeout(() => searchCid(targetInput.value, resultsContainer), 150);
+            }
+        });
+
+        patientForm.addEventListener('click', function(e) {
+            const item = e.target.closest('.autocomplete-item');
+            if (item && !item.classList.contains('error-item')) {
+                const container = item.parentElement;
+                const parentGroup = container.closest('.form-group, .secondary-diagnosis-entry');
+                if (parentGroup) {
+                    const descInput = parentGroup.querySelector('#hd_primary_desc, .secondary_desc');
+                    const cidInput = parentGroup.querySelector('#hd_primary_cid, .secondary_cid');
+                    if (descInput && cidInput) {
+                        descInput.value = item.dataset.nome;
+                        cidInput.value = item.dataset.cid;
+                    }
+                }
+                container.innerHTML = '';
+                container.classList.remove('active');
+            }
+        });
+    }
 
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.autocomplete-container') && !e.target.closest('.secondary-diagnosis-entry')) {
