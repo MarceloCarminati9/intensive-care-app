@@ -1,4 +1,4 @@
-// VERSÃO FINAL, COMPLETA E UNIFICADA - 11/07/2025
+// VERSÃO FINAL, COM BUSCA DE CID LOCAL - 12/07/2025
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const destinationBedSelect = document.getElementById('destinationBedSelect');
     let unitsWithFreeBeds = [];
 
+    // [NOVO] ARMAZENAMENTO DE DADOS CID 
+    let cid10Data = [];
+
     // Elementos da Busca de CID
     let cidTimeout;
     const hdPrimaryDesc = document.getElementById('hd_primary_desc');
@@ -55,6 +58,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     // FUNÇÕES DE CARREGAMENTO E RENDERIZAÇÃO
     // =================================================================================
+
+    // [NOVO] FUNÇÃO PARA CARREGAR O ARQUIVO JSON LOCAL
+    async function loadCidData() {
+        try {
+            const response = await fetch('data/cid10.json'); // Carrega o arquivo local
+            if (!response.ok) {
+                throw new Error('Não foi possível carregar a lista de CIDs local.');
+            }
+            cid10Data = await response.json();
+            console.log('Banco de dados de CIDs carregado com sucesso.');
+        } catch (error) {
+            console.error(error);
+            // Desabilita os campos de busca se o arquivo não puder ser carregado
+            hdPrimaryDesc.disabled = true;
+            hdPrimaryDesc.placeholder = 'Erro ao carregar CIDs';
+            hdSecondaryDesc.disabled = true;
+            hdSecondaryDesc.placeholder = 'Erro ao carregar CIDs';
+        }
+    }
 
     async function loadUnitAndBeds() {
         try {
@@ -278,62 +300,59 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // [NOVO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID - CORRIGIDO E FUNCIONAL
-    async function searchCid(query, resultsContainer, cidInput) {
+    // [ALTERADO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID (AGORA LOCAL)
+    function searchCid(query, resultsContainer, cidInput) {
         if (query.length < 3) {
             resultsContainer.innerHTML = '';
             resultsContainer.classList.remove('active');
             return;
         }
-        try {
-            // ALTERAÇÃO 1: URL corrigida para a API funcional (BrasilAPI)
-            const response = await fetch(`https://brasilapi.com.br/api/cid/v1?search=${query}`);
-            
-            if (!response.ok) {
-                throw new Error('Serviço de busca de CID indisponível no momento.');
-            }
-            const results = await response.json();
-            resultsContainer.innerHTML = '';
 
-            if (results && results.length > 0) {
-                results.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'autocomplete-item';
-                    
-                    // ALTERAÇÃO 2: Campos da resposta da API (item.code, item.name)
-                    div.textContent = `${item.code} - ${item.name}`;
-                    div.dataset.cid = item.code;
-                    div.dataset.nome = item.name; // Apenas a descrição para o campo de texto
-                    
-                    resultsContainer.appendChild(div);
-                });
-                resultsContainer.classList.add('active');
-            } else {
-                resultsContainer.classList.remove('active');
-            }
-        } catch (error) { 
-            console.error("Erro ao buscar CID:", error);
-            resultsContainer.innerHTML = `<div class="autocomplete-item error-item">${error.message}</div>`;
+        // Converte a busca para minúsculas para uma pesquisa case-insensitive
+        const lowerCaseQuery = query.toLowerCase();
+
+        // Filtra o array local em vez de chamar a API
+        const results = cid10Data.filter(item => 
+            item.nome.toLowerCase().includes(lowerCaseQuery) || 
+            item.cod.toLowerCase().includes(lowerCaseQuery)
+        ).slice(0, 10); // Limita a 10 resultados para performance
+
+        resultsContainer.innerHTML = '';
+
+        if (results && results.length > 0) {
+            results.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                
+                div.textContent = `${item.cod} - ${item.nome}`;
+                div.dataset.cid = item.cod;
+                div.dataset.nome = item.nome;
+                
+                resultsContainer.appendChild(div);
+});
+            resultsContainer.classList.add('active');
+        } else {
+            resultsContainer.innerHTML = '<div class="autocomplete-item error-item">Nenhum resultado encontrado.</div>';
             resultsContainer.classList.add('active');
         }
     }
 
     hdPrimaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);
-        cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults, hdPrimaryCid), 300);
+        cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults, hdPrimaryCid), 150); // Tempo de espera menor
     });
 
     hdSecondaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);
-        cidTimeout = setTimeout(() => searchCid(hdSecondaryDesc.value, hdSecondaryResults, hdSecondaryCid), 300);
+        cidTimeout = setTimeout(() => searchCid(hdSecondaryDesc.value, hdSecondaryResults, hdSecondaryCid), 150);
     });
 
     document.addEventListener('click', function(e) {
         const item = e.target.closest('.autocomplete-item');
-        if (item) {
+        // Adicionada verificação para não fazer nada se clicar no item de erro
+        if (item && !item.classList.contains('error-item')) {
             const container = item.parentElement;
             if (container.id === 'hd_primary_results') {
-                // ALTERAÇÃO 3: Preenche o campo de descrição com nome e código para clareza
                 hdPrimaryDesc.value = `${item.dataset.cid} - ${item.dataset.nome}`;
                 hdPrimaryCid.value = item.dataset.cid;
             } else if (container.id === 'secondary_diagnoses_results') {
@@ -343,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = '';
             container.classList.remove('active');
         } else {
+            // Esconde os resultados se clicar fora
             if (hdPrimaryResults) hdPrimaryResults.classList.remove('active');
             if (hdSecondaryResults) hdSecondaryResults.classList.remove('active');
         }
@@ -350,4 +370,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // INICIALIZAÇÃO DA PÁGINA
     loadUnitAndBeds();
+    loadCidData(); // Inicia o carregamento do arquivo JSON local
 });

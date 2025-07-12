@@ -1,0 +1,26 @@
+[
+  {
+    "cod": "A00",
+    "nome": "Cólera"
+  },
+  {
+    "cod": "J18",
+    "nome": "Pneumonia, organismo não especificado"
+  },
+  {
+    "cod": "J18.0",
+    "nome": "Broncopneumonia, organismo não especificado"
+  },
+  {
+    "cod": "J18.1",
+    "nome": "Pneumonia lobar, organismo não especificado"
+  },
+  {
+    "cod": "I10",
+    "nome": "Hipertensão essencial (primária)"
+  },
+  {
+    "cod": "E11",
+    "nome": "Diabetes mellitus não-insulino-dependente"
+  }
+]
