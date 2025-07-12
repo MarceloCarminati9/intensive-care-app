@@ -131,17 +131,17 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
 
 apiRouter.post('/patients', async (req, res) => {
     const { 
-        bed_id, name, mother_name, dob, cns, dih, 
-        hd_primary_desc, hd_primary_cid, secondary_diagnoses_desc, secondary_diagnoses_cid, hpp, allergies
-    } = req.body;
+    bed_id, name, mother_name, dob, cns, dih, 
+    hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies // << secondary_diagnoses é agora um array
+} = req.body;
     if (!bed_id || !name || !dob) { return res.status(400).json({ error: 'ID do leito, nome e data de nascimento são obrigatórios.' }); }
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
         const patientSql = `
-            INSERT INTO patients (name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses_desc, secondary_diagnoses_cid, hpp, allergies, current_bed_id) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id;`;
-        const patientParams = [name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses_desc, secondary_diagnoses_cid, hpp, allergies, bed_id];
+    INSERT INTO patients (name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies, current_bed_id) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;`; // Agora são 11 parâmetros
+        const patientParams = [name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, JSON.stringify(secondary_diagnoses), hpp, allergies, bed_id];
         const patientResult = await client.query(patientSql, patientParams);
         const newPatientId = patientResult.rows[0].id;
         const bedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3;`;

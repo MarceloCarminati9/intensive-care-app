@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const patientCns = document.getElementById('patientCns');
         const patientDih = document.getElementById('patientDih');
         const patientHpp = document.getElementById('patientHpp');
-        const patientHd = document.getElementById('patientHd');
+        const patientHd = document.getElementById('patientHd'); // Variável declarada
+
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
         if(patientBed) patientBed.textContent = `${patient.unit_name || 'Unidade'} - Leito ${patient.bed_number || 'N/A'}`;
         if(patientAge) patientAge.textContent = patient.age ? `${patient.age} anos` : 'N/A';
@@ -94,15 +95,33 @@ document.addEventListener('DOMContentLoaded', function() {
             patientDih.textContent = patient.dih ? new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
         }
         if (patientHpp) patientHpp.textContent = patient.hpp || 'Nenhuma informação de HPP cadastrada.';
+        
+        // Bloco de código corrigido e unificado para exibir diagnósticos
         if (patientHd) {
-    if (patient.hd_primary_desc) {
-        // Se o código CID também existir, mostra ambos
-        const cidCode = patient.hd_primary_cid ? `(${patient.hd_primary_cid})` : '';
-        patientHd.textContent = `${patient.hd_primary_desc} ${cidCode}`.trim();
-    } else {
-        patientHd.textContent = 'Nenhuma hipótese diagnóstica cadastrada.';
-    }
-}
+            let hdContent = '';
+            // Diagnóstico Primário
+            if (patient.hd_primary_desc) {
+                const primaryCid = patient.hd_primary_cid ? `(${patient.hd_primary_cid})` : '';
+                hdContent += `<p><strong>Primário:</strong> ${patient.hd_primary_desc} ${primaryCid}</p>`;
+            }
+
+            // Diagnósticos Secundários (agora um array)
+            if (patient.secondary_diagnoses && patient.secondary_diagnoses.length > 0) {
+                hdContent += '<strong>Secundários:</strong><ul>';
+                patient.secondary_diagnoses.forEach(diag => {
+                    const secondaryCid = diag.cid ? `(${diag.cid})` : '';
+                    hdContent += `<li>${diag.desc} ${secondaryCid}</li>`;
+                });
+                hdContent += '</ul>';
+            }
+
+            if (hdContent === '') {
+                patientHd.innerHTML = '<p>Nenhuma hipótese diagnóstica cadastrada.</p>';
+            } else {
+                // Usamos .innerHTML porque estamos inserindo tags HTML (p, ul, li)
+                patientHd.innerHTML = hdContent;
+            }
+        }
     }
 
     function updateActionLinks(pId) {

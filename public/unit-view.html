@@ -62,14 +62,17 @@
     <input type="text" id="hd_primary_cid" placeholder="Ex: J18.9">
 </div>
 
-<div class="form-group">
+<div>
     <label for="secondary_diagnoses_desc">Diagnósticos Secundários (e CID, se houver)</label>
-    <div class="autocomplete-container">
-        <textarea id="secondary_diagnoses_desc" rows="3" placeholder="Comece a digitar o diagnóstico..."></textarea>
-        <div class="autocomplete-results" id="secondary_diagnoses_results"></div>
+    <div id="secondary_diagnoses_container">
+        <div class="secondary-diagnosis-entry">
+            <input type="text" class="secondary_desc" placeholder="Comece a digitar o diagnóstico...">
+            <input type="hidden" class="secondary_cid">
+            <div class="autocomplete-results"></div>
+            <button type="button" class="remove-diag-btn" disabled>&times;</button>
+        </div>
     </div>
-    <label for="secondary_diagnoses_cid" style="margin-top: 8px;">CID-10</label>
-    <input type="text" id="secondary_diagnoses_cid" placeholder="Ex: E11.9">
+    <button type="button" id="add_secondary_diag_btn" class="button-secondary small-btn">Adicionar outro diagnóstico</button>
 </div>
             <hr>
             <div class="form-group">

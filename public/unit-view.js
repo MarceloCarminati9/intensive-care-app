@@ -1,4 +1,4 @@
-// VERSÃO FINAL, COM BUSCA DE CID LOCAL - 12/07/2025
+// VERSÃO FINAL, COM BUSCA DE CID LOCAL E NOMES DE CHAVE CORRIGIDOS
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const destinationBedSelect = document.getElementById('destinationBedSelect');
     let unitsWithFreeBeds = [];
 
-    // [NOVO] ARMAZENAMENTO DE DADOS CID 
+    // ARMAZENAMENTO DE DADOS CID 
     let cid10Data = [];
 
     // Elementos da Busca de CID
@@ -45,9 +45,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const hdPrimaryDesc = document.getElementById('hd_primary_desc');
     const hdPrimaryResults = document.getElementById('hd_primary_results');
     const hdPrimaryCid = document.getElementById('hd_primary_cid');
-    const hdSecondaryDesc = document.getElementById('secondary_diagnoses_desc');
-    const hdSecondaryResults = document.getElementById('secondary_diagnoses_results');
-    const hdSecondaryCid = document.getElementById('secondary_diagnoses_cid');
+    // Múltiplos Diagnósticos Secundários
+    const addSecondaryDiagBtn = document.getElementById('add_secondary_diag_btn');
+    const secondaryDiagnosesContainer = document.getElementById('secondary_diagnoses_container');
+
 
     if (!unitId) {
         unitNameTitle.textContent = "ID da Unidade não fornecido.";
@@ -59,10 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // FUNÇÕES DE CARREGAMENTO E RENDERIZAÇÃO
     // =================================================================================
 
-    // [NOVO] FUNÇÃO PARA CARREGAR O ARQUIVO JSON LOCAL
     async function loadCidData() {
         try {
-            const response = await fetch('data/cid10.json'); // Carrega o arquivo local
+            const response = await fetch('data/cid10.json');
             if (!response.ok) {
                 throw new Error('Não foi possível carregar a lista de CIDs local.');
             }
@@ -70,11 +70,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Banco de dados de CIDs carregado com sucesso.');
         } catch (error) {
             console.error(error);
-            // Desabilita os campos de busca se o arquivo não puder ser carregado
             hdPrimaryDesc.disabled = true;
             hdPrimaryDesc.placeholder = 'Erro ao carregar CIDs';
-            hdSecondaryDesc.disabled = true;
-            hdSecondaryDesc.placeholder = 'Erro ao carregar CIDs';
         }
     }
 
@@ -197,9 +194,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if(cancelTransferBtn) cancelTransferBtn.addEventListener('click', () => closeModal(transferModal));
 
     savePatientButton.addEventListener('click', async () => {
-        const bedId = patientModal.dataset.bedId;
+        const secondaryDiagnoses = [];
+        document.querySelectorAll('.secondary-diagnosis-entry').forEach(entry => {
+            const desc = entry.querySelector('.secondary_desc').value.trim();
+            const cid = entry.querySelector('.secondary_cid').value.trim();
+            if (desc) {
+                secondaryDiagnoses.push({ desc, cid });
+            }
+        });
+
         const patientData = {
-            bed_id: bedId,
+            bed_id: patientModal.dataset.bedId,
             name: document.getElementById('patientName').value.trim(),
             mother_name: document.getElementById('motherName').value.trim(),
             dob: document.getElementById('patientDob').value,
@@ -207,8 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dih: document.getElementById('hospitalAdmissionDate').value,
             hd_primary_desc: hdPrimaryDesc.value.trim(),
             hd_primary_cid: hdPrimaryCid.value.trim(),
-            secondary_diagnoses_desc: hdSecondaryDesc.value.trim(),
-            secondary_diagnoses_cid: hdSecondaryCid.value.trim(),
+            secondary_diagnoses: secondaryDiagnoses,
             hpp: document.getElementById('hpp').value.trim(),
             allergies: document.getElementById('allergies').value.trim(),
         };
@@ -300,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // [ALTERADO] LÓGICA PARA BUSCA AUTOMÁTICA DE CID (AGORA LOCAL)
+    // LÓGICA PARA BUSCA AUTOMÁTICA DE CID (LOCAL)
     function searchCid(query, resultsContainer, cidInput) {
         if (query.length < 3) {
             resultsContainer.innerHTML = '';
@@ -308,14 +312,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Converte a busca para minúsculas para uma pesquisa case-insensitive
         const lowerCaseQuery = query.toLowerCase();
 
-        // Filtra o array local em vez de chamar a API
+        // **CORREÇÃO AQUI**: Usa 'display' e 'code' para a busca
         const results = cid10Data.filter(item => 
-            item.nome.toLowerCase().includes(lowerCaseQuery) || 
-            item.cod.toLowerCase().includes(lowerCaseQuery)
-        ).slice(0, 10); // Limita a 10 resultados para performance
+            item.display.toLowerCase().includes(lowerCaseQuery) || 
+            item.code.toLowerCase().includes(lowerCaseQuery)
+        ).slice(0, 10);
 
         resultsContainer.innerHTML = '';
 
@@ -324,12 +327,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const div = document.createElement('div');
                 div.className = 'autocomplete-item';
                 
-                div.textContent = `${item.cod} - ${item.nome}`;
-                div.dataset.cid = item.cod;
-                div.dataset.nome = item.nome;
+                // **CORREÇÃO AQUI**: Usa 'code' e 'display' para exibir
+                div.textContent = `${item.code} - ${item.display}`;
+                div.dataset.cid = item.code;
+                div.dataset.nome = item.display;
                 
                 resultsContainer.appendChild(div);
-});
+            });
             resultsContainer.classList.add('active');
         } else {
             resultsContainer.innerHTML = '<div class="autocomplete-item error-item">Nenhum resultado encontrado.</div>';
@@ -339,36 +343,78 @@ document.addEventListener('DOMContentLoaded', function() {
 
     hdPrimaryDesc.addEventListener('input', () => {
         clearTimeout(cidTimeout);
-        cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults, hdPrimaryCid), 150); // Tempo de espera menor
+        cidTimeout = setTimeout(() => searchCid(hdPrimaryDesc.value, hdPrimaryResults, hdPrimaryCid), 150);
     });
 
-    hdSecondaryDesc.addEventListener('input', () => {
-        clearTimeout(cidTimeout);
-        cidTimeout = setTimeout(() => searchCid(hdSecondaryDesc.value, hdSecondaryResults, hdSecondaryCid), 150);
-    });
+    // Lógica para Múltiplos Diagnósticos Secundários
+    if (addSecondaryDiagBtn) {
+        addSecondaryDiagBtn.addEventListener('click', () => {
+            const newEntry = document.createElement('div');
+            newEntry.className = 'secondary-diagnosis-entry';
+            newEntry.innerHTML = `
+                <input type="text" class="secondary_desc" placeholder="Comece a digitar o diagnóstico...">
+                <input type="hidden" class="secondary_cid">
+                <div class="autocomplete-results"></div>
+                <button type="button" class="remove-diag-btn">&times;</button>
+            `;
+            secondaryDiagnosesContainer.appendChild(newEntry);
+        });
+    }
+    
+    if(secondaryDiagnosesContainer) {
+        secondaryDiagnosesContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-diag-btn')) {
+                e.target.closest('.secondary-diagnosis-entry').remove();
+            }
+        });
+
+        secondaryDiagnosesContainer.addEventListener('input', (e) => {
+            if (e.target.classList.contains('secondary_desc')) {
+                const inputField = e.target;
+                const resultsContainer = inputField.nextElementSibling.nextElementSibling;
+                const cidField = inputField.nextElementSibling;
+                
+                clearTimeout(cidTimeout);
+                cidTimeout = setTimeout(() => searchCid(inputField.value, resultsContainer, cidField), 150);
+            }
+        });
+    }
+
 
     document.addEventListener('click', function(e) {
         const item = e.target.closest('.autocomplete-item');
-        // Adicionada verificação para não fazer nada se clicar no item de erro
         if (item && !item.classList.contains('error-item')) {
             const container = item.parentElement;
+            let descInput, cidInput;
+
+            // Determina se estamos no campo primário ou em um dos secundários
             if (container.id === 'hd_primary_results') {
-                hdPrimaryDesc.value = `${item.dataset.cid} - ${item.dataset.nome}`;
-                hdPrimaryCid.value = item.dataset.cid;
-            } else if (container.id === 'secondary_diagnoses_results') {
-                hdSecondaryDesc.value = `${item.dataset.cid} - ${item.dataset.nome}`;
-                hdSecondaryCid.value = item.dataset.cid;
+                descInput = hdPrimaryDesc;
+                cidInput = hdPrimaryCid;
+            } else {
+                const parentEntry = container.closest('.secondary-diagnosis-entry');
+                if (parentEntry) {
+                    descInput = parentEntry.querySelector('.secondary_desc');
+                    cidInput = parentEntry.querySelector('.secondary_cid');
+                }
             }
+            
+            if(descInput && cidInput) {
+                descInput.value = `${item.dataset.cid} - ${item.dataset.nome}`;
+                cidInput.value = item.dataset.cid;
+            }
+
+            // Limpa o container de resultados específico que foi clicado
             container.innerHTML = '';
             container.classList.remove('active');
-        } else {
-            // Esconde os resultados se clicar fora
-            if (hdPrimaryResults) hdPrimaryResults.classList.remove('active');
-            if (hdSecondaryResults) hdSecondaryResults.classList.remove('active');
+
+        } else if (!e.target.closest('.secondary-diagnosis-entry') && !e.target.closest('#hd_primary_desc')) {
+             // Esconde todos os resultados se clicar fora de qualquer campo de diagnóstico
+            document.querySelectorAll('.autocomplete-results').forEach(res => res.classList.remove('active'));
         }
     });
 
     // INICIALIZAÇÃO DA PÁGINA
     loadUnitAndBeds();
-    loadCidData(); // Inicia o carregamento do arquivo JSON local
+    loadCidData();
 });
