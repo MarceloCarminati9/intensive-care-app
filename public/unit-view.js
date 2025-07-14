@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     if (bedGridContainer) {
-        // CORREÇÃO CRÍTICA: Removido o 'async' daqui.
+        // CORREÇÃO CRÍTICA: A função de clique NÃO é mais 'async'.
         bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
             const bedCard = target.closest('.bed-card');
@@ -188,51 +188,49 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             else if (target.closest('.dar-alta-btn')) {
-                if (dischargeModal) {
-                    if (dischargePatientName) dischargePatientName.textContent = patientName;
+                if (dischargeModal && dischargePatientName && dischargeDateInput) {
+                    dischargePatientName.textContent = patientName;
                     dischargeModal.dataset.patientId = bedCard.dataset.patientId;
                     dischargeModal.dataset.bedId = bedCard.dataset.bedId;
                     const now = new Date();
                     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                    if (dischargeDateInput) dischargeDateInput.value = now.toISOString().slice(0, 16);
+                    dischargeDateInput.value = now.toISOString().slice(0, 16);
                     dischargeModal.classList.add('active');
                 }
             }
 
             else if (target.closest('.transferir-paciente-btn')) {
-                if (transferModal) {
-                    if (transferPatientName) transferPatientName.textContent = patientName;
+                if (transferModal && transferPatientName && destinationUnitSelect && destinationBedSelect) {
+                    transferPatientName.textContent = patientName;
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
                     
                     // 1. Abre o modal imediatamente
                     transferModal.classList.add('active'); 
                     
-                    // 2. Busca os dados em segundo plano, usando uma função auto-invocável (IIFE)
+                    // 2. Busca os dados em segundo plano
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
                             if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
                             const result = await response.json();
                             unitsWithFreeBeds = result.data;
-                            if(destinationUnitSelect) {
-                                destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
-                                unitsWithFreeBeds.forEach(unit => {
-                                    const option = document.createElement('option');
-                                    option.value = unit.id;
-                                    option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
-                                    option.disabled = !unit.free_beds || unit.free_beds.length === 0;
-                                    destinationUnitSelect.appendChild(option);
-                                });
-                            }
-                           if(destinationBedSelect) {
-                                destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
-                                destinationBedSelect.disabled = true;
-                           }
+
+                            destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
+                            unitsWithFreeBeds.forEach(unit => {
+                                const option = document.createElement('option');
+                                option.value = unit.id;
+                                option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
+                                option.disabled = !unit.free_beds || unit.free_beds.length === 0;
+                                destinationUnitSelect.appendChild(option);
+                            });
+
+                            destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+                            destinationBedSelect.disabled = true;
                         } catch(error) {
                             console.error("Erro ao carregar dados para transferência:", error);
                             alert("Não foi possível carregar as unidades de destino.");
-                            closeModal(transferModal); // Fecha o modal se a busca de dados falhar
+                            closeModal(transferModal); 
                         }
                     })();
                 }
@@ -274,9 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.secondary-diagnosis-entry').forEach(entry => {
                     const desc = entry.querySelector('.secondary_desc').value.trim();
                     const cid = entry.querySelector('.secondary_cid').value.trim();
-                    if (desc) {
-                        secondaryDiagnoses.push({ desc, cid });
-                    }
+                    if (desc) { secondaryDiagnoses.push({ desc, cid }); }
                 });
             }
             const patientData = {
@@ -308,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 alert("Paciente cadastrado com sucesso!");
                 closeModal(patientModal);
-                loadUnitAndBeds();
+                await loadUnitAndBeds();
             } catch(error) {
                 console.error("Erro ao salvar paciente:", error);
                 alert(`Erro: ${error.message}`);
@@ -332,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!response.ok) throw new Error("Falha ao dar alta.");
                 alert("Alta registrada com sucesso!");
                 closeModal(dischargeModal);
-                loadUnitAndBeds();
+                await loadUnitAndBeds();
             } catch (error) {
                 alert(`Erro: ${error.message}`);
             }
@@ -376,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 alert("Paciente transferido com sucesso!");
                 closeModal(transferModal);
-                loadUnitAndBeds();
+                await loadUnitAndBeds();
             } catch(error) {
                 console.error("Erro ao confirmar transferência:", error);
                 alert(`Erro: ${error.message}`);
@@ -397,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
                 <button type="button" class="remove-diag-btn">&times;</button>
             `;
-            secondaryDiagnosesContainer.appendChild(newEntry);
+            if (secondaryDiagnosesContainer) secondaryDiagnosesContainer.appendChild(newEntry);
         });
     }
     
