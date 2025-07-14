@@ -162,11 +162,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     if (bedGridContainer) {
-        // CORREÇÃO CRÍTICA: Removido o 'async' daqui para não pausar a execução do evento.
         bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
             const bedCard = target.closest('.bed-card');
             if (!bedCard) return;
+
+            const patientInfoP = bedCard.querySelector('.patient-info p');
+            const patientName = patientInfoP && patientInfoP.lastChild ? patientInfoP.lastChild.textContent.trim() : 'Paciente';
 
             if (target.closest('.cadastrar-paciente-btn')) {
                 if (patientModal) {
@@ -186,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             else if (target.closest('.dar-alta-btn')) {
                 if (dischargeModal) {
-                    if (dischargePatientName) dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+                    if (dischargePatientName) dischargePatientName.textContent = patientName;
                     dischargeModal.dataset.patientId = bedCard.dataset.patientId;
                     dischargeModal.dataset.bedId = bedCard.dataset.bedId;
                     const now = new Date();
@@ -198,14 +200,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             else if (target.closest('.transferir-paciente-btn')) {
                 if (transferModal) {
-                    if (transferPatientName) transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+                    if (transferPatientName) transferPatientName.textContent = patientName;
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
                     
-                    // 1. Abre o modal imediatamente
                     transferModal.classList.add('active'); 
                     
-                    // 2. Busca os dados em segundo plano, usando uma função auto-invocável (IIFE)
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
