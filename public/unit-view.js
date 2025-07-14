@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     if (bedGridContainer) {
-        // CORREÇÃO CRÍTICA: A função de clique NÃO é mais 'async'
+        // CORREÇÃO CRÍTICA: Removido o 'async' daqui para não pausar a execução do evento.
         bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
             const bedCard = target.closest('.bed-card');
