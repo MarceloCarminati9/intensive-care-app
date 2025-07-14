@@ -168,71 +168,70 @@ document.addEventListener('DOMContentLoaded', function() {
             const bedCard = target.closest('.bed-card');
             if (!bedCard) return;
 
-            // Ação de cadastrar paciente (síncrona)
             if (target.closest('.cadastrar-paciente-btn')) {
                 if (patientModal) {
-                    document.getElementById('modalLeitoNum').textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
+                    const bedNumberSpan = document.getElementById('modalLeitoNum');
+                    if (bedNumberSpan) {
+                         bedNumberSpan.textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
+                    }
                     patientModal.dataset.bedId = bedCard.dataset.bedId;
                     patientModal.classList.add('active');
                 }
-                return; // Importante para não continuar
             }
             
-            // Ação de acessar prontuário (síncrona)
-            if (target.closest('.acessar-paciente-btn')) {
+            else if (target.closest('.acessar-paciente-btn')) {
                 const patientId = bedCard.dataset.patientId;
                 if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
-                return;
             }
 
-            // Ação de dar alta (síncrona)
-            if (target.closest('.dar-alta-btn')) {
+            else if (target.closest('.dar-alta-btn')) {
                 if (dischargeModal) {
-                    dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+                    if (dischargePatientName) dischargePatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
                     dischargeModal.dataset.patientId = bedCard.dataset.patientId;
                     dischargeModal.dataset.bedId = bedCard.dataset.bedId;
                     const now = new Date();
                     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                    dischargeDateInput.value = now.toISOString().slice(0, 16);
+                    if (dischargeDateInput) dischargeDateInput.value = now.toISOString().slice(0, 16);
                     dischargeModal.classList.add('active');
                 }
-                return;
             }
 
-            // Ação de transferir (assíncrona, mas com a correção)
-            if (target.closest('.transferir-paciente-btn')) {
+            else if (target.closest('.transferir-paciente-btn')) {
                 if (transferModal) {
-                    transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
+                    if (transferPatientName) transferPatientName.textContent = bedCard.querySelector('.patient-info p').lastChild.textContent.trim();
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
                     
                     // 1. Abre o modal imediatamente
                     transferModal.classList.add('active'); 
                     
-                    // 2. Busca os dados em segundo plano
+                    // 2. Busca os dados em segundo plano, usando uma função auto-invocável (IIFE)
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
                             if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
                             const result = await response.json();
                             unitsWithFreeBeds = result.data;
-                            destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
-                            unitsWithFreeBeds.forEach(unit => {
-                                const option = document.createElement('option');
-                                option.value = unit.id;
-                                option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
-                                option.disabled = !unit.free_beds || unit.free_beds.length === 0;
-                                destinationUnitSelect.appendChild(option);
-                            });
-                            destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
-                            destinationBedSelect.disabled = true;
+                            if(destinationUnitSelect) {
+                                destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
+                                unitsWithFreeBeds.forEach(unit => {
+                                    const option = document.createElement('option');
+                                    option.value = unit.id;
+                                    option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
+                                    option.disabled = !unit.free_beds || unit.free_beds.length === 0;
+                                    destinationUnitSelect.appendChild(option);
+                                });
+                            }
+                           if(destinationBedSelect) {
+                                destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+                                destinationBedSelect.disabled = true;
+                           }
                         } catch(error) {
                             console.error("Erro ao carregar dados para transferência:", error);
                             alert("Não foi possível carregar as unidades de destino.");
                         }
                     })();
                 }
-                return;
             }
         });
     }
