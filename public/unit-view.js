@@ -208,25 +208,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     // 1. Abre o modal imediatamente
                     transferModal.classList.add('active'); 
                     
-                    // 2. Busca os dados em segundo plano
+                    // 2. Busca os dados em segundo plano, usando uma função auto-invocável (IIFE)
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
                             if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
                             const result = await response.json();
                             unitsWithFreeBeds = result.data;
-
-                            destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
-                            unitsWithFreeBeds.forEach(unit => {
-                                const option = document.createElement('option');
-                                option.value = unit.id;
-                                option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
-                                option.disabled = !unit.free_beds || unit.free_beds.length === 0;
-                                destinationUnitSelect.appendChild(option);
-                            });
-
-                            destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
-                            destinationBedSelect.disabled = true;
+                            if(destinationUnitSelect) {
+                                destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
+                                unitsWithFreeBeds.forEach(unit => {
+                                    const option = document.createElement('option');
+                                    option.value = unit.id;
+                                    option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
+                                    option.disabled = !unit.free_beds || unit.free_beds.length === 0;
+                                    destinationUnitSelect.appendChild(option);
+                                });
+                            }
+                           if(destinationBedSelect) {
+                                destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+                                destinationBedSelect.disabled = true;
+                           }
                         } catch(error) {
                             console.error("Erro ao carregar dados para transferência:", error);
                             alert("Não foi possível carregar as unidades de destino.");
