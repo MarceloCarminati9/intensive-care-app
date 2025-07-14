@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     if (bedGridContainer) {
+        // CORREÇÃO CRÍTICA: Removido o 'async' daqui.
         bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
             const bedCard = target.closest('.bed-card');
@@ -204,8 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
                     
+                    // 1. Abre o modal imediatamente
                     transferModal.classList.add('active'); 
                     
+                    // 2. Busca os dados em segundo plano, usando uma função auto-invocável (IIFE)
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
@@ -229,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         } catch(error) {
                             console.error("Erro ao carregar dados para transferência:", error);
                             alert("Não foi possível carregar as unidades de destino.");
+                            closeModal(transferModal); // Fecha o modal se a busca de dados falhar
                         }
                     })();
                 }
