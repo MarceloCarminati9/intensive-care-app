@@ -13,14 +13,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const patientDihEl = document.getElementById('patientDih');
     const patientHdEl = document.getElementById('patientHd');
     const patientHppEl = document.getElementById('patientHpp');
+    const patientDaysInIcuEl = document.getElementById('patientDaysInIcu'); // Adicionado
 
-    // ... (restante da seleção de elementos permanece a mesma)
+    // Elementos de Status
     const admissionContainer = document.getElementById('admission-info-container');
     const patientBedEl = document.getElementById('patientBed');
     const dischargeContainer = document.getElementById('discharge-info-container');
     const dischargeReasonEl = document.getElementById('dischargeReason');
     const dischargeDateEl = document.getElementById('dischargeDate');
     const readmitPatientBtn = document.getElementById('readmitPatientBtn');
+    
+    // Elementos do Modal de Reinternação
     const readmitModal = document.getElementById('readmitModal');
     const readmitForm = document.getElementById('readmitForm');
     const readmitPatientNameEl = document.getElementById('readmitPatientName');
@@ -36,6 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitHdPrimaryCid = document.getElementById('readmit_hd_primary_cid');
     const readmitAddSecondaryDiagBtn = document.getElementById('readmit_add_secondary_diag_btn');
     const readmitSecondaryDiagnosesContainer = document.getElementById('readmit_secondary_diagnoses_container');
+    
+    // Elementos do Histórico
     const historyList = document.getElementById('historyList');
     const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
     const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
@@ -44,6 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewerContent = document.getElementById('viewerContent');
     const closeViewerBtn = document.getElementById('closeViewerBtn');
     const printDocumentBtn = document.getElementById('printDocumentBtn');
+    
+    // Variáveis para a lógica de busca de CID
     let cid10Data = [];
     let cidTimeout;
 
@@ -54,58 +61,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =================================================================================
-    // [NOVO] FUNÇÃO PARA CALCULAR A IDADE
+    // FUNÇÕES AUXILIARES DE CÁLCULO
     // =================================================================================
     function calculateAge(dobString) {
-        if (!dobString) {
-            return 'N/A';
-        }
-
+        if (!dobString) return 'N/A';
         const birthDate = new Date(dobString);
-        // Ajuste para evitar problemas de fuso horário que podem alterar o dia
         birthDate.setMinutes(birthDate.getMinutes() + birthDate.getTimezoneOffset());
-        
         const today = new Date();
-
-        if (birthDate > today) {
-            return 'Data de nascimento futura';
-        }
-
+        if (birthDate > today) return 'Data de nascimento futura';
         let years = today.getFullYear() - birthDate.getFullYear();
         let months = today.getMonth() - birthDate.getMonth();
         let days = today.getDate() - birthDate.getDate();
-
-        // Se os dias forem negativos, "pega emprestado" do mês anterior
         if (days < 0) {
             months--;
-            // Pega o último dia do mês anterior para saber quantos dias adicionar
             const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
             days += lastMonth.getDate();
         }
-
-        // Se os meses forem negativos, "pega emprestado" do ano anterior
         if (months < 0) {
             years--;
             months += 12;
         }
-
-        // Constrói a string de resultado
         const parts = [];
         if (years > 0) parts.push(`${years} ${years > 1 ? 'anos' : 'ano'}`);
         if (months > 0) parts.push(`${months} ${months > 1 ? 'meses' : 'mês'}`);
-        // Mostra os dias se a idade for menor que 1 mês, ou se houver dias restantes
-        if (days > 0 || (years === 0 && months === 0)) {
-            parts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
+        if (days >= 0 && parts.length < 2) {
+             parts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);
         }
-        
-        return parts.join(', ') || 'Recém-nascido';
+        return parts.join(', ') || 'Hoje';
+    }
+
+    // [NOVO] FUNÇÃO PARA CALCULAR DIAS DE INTERNAÇÃO
+    function calculateIcuDays(admissionDateString) {
+        if (!admissionDateString) return 'N/A';
+        const admissionDate = new Date(admissionDateString);
+        const today = new Date();
+        admissionDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        if (admissionDate > today) return 'N/A';
+        const diffTime = Math.abs(today - admissionDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para contar o dia de entrada como Dia 1
+        return `${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}`;
     }
 
 
     // =================================================================================
-    // FUNÇÕES DE LÓGICA E RENDERIZAÇÃO
+    // FUNÇÕES DE LÓGICA PRINCIPAL E RENDERIZAÇÃO
     // =================================================================================
-
     async function loadCidData() {
         try {
             const response = await fetch('data/cid10.json'); 
@@ -120,14 +121,11 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch(`/api/patients/${patientId}`);
             if (!response.ok) throw new Error('Paciente não encontrado ou erro no servidor.');
-            
             const result = await response.json();
             const patient = result.data;
-
             renderPatientInfo(patient);
             updateActionLinks(patient.id);
             loadHistory(patient);
-
         } catch (error) {
             console.error("Erro ao carregar dados da página:", error);
             document.body.innerHTML = `<h1>Erro ao carregar dados do paciente.</h1><p>${error.message}</p>`;
@@ -135,17 +133,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderPatientInfo(patient) {
-        // Preenche os dados gerais
+        // Preenche dados gerais
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
-        
-        // ATUALIZADO: Chama a nova função para calcular e exibir a idade
         if(patientAgeEl) patientAgeEl.textContent = calculateAge(patient.dob);
-        
         if(patientCnsEl) patientCnsEl.textContent = patient.cns || 'N/A';
         if(patientDihEl) patientDihEl.textContent = patient.dih ? new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
-        
         if (patientHppEl) patientHppEl.textContent = patient.hpp || 'Nenhuma informação de HPP cadastrada.';
-        
         if (patientHdEl) {
             let hdContent = '';
             if (patient.hd_primary_desc) {
@@ -163,10 +156,12 @@ document.addEventListener('DOMContentLoaded', function() {
             patientHdEl.innerHTML = hdContent || '<p>Nenhuma hipótese diagnóstica cadastrada.</p>';
         }
 
-        // Lógica condicional para exibir o status correto
+        // Lógica condicional de status
         if (patient.discharge_date) {
+            // PACIENTE COM ALTA
             admissionContainer.style.display = 'none';
             dischargeContainer.style.display = 'block';
+            if (patientDaysInIcuEl) patientDaysInIcuEl.parentElement.style.display = 'none'; // Esconde o campo "Dias na UTI"
             const dischargeReasons = { 'alta_enfermaria': 'Alta para Enfermaria', 'alta_domiciliar': 'Alta Domiciliar', 'obito': 'Óbito', 'transferencia_externa': 'Transferência Externa' };
             dischargeReasonEl.textContent = dischargeReasons[patient.discharge_reason] || patient.discharge_reason;
             dischargeDateEl.textContent = new Date(patient.discharge_date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
@@ -177,14 +172,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 readmitPatientBtn.addEventListener('click', () => openReadmitModal(patient));
             }
         } else {
+            // PACIENTE INTERNADO
             admissionContainer.style.display = 'block';
             dischargeContainer.style.display = 'none';
             if(patientBedEl) patientBedEl.textContent = `${patient.unit_name || 'Unidade'} - Leito ${patient.bed_number || 'N/A'}`;
+            // ATUALIZADO: Calcula e exibe os dias de internação
+            if (patientDaysInIcuEl) {
+                patientDaysInIcuEl.parentElement.style.display = 'inline';
+                patientDaysInIcuEl.textContent = calculateIcuDays(patient.dih);
+            }
         }
     }
-
-    // ... (O restante do arquivo, incluindo loadHistory, renderHistoryList, e toda a lógica dos modais e eventos, permanece exatamente o mesmo)
-    // Para fins de completude, o código completo está abaixo.
 
     async function loadHistory(patientData) {
         try {
@@ -234,21 +232,11 @@ document.addEventListener('DOMContentLoaded', function() {
             let buttonsHTML = '';
             if (item.type === 'Evolução Médica') {
                 const isDisabled = !!item.deleted_at;
-                buttonsHTML = `
-                    <button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button>
-                    <button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button>
-                    <button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button>
-                    <button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button> 
-                `;
+                buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button> `;
             } else if (item.type === 'Receituário') {
                 buttonsHTML = `<button class="button-secondary" data-action="view">Visualizar/Imprimir</button>`;
             }
-            historyItemDiv.innerHTML = `
-                <div class="history-item-content">
-                    <div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div>
-                    <div class="history-item-actions">${buttonsHTML}</div>
-                </div>
-            `;
+            historyItemDiv.innerHTML = `<div class="history-item-content"><div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div><div class="history-item-actions">${buttonsHTML}</div></div>`;
             historyList.appendChild(historyItemDiv);
         });
     }
@@ -262,22 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!patientData || !evolutionContent) return '<p>Dados insuficientes para gerar o relatório.</p>';
         const getField = (field) => evolutionContent[field] || 'N/A';
         const patientDIH = patientData.dih ? new Date(patientData.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
-        
-        return `
-            <div class="report-header"><h3>Evolução Médica Diária</h3><p>Intensive Care Brasil</p></div>
-            <div class="report-id-section">
-                <h4>Identificação do Paciente</h4>
-                <div class="report-id-grid">
-                    <p><strong>Nome:</strong> ${patientData.name || 'N/A'}</p>
-                    <p><strong>Idade:</strong> ${calculateAge(patientData.dob)}</p>
-                    <p><strong>Leito:</strong> ${patientData.bed_number || 'N/A'}</p>
-                    <p><strong>DIH:</strong> ${patientDIH}</p>
-                </div>
-            </div>
-            <div class="report-section"><h4>Impressão 24h</h4><p>${getField('impressao24h')}</p></div>
-            <div class="report-section"><h4>Condutas</h4><p>${getField('condutas')}</p></div>
-            <div class="signature-area"><div class="signature-line">${getField('medico_responsavel')}<br>CRM: ${getField('crm_medico')}</div></div>
-        `;
+        return `<div class="report-header"><h3>Evolução Médica Diária</h3><p>Intensive Care Brasil</p></div><div class="report-id-section"><h4>Identificação do Paciente</h4><div class="report-id-grid"><p><strong>Nome:</strong> ${patientData.name || 'N/A'}</p><p><strong>Idade:</strong> ${calculateAge(patientData.dob)}</p><p><strong>Leito:</strong> ${patientData.bed_number || 'N/A'}</p><p><strong>DIH:</strong> ${patientDIH}</p></div></div><div class="report-section"><h4>Impressão 24h</h4><p>${getField('impressao24h')}</p></div><div class="report-section"><h4>Condutas</h4><p>${getField('condutas')}</p></div><div class="signature-area"><div class="signature-line">${getField('medico_responsavel')}<br>CRM: ${getField('crm_medico')}</div></div>`;
     }
     
     function searchCid(query, resultsContainer) {
@@ -492,16 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const uniqueId = 'readmit_sec_diag_' + Date.now();
             const newEntry = document.createElement('div');
             newEntry.className = 'secondary-diagnosis-entry';
-            newEntry.innerHTML = `
-                <div class="autocomplete-container">
-                    <label for="${uniqueId}_desc" class="sr-only">Descrição do Diagnóstico Secundário</label>
-                    <textarea id="${uniqueId}_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
-                    <div class="autocomplete-results"></div>
-                </div>
-                <label for="${uniqueId}_cid" class="cid-label">CID-10</label>
-                <input type="text" id="${uniqueId}_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1">
-                <button type="button" class="remove-diag-btn">&times;</button>
-            `;
+            newEntry.innerHTML = `<div class="autocomplete-container"><label for="${uniqueId}_desc" class="sr-only">Descrição do Diagnóstico Secundário</label><textarea id="${uniqueId}_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea><div class="autocomplete-results"></div></div><label for="${uniqueId}_cid" class="cid-label">CID-10</label><input type="text" id="${uniqueId}_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1"><button type="button" class="remove-diag-btn">&times;</button>`;
             if (readmitSecondaryDiagnosesContainer) readmitSecondaryDiagnosesContainer.appendChild(newEntry);
         });
     }
