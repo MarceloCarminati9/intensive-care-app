@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // 1. Abre o modal imediatamente
                     transferModal.classList.add('active'); 
                     
-                    // 2. Busca os dados em segundo plano, usando uma função auto-invocável (IIFE)
+                    // 2. Busca os dados em segundo plano
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
