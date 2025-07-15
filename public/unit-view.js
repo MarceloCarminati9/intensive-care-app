@@ -158,9 +158,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // =================================================================================
-    // LÓGICA DE EVENTOS E MODAIS
+    // LÓGICA DE EVENTOS E MODAIS (COM A NOVA LÓGICA DE "FORÇAR")
     // =================================================================================
     
+    // ATUALIZADO: Função de fechar o modal agora reverte os estilos diretos
+    const closeModal = (modal) => { 
+        if(modal) {
+            modal.classList.remove('active');
+            // Reverte os estilos diretos que forçaram a abertura
+            modal.style.display = 'none';
+            modal.style.visibility = 'hidden';
+
+            if (modal.id === 'addPatientModal' && patientForm && secondaryDiagnosesContainer) {
+                patientForm.reset();
+                const firstEntryHTML = `
+                    <div class="secondary-diagnosis-entry">
+                        <div class="autocomplete-container">
+                            <textarea class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                            <div class="autocomplete-results"></div>
+                        </div>
+                        <label class="cid-label">CID-10</label>
+                        <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
+                        <button type="button" class="remove-diag-btn" disabled>&times;</button>
+                    </div>`;
+                secondaryDiagnosesContainer.innerHTML = firstEntryHTML;
+            }
+        }
+    };
+
     if (bedGridContainer) {
         bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
@@ -170,26 +195,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const patientInfoP = bedCard.querySelector('.patient-info p');
             const patientName = patientInfoP && patientInfoP.lastChild ? patientInfoP.lastChild.textContent.trim() : 'Paciente';
     
-            // Lógica para CADASTRO
             if (target.closest('.cadastrar-paciente-btn')) {
+                event.stopPropagation(); // Boa prática adicionar aqui também
                 if (patientModal) {
                     const bedNumberSpan = document.getElementById('modalLeitoNum');
                     if (bedNumberSpan) {
                          bedNumberSpan.textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
                     }
                     patientModal.dataset.bedId = bedCard.dataset.bedId;
-                    patientModal.classList.add('active');
+                    patientModal.style.display = 'flex'; // Usando estilo direto
+                    patientModal.style.visibility = 'visible';
                 }
             }
             
-            // Lógica para ACESSAR PRONTUÁRIO
             else if (target.closest('.acessar-paciente-btn')) {
                 const patientId = bedCard.dataset.patientId;
                 if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
             }
     
-            // Lógica para DAR ALTA
             else if (target.closest('.dar-alta-btn')) {
+                event.stopPropagation(); // Evita conflitos
                 if (dischargeModal && dischargePatientName && dischargeDateInput) {
                     dischargePatientName.textContent = patientName;
                     dischargeModal.dataset.patientId = bedCard.dataset.patientId;
@@ -199,21 +224,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                     dischargeDateInput.value = now.toISOString().slice(0, 16);
                     
-                    dischargeModal.classList.add('active');
+                    dischargeModal.style.display = 'flex'; // Usando estilo direto
+                    dischargeModal.style.visibility = 'visible';
                 }
             }
     
-            // Lógica para TRANSFERIR
+            // ATUALIZADO: Lógica para FORÇAR a abertura do modal de transferência
             else if (target.closest('.transferir-paciente-btn')) {
+                // 1. Impedir que o evento se propague e cause conflitos
+                event.stopPropagation();
+
                 if (transferModal && transferPatientName && destinationUnitSelect && destinationBedSelect) {
                     transferPatientName.textContent = patientName;
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
                     
-                    // 1. Abre o modal imediatamente
-                    transferModal.classList.add('active'); 
+                    // 2. Forçar a exibição do modal com estilos diretos
+                    // (Assumindo que o modal usa flex para centralizar. Se não, use 'block')
+                    transferModal.style.display = 'flex'; 
+                    transferModal.style.visibility = 'visible';
                     
-                    // 2. Busca os dados em segundo plano, usando uma função auto-invocável (IIFE)
+                    // 3. Buscar os dados em segundo plano, como antes
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
@@ -248,26 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const closeModal = (modal) => { 
-        if(modal) {
-            modal.classList.remove('active');
-            if (modal.id === 'addPatientModal' && patientForm && secondaryDiagnosesContainer) {
-                patientForm.reset();
-                const firstEntryHTML = `
-                    <div class="secondary-diagnosis-entry">
-                        <div class="autocomplete-container">
-                            <textarea class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
-                            <div class="autocomplete-results"></div>
-                        </div>
-                        <label class="cid-label">CID-10</label>
-                        <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
-                        <button type="button" class="remove-diag-btn" disabled>&times;</button>
-                    </div>`;
-                secondaryDiagnosesContainer.innerHTML = firstEntryHTML;
-            }
-        }
-    };
-    
     if(closePatientModal) closePatientModal.addEventListener('click', () => closeModal(patientModal));
     if(cancelPatientModal) cancelPatientModal.addEventListener('click', () => closeModal(patientModal));
     if(closeDischargeModal) closeDischargeModal.addEventListener('click', () => closeModal(dischargeModal));
