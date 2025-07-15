@@ -12,24 +12,19 @@
         <header class="patient-header">
             <div class="patient-info-main">
                 <a href="dashboard.html" class="back-link">&larr; Voltar para o Dashboard</a>
-                <h1 id="patientName">Carregando paciente...</h1>
+                <h1 id="patientNameHeader">Carregando paciente...</h1>
                 <div class="patient-details">
-                    <span><strong>Nasc:</strong> <span id="patientDob">--/--/----</span></span>
-                    <span><strong>Mãe:</strong> <span id="patientMotherName">Não informado</span></span>
+                    <span><strong>Idade:</strong> <span id="patientAge">--</span></span>
                     <span><strong>CNS:</strong> <span id="patientCns">Não informado</span></span>
+                    <span><strong>DIH:</strong> <span id="patientDih">--/--/----</span></span>
                 </div>
             </div>
 
             <div id="admission-info-container" class="status-card admitted">
                 <h2>Status Atual</h2>
-                <p>
-                    <strong id="patientUnit">Carregando...</strong>
-                    <span class="separator">/</span>
-                    <span id="patientBed">Leito ...</span>
+                <p id="patientBed">
+                    Carregando...
                 </p>
-                <div class="admission-details">
-                    Data de Internação: <strong id="patientAdmissionDate">--/--/----</strong>
-                </div>
             </div>
 
             <div id="discharge-info-container" class="status-card discharged" style="display: none;">
@@ -47,28 +42,46 @@
         </header>
 
         <main class="patient-content">
-            <nav class="content-tabs">
-                <button class="tab-link active" data-tab="evolutions">Evoluções</button>
-                <button class="tab-link" data-tab="prescriptions">Receitas</button>
-                <button class="tab-link" data-tab="exams">Exames</button>
-                <button class="tab-link" data-tab="summary">Resumo do Caso</button>
-            </nav>
+            <div class="patient-summary">
+                <div class="summary-item">
+                    <h4>Hipóteses Diagnósticas</h4>
+                    <div id="patientHd"><p>Carregando...</p></div>
+                </div>
+                 <div class="summary-item">
+                    <h4>História Patológica Pregressa (HPP)</h4>
+                    <p id="patientHpp">Carregando...</p>
+                </div>
+            </div>
 
-            <div id="evolutions" class="tab-content active">
-                <p>Carregando evoluções...</p>
-            </div>
-            <div id="prescriptions" class="tab-content">
-                <p>Carregando receitas...</p>
-            </div>
-            <div id="exams" class="tab-content">
-                <p>Carregando exames...</p>
-            </div>
-            <div id="summary" class="tab-content">
-                <p>Carregando resumo do caso...</p>
+            <div class="history-section">
+                <div class="history-header">
+                    <h3>Histórico do Paciente</h3>
+                    <div class="history-actions">
+                        <a href="#" id="goToPrescriptionBtn" class="button-secondary">Nova Receita</a>
+                        <a href="#" id="goToEvolutionBtn" class="button-primary">Nova Evolução</a>
+                    </div>
+                </div>
+                <div id="historyList">
+                    <p>Carregando histórico...</p>
+                </div>
             </div>
         </main>
     </div>
 
+    <div id="historyViewerModal" class="modal-overlay">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h2 id="viewerTitle">Visualizar Documento</h2>
+                <button id="closeViewerBtn" class="close-button">&times;</button>
+            </div>
+            <div id="viewerContent" class="modal-body report-view">
+                </div>
+            <div class="modal-footer">
+                <button id="printDocumentBtn" class="button-primary">Imprimir</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="readmitModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
