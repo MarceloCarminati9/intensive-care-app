@@ -83,30 +83,64 @@
     </div>
     
     <div id="readmitModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content large-modal"> <div class="modal-header">
                 <h2>Reinternar Paciente</h2>
                 <button id="closeReadmitModal" class="close-button">&times;</button>
             </div>
-            <div class="modal-body">
+            <form id="readmitForm" class="modal-body" onsubmit="return false;">
                 <p>Reinternando o paciente <strong id="readmitPatientName"></strong>.</p>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="readmitUnitSelect">Nova Unidade de Destino</label>
+                        <select id="readmitUnitSelect" name="readmitUnitSelect" required>
+                            <option value="">Selecione a unidade...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="readmitBedSelect">Novo Leito de Destino</label>
+                        <select id="readmitBedSelect" name="readmitBedSelect" disabled required>
+                            <option value="">Selecione um leito livre...</option>
+                        </select>
+                    </div>
+                     <div class="form-group full-width">
+                        <label for="readmissionDate">Nova Data de Internação</label>
+                        <input type="datetime-local" id="readmissionDate" name="readmissionDate" required>
+                    </div>
+                </div>
+
+                <hr>
+                
+                <h4>Novas Hipóteses Diagnósticas para esta Internação</h4>
+
                 <div class="form-group">
-                    <label for="readmitUnitSelect">Nova Unidade de Destino</label>
-                    <select id="readmitUnitSelect">
-                        <option value="">Selecione a unidade...</option>
-                    </select>
+                    <label for="readmit_hd_primary_desc">Hipótese Diagnóstica Primária</label>
+                    <div class="autocomplete-container">
+                        <textarea id="readmit_hd_primary_desc" name="hd_primary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                        <div class="autocomplete-results" id="readmit_hd_primary_results"></div>
+                    </div>
+                    <label for="readmit_hd_primary_cid" class="cid-label">CID-10</label>
+                    <input type="text" id="readmit_hd_primary_cid" name="hd_primary_cid" placeholder="Ex: J18.9">
                 </div>
-                <div class="form-group">
-                    <label for="readmitBedSelect">Novo Leito de Destino</label>
-                    <select id="readmitBedSelect" disabled>
-                        <option value="">Selecione um leito livre...</option>
-                    </select>
+    
+                <div class="form-group full-width">
+                    <label>Diagnósticos Secundários</label>
+                    <div id="readmit_secondary_diagnoses_container">
+                        <div class="secondary-diagnosis-entry">
+                            <div class="autocomplete-container">
+                                <label for="readmit_sec_diag_init_desc" class="sr-only">Descrição do Diagnóstico Secundário</label>
+                                <textarea id="readmit_sec_diag_init_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                                <div class="autocomplete-results"></div>
+                            </div>
+                            <label for="readmit_sec_diag_init_cid" class="cid-label">CID-10</label>
+                            <input type="text" id="readmit_sec_diag_init_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1">
+                            <button type="button" class="remove-diag-btn" disabled>&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" id="readmit_add_secondary_diag_btn" class="button-secondary small-btn">Adicionar outro diagnóstico</button>
                 </div>
-                 <div class="form-group">
-                    <label for="readmissionDate">Nova Data de Internação</label>
-                    <input type="datetime-local" id="readmissionDate">
-                </div>
-            </div>
+
+            </form>
             <div class="modal-footer">
                 <button id="cancelReadmitBtn" class="button-secondary">Cancelar</button>
                 <button id="confirmReadmitBtn" class="button-primary">Confirmar Reinternação</button>
