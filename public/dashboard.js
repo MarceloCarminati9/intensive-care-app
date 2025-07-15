@@ -158,6 +158,82 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // =================================================================================
+    // NOVA LÓGICA DA BUSCA DE PACIENTES
+    // =================================================================================
+    const searchInput = document.getElementById('patientSearchInput');
+    const searchResultsContainer = document.getElementById('patientSearchResults');
+    let searchTimeout;
+
+    if (searchInput && searchResultsContainer) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            const query = searchInput.value.trim();
+
+            if (query.length < 3) {
+                searchResultsContainer.classList.remove('active');
+                return;
+            }
+
+            // Espera 300ms após o usuário parar de digitar para fazer a busca
+            searchTimeout = setTimeout(async () => {
+                try {
+                    // Futura rota de API para buscar pacientes
+                    const response = await fetch(`/api/patients/search?q=${encodeURIComponent(query)}`);
+                    if (!response.ok) throw new Error('Falha na busca.');
+
+                    const results = await response.json();
+                    displaySearchResults(results.data);
+                } catch (error) {
+                    console.error("Erro ao buscar pacientes:", error);
+                    searchResultsContainer.innerHTML = '<div class="result-item"><p>Erro ao buscar. Tente novamente.</p></div>';
+                    searchResultsContainer.classList.add('active');
+                }
+            }, 300);
+        });
+
+        // Esconde os resultados se o usuário clicar fora da área de busca
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                searchResultsContainer.classList.remove('active');
+            }
+        });
+    }
+
+    function displaySearchResults(patients) {
+        if (!searchResultsContainer) return;
+        searchResultsContainer.innerHTML = '';
+
+        if (!patients || patients.length === 0) {
+            searchResultsContainer.innerHTML = '<div class="result-item"><p>Nenhum paciente encontrado.</p></div>';
+        } else {
+            patients.forEach(patient => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.dataset.patientId = patient.id; // Armazena o ID do paciente
+
+                const dob = new Date(patient.dob).toLocaleDateString('pt-BR');
+                const statusClass = patient.status === 'admitted' ? 'admitted' : 'discharged';
+                const statusText = patient.status === 'admitted' ? `Internado - ${patient.unit_name} / Leito ${patient.bed_number}` : 'Alta';
+
+                item.innerHTML = `
+                    <div class="info">
+                        <p>${patient.name}</p>
+                        <span>Nasc: ${dob} | CNS: ${patient.cns || 'Não informado'}</span>
+                    </div>
+                    <div class="status ${statusClass}">${statusText}</div>
+                `;
+
+                item.addEventListener('click', () => {
+                    window.location.href = `patient-view.html?patientId=${patient.id}`;
+                });
+
+                searchResultsContainer.appendChild(item);
+            });
+        }
+        searchResultsContainer.classList.add('active');
+    }
+
+    // =================================================================================
     // INICIALIZAÇÃO
     // =================================================================================
     loadUnits();

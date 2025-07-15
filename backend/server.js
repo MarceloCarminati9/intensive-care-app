@@ -132,7 +132,7 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
 apiRouter.post('/patients', async (req, res) => {
     const { 
     bed_id, name, mother_name, dob, cns, dih, 
-    hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies // << secondary_diagnoses é agora um array
+    hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies
 } = req.body;
     if (!bed_id || !name || !dob) { return res.status(400).json({ error: 'ID do leito, nome e data de nascimento são obrigatórios.' }); }
     const client = await pool.connect();
@@ -140,7 +140,7 @@ apiRouter.post('/patients', async (req, res) => {
         await client.query('BEGIN');
         const patientSql = `
     INSERT INTO patients (name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies, current_bed_id) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;`; // Agora são 11 parâmetros
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;`;
         const patientParams = [name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, JSON.stringify(secondary_diagnoses), hpp, allergies, bed_id];
         const patientResult = await client.query(patientSql, patientParams);
         const newPatientId = patientResult.rows[0].id;
@@ -174,6 +174,55 @@ apiRouter.get('/patients/:id', async (req, res) => {
         res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
     }
 });
+
+// =================================================================================
+// [NOVO] ROTA DA API PARA BUSCAR PACIENTES
+// =================================================================================
+apiRouter.get('/patients/search', async (req, res) => {
+    const { q } = req.query; 
+
+    if (!q || q.length < 3) {
+        return res.status(400).json({ error: 'O termo de busca deve ter pelo menos 3 caracteres.' });
+    }
+
+    try {
+        const searchTerm = `%${q}%`;
+
+        const query = `
+            SELECT 
+                p.id,
+                p.name,
+                p.dob,
+                p.cns,
+                CASE
+                    WHEN p.current_bed_id IS NULL THEN 'discharged'
+                    ELSE 'admitted'
+                END as status,
+                u.name AS unit_name,
+                b.bed_number
+            FROM 
+                patients p
+            LEFT JOIN 
+                beds b ON p.current_bed_id = b.id
+            LEFT JOIN 
+                units u ON b.unit_id = u.id
+            WHERE 
+                p.name ILIKE $1 OR p.cns ILIKE $1
+            ORDER BY
+                p.name ASC
+            LIMIT 10; 
+        `;
+        
+        const result = await pool.query(query, [searchTerm]);
+        
+        res.json({ data: result.rows });
+
+    } catch (error) {
+        console.error('Erro na busca de pacientes:', error);
+        res.status(500).json({ error: 'Erro interno do servidor ao buscar pacientes.' });
+    }
+});
+
 
 apiRouter.post('/patients/:id/discharge', async (req, res) => {
     const { id } = req.params;
@@ -218,10 +267,6 @@ apiRouter.post('/patients/:id/transfer', async (req, res) => {
 
 
 // --- ROTAS DE HISTÓRICO ---
-// Estas rotas não foram fornecidas no arquivo `server.js` mais recente, mas existiam no backup.
-// Adicionando as versões corrigidas e completas para garantir a funcionalidade.
-
-// Rota para SALVAR uma nova evolução médica
 apiRouter.post('/patients/:id/evolutions', async (req, res) => {
     const { id } = req.params;
     const evolutionData = req.body;
@@ -238,7 +283,6 @@ apiRouter.post('/patients/:id/evolutions', async (req, res) => {
     }
 });
 
-// Rota para SALVAR uma nova receita
 apiRouter.post('/prescriptions', async (req, res) => {
     const { patient_id, medicamento, posologia, via_administracao, quantidade } = req.body;
     if (!patient_id || !medicamento || !posologia) {
@@ -254,8 +298,6 @@ apiRouter.post('/prescriptions', async (req, res) => {
     }
 });
 
-
-// Rotas para BUSCAR histórico
 apiRouter.get('/patients/:id/evolutions', async (req, res) => {
     try {
         const sql = `SELECT * FROM evolutions WHERE patient_id = $1 ORDER BY created_at DESC`;
@@ -277,7 +319,6 @@ apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
     }
 });
 
-// Rotas para GERENCIAR UMA ÚNICA evolução
 apiRouter.get('/evolutions/:evolutionId', async (req, res) => {
     try {
         const { evolutionId } = req.params;
