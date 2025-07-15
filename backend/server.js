@@ -176,7 +176,7 @@ apiRouter.get('/patients/:id', async (req, res) => {
 });
 
 // =================================================================================
-// ROTA DE BUSCA DE PACIENTES (CORRIGIDA)
+// ROTA DE BUSCA DE PACIENTES (COM LOG DE ERRO DETALHADO)
 // =================================================================================
 apiRouter.get('/patients/search', async (req, res) => {
     const { q } = req.query; 
@@ -187,14 +187,9 @@ apiRouter.get('/patients/search', async (req, res) => {
 
     try {
         const searchTerm = `%${q}%`;
-
-        // CORRIGIDO: Adicionado "p.cns::text" para evitar erro de tipo de dado na busca
         const query = `
             SELECT 
-                p.id,
-                p.name,
-                p.dob,
-                p.cns,
+                p.id, p.name, p.dob, p.cns,
                 CASE
                     WHEN p.current_bed_id IS NULL THEN 'discharged'
                     ELSE 'admitted'
@@ -215,11 +210,15 @@ apiRouter.get('/patients/search', async (req, res) => {
         `;
         
         const result = await pool.query(query, [searchTerm]);
-        
         res.json({ data: result.rows });
 
     } catch (error) {
-        console.error('Erro na busca de pacientes:', error);
+        // LOG DE ERRO DETALHADO
+        console.error("--- ERRO DETALHADO NA BUSCA DE PACIENTES ---");
+        console.error("Termo Buscado:", q);
+        console.error("Mensagem do Erro:", error.message);
+        console.error("Stack do Erro:", error.stack);
+        console.error("--- FIM DO ERRO DETALHADO ---");
         res.status(500).json({ error: 'Erro interno do servidor ao buscar pacientes.' });
     }
 });
