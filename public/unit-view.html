@@ -23,78 +23,79 @@
     </div>
 
     <div id="addPatientModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Cadastrar Paciente no Leito <span id="modalLeitoNum"></span></h2>
-            <button id="closePatientModal" class="close-button">&times;</button>
-        </div>
-        <form id="patientForm" class="modal-body">
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label for="patientName">Nome Completo do Paciente</label>
-                    <input type="text" id="patientName" name="patientName" required>
-                </div>
-                <div class="form-group full-width">
-                    <label for="motherName">Nome da Mãe</label>
-                    <input type="text" id="motherName" name="motherName">
-                </div>
-                <div class="form-group">
-                    <label for="patientDob">Data de Nascimento</label>
-                    <input type="date" id="patientDob" name="patientDob">
-                </div>
-                <div class="form-group">
-                    <label for="patientCns">CNS (Cartão Nacional de Saúde)</label>
-                    <input type="text" id="patientCns" name="patientCns">
-                </div>
-                <div class="form-group">
-                    <label for="hospitalAdmissionDate">Data de Internação Hospitalar</label>
-                    <input type="date" id="hospitalAdmissionDate" name="hospitalAdmissionDate">
-                </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cadastrar Paciente no Leito <span id="modalLeitoNum"></span></h2>
+                <button id="closePatientModal" class="close-button">&times;</button>
             </div>
-            <hr>
-            <div class="form-group">
-                <label for="hd_primary_desc">Hipótese Diagnóstica Primária</label>
-                <div class="autocomplete-container">
-                    <textarea id="hd_primary_desc" name="hd_primary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
-                    <div class="autocomplete-results" id="hd_primary_results"></div>
-                </div>
-                <label for="hd_primary_cid" style="margin-top: 8px;">CID-10</label>
-                <input type="text" id="hd_primary_cid" name="hd_primary_cid" placeholder="Ex: J18.9">
-            </div>
-
-            <div>
-                <div class="form-group full-width">
-                <label>Diagnósticos Secundários (e CID, se houver)</label>
-                <div id="secondary_diagnoses_container">
-                    <div class="secondary-diagnosis-entry">
-                        <div class="autocomplete-container">
-                            <textarea id="sec_diag_init_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
-                            <div class="autocomplete-results"></div>
-                        </div>
-                        <label for="sec_diag_init_cid" class="cid-label">CID-10</label>
-                        <input type="text" id="sec_diag_init_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1">
-                        <button type="button" class="remove-diag-btn" disabled>&times;</button>
+            <form id="patientForm" class="modal-body" onsubmit="return false;">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="patientName">Nome Completo do Paciente</label>
+                        <input type="text" id="patientName" name="patientName" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="motherName">Nome da Mãe</label>
+                        <input type="text" id="motherName" name="motherName">
+                    </div>
+                    <div class="form-group">
+                        <label for="patientDob">Data de Nascimento</label>
+                        <input type="date" id="patientDob" name="patientDob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientCns">CNS (Cartão Nacional de Saúde)</label>
+                        <input type="text" id="patientCns" name="patientCns">
+                    </div>
+                    <div class="form-group">
+                        <label for="hospitalAdmissionDate">Data de Internação Hospitalar</label>
+                        <input type="date" id="hospitalAdmissionDate" name="hospitalAdmissionDate" required>
                     </div>
                 </div>
-                <button type="button" id="add_secondary_diag_btn" class="button-secondary small-btn">Adicionar outro diagnóstico</button>
+                <hr>
+                <div class="form-group">
+                    <label for="hd_primary_desc">Hipótese Diagnóstica Primária</label>
+                    <div class="autocomplete-container">
+                        <textarea id="hd_primary_desc" name="hd_primary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                        <div class="autocomplete-results" id="hd_primary_results"></div>
+                    </div>
+                    <label for="hd_primary_cid" class="cid-label">CID-10</label>
+                    <input type="text" id="hd_primary_cid" name="hd_primary_cid" placeholder="Ex: J18.9">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Diagnósticos Secundários</label>
+                    <div id="secondary_diagnoses_container">
+                        <div class="secondary-diagnosis-entry">
+                            <div class="autocomplete-container">
+                                <label for="sec_diag_init_desc" class="sr-only">Descrição do Diagnóstico Secundário</label>
+                                <textarea id="sec_diag_init_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                                <div class="autocomplete-results"></div>
+                            </div>
+                            <label for="sec_diag_init_cid" class="cid-label">CID-10</label>
+                            <input type="text" id="sec_diag_init_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1">
+                            <button type="button" class="remove-diag-btn" disabled>&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" id="add_secondary_diag_btn" class="button-secondary small-btn">Adicionar outro diagnóstico</button>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <label for="hpp">História Patológica Pregressa (HPP)</label>
+                    <textarea id="hpp" name="hpp" rows="3" placeholder="Descreva as comorbidades..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="allergies">Alergias</label>
+                    <textarea id="allergies" name="allergies" rows="2" placeholder="Descreva as alergias conhecidas..."></textarea>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" id="cancelPatientModal" class="button-secondary">Cancelar</button>
+                <button type="button" id="savePatientButton" class="button-primary">Salvar Paciente</button>
             </div>
-            <hr>
-            <div class="form-group">
-                <label for="hpp">História Patológica Pregressa (HPP)</label>
-                <textarea id="hpp" name="hpp" rows="3" placeholder="Descreva as comorbidades..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="allergies">Alergias</label>
-                <textarea id="allergies" name="allergies" rows="2" placeholder="Descreva as alergias conhecidas..."></textarea>
-            </div>
-        </form>
-        <div class="modal-footer">
-            <button type="button" id="cancelPatientModal" class="button-secondary">Cancelar</button>
-            <button type="button" id="savePatientButton" class="button-primary">Salvar Paciente</button>
         </div>
     </div>
-</div>
-<div id="dischargeModal" class="modal-overlay">
+
+    <div id="dischargeModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Dar Alta ao Paciente</h2>
@@ -104,7 +105,7 @@
                 <p>Você está prestes a dar alta para o paciente <strong id="dischargePatientName"></strong>.</p>
                 <div class="form-group">
                     <label for="dischargeReason">Motivo da Alta</label>
-                    <select id="dischargeReason">
+                    <select id="dischargeReason" name="dischargeReason">
                         <option value="alta_enfermaria">Alta para Enfermaria</option>
                         <option value="alta_domiciliar">Alta Domiciliar</option>
                         <option value="obito">Óbito</option>
@@ -113,12 +114,12 @@
                 </div>
                  <div class="form-group">
                     <label for="dischargeDate">Data e Hora da Alta</label>
-                    <input type="datetime-local" id="dischargeDate">
+                    <input type="datetime-local" id="dischargeDate" name="dischargeDate">
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="cancelDischargeBtn" class="button-secondary">Cancelar</button>
-                <button id="confirmDischargeBtn" class="button-danger">Confirmar Alta</button>
+                <button type="button" id="cancelDischargeBtn" class="button-secondary">Cancelar</button>
+                <button type="button" id="confirmDischargeBtn" class="button-danger">Confirmar Alta</button>
             </div>
         </div>
     </div>
@@ -133,24 +134,25 @@
                 <p>Transferindo o paciente <strong id="transferPatientName"></strong>.</p>
                 <div class="form-group">
                     <label for="destinationUnitSelect">Unidade de Destino</label>
-                    <select id="destinationUnitSelect">
+                    <select id="destinationUnitSelect" name="destinationUnitSelect">
                         <option value="">Selecione a unidade...</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="destinationBedSelect">Leito de Destino</label>
-                    <select id="destinationBedSelect" disabled>
+                    <select id="destinationBedSelect" name="destinationBedSelect" disabled>
                         <option value="">Selecione um leito livre...</option>
                     </select>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="cancelTransferBtn" class="button-secondary">Cancelar</button>
-                <button id="confirmTransferBtn" class="button-primary">Confirmar Transferência</button>
+                <button type="button" id="cancelTransferBtn" class="button-secondary">Cancelar</button>
+                <button type="button" id="confirmTransferBtn" class="button-primary">Confirmar Transferência</button>
             </div>
         </div>
     </div>
 
     <script src="unit-view.js"></script>
+    <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}</style>
 </body>
 </html>

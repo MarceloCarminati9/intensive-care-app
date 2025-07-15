@@ -158,44 +158,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // =================================================================================
-    // LÓGICA DE EVENTOS E MODAIS
+    // LÓGICA DE EVENTOS E MODAIS (CORRIGIDA E SINCRONIZADA COM CSS)
     // =================================================================================
     
     const openModal = (modal) => {
-        if (!modal) return;
-        // Pede ao navegador para executar esta ação no próximo ciclo de renderização
-        requestAnimationFrame(() => {
-            modal.style.display = 'flex'; // Ou 'block', dependendo do seu CSS
-            modal.style.visibility = 'visible';
-            // Adicionamos um pequeno delay para a opacidade para garantir que a transição CSS funcione
-            setTimeout(() => {
-                modal.style.opacity = '1';
-            }, 10);
-        });
+        if (modal) {
+            modal.classList.add('active');
+        }
     };
 
     const closeModal = (modal) => { 
         if(modal) {
-            modal.style.opacity = '0';
-            // Espera a transição de opacidade terminar para esconder o modal
-            setTimeout(() => {
-                modal.style.display = 'none';
-                modal.style.visibility = 'hidden';
-            }, 200); // O tempo deve ser igual à duração da sua transição CSS
+            modal.classList.remove('active');
 
+            // CORRIGIDO: Recria o HTML do formulário com a estrutura certa ao fechar
             if (modal.id === 'addPatientModal' && patientForm && secondaryDiagnosesContainer) {
                 patientForm.reset();
-                const firstEntryHTML = `
+                secondaryDiagnosesContainer.innerHTML = `
                     <div class="secondary-diagnosis-entry">
                         <div class="autocomplete-container">
-                            <textarea class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                            <label for="sec_diag_init_desc" class="sr-only">Descrição do Diagnóstico Secundário</label>
+                            <textarea id="sec_diag_init_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
                             <div class="autocomplete-results"></div>
                         </div>
-                        <label class="cid-label">CID-10</label>
-                        <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
+                        <label for="sec_diag_init_cid" class="cid-label">CID-10</label>
+                        <input type="text" id="sec_diag_init_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1">
                         <button type="button" class="remove-diag-btn" disabled>&times;</button>
                     </div>`;
-                secondaryDiagnosesContainer.innerHTML = firstEntryHTML;
             }
         }
     };
@@ -209,8 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const patientInfoP = bedCard.querySelector('.patient-info p');
             const patientName = patientInfoP && patientInfoP.lastChild ? patientInfoP.lastChild.textContent.trim() : 'Paciente';
             
-            event.stopPropagation(); // Impede a propagação para todos os cliques em botões
-    
             if (target.closest('.cadastrar-paciente-btn')) {
                 if (patientModal) {
                     const bedNumberSpan = document.getElementById('modalLeitoNum');
@@ -283,12 +270,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if(closePatientModal) closePatientModal.addEventListener('click', () => closeModal(patientModal));
-    if(cancelPatientModal) cancelPatientModal.addEventListener('click', () => closeModal(patientModal));
-    if(closeDischargeModal) closeDischargeModal.addEventListener('click', () => closeModal(dischargeModal));
-    if(cancelDischargeBtn) cancelDischargeBtn.addEventListener('click', () => closeModal(dischargeModal));
-    if(closeTransferModal) closeTransferModal.addEventListener('click', () => closeModal(transferModal));
-    if(cancelTransferBtn) cancelTransferBtn.addEventListener('click', () => closeModal(transferModal));
+    [closePatientModal, cancelPatientModal].forEach(btn => btn?.addEventListener('click', () => closeModal(patientModal)));
+    [closeDischargeModal, cancelDischargeBtn].forEach(btn => btn?.addEventListener('click', () => closeModal(dischargeModal)));
+    [closeTransferModal, cancelTransferBtn].forEach(btn => btn?.addEventListener('click', () => closeModal(transferModal)));
 
     if (savePatientButton) {
         savePatientButton.addEventListener('click', async () => {
@@ -313,8 +297,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 hpp: document.getElementById('hpp').value.trim(),
                 allergies: document.getElementById('allergies').value.trim(),
             };
-            if (!patientData.name || !patientData.dob) {
-                alert('Por favor, preencha pelo menos o Nome e a Data de Nascimento do paciente.');
+            if (!patientData.name || !patientData.dob || !patientData.dih) {
+                alert('Por favor, preencha pelo menos Nome, Data de Nascimento e Data de Internação.');
                 return;
             }
             try {
@@ -405,18 +389,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // CORRIGIDO: Gera HTML válido ao adicionar novo diagnóstico
     if (addSecondaryDiagBtn) {
         addSecondaryDiagBtn.addEventListener('click', () => {
-            // Gera um ID único baseado no tempo atual para garantir que nunca se repita
             const uniqueId = 'sec_diag_' + Date.now(); 
-
             const newEntry = document.createElement('div');
             newEntry.className = 'secondary-diagnosis-entry';
-            
-            // CORRIGIDO: Adicionado 'id' e 'name' aos inputs e o atributo 'for' ao label
             newEntry.innerHTML = `
                 <div class="autocomplete-container">
-                    <label for="${uniqueId}_desc" class="sr-only">Diagnóstico Secundário</label> 
+                    <label for="${uniqueId}_desc" class="sr-only">Descrição do Diagnóstico Secundário</label> 
                     <textarea id="${uniqueId}_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
                     <div class="autocomplete-results"></div>
                 </div>
