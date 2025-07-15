@@ -22,6 +22,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitButtonContainer = document.getElementById('readmit-button-container');
     const readmitPatientBtn = document.getElementById('readmitPatientBtn');
     
+    // CORREÇÃO: Selecionando os botões com seus IDs corretos
+    const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
+    const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
+    const goToReceitaBtn = document.getElementById('goToReceitaBtn');
+
+    const historyList = document.getElementById('historyList');
+    
+    // Elementos de Modais
+    const historyViewerModal = document.getElementById('historyViewerModal');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const viewerContent = document.getElementById('viewerContent');
+    const closeViewerBtn = document.getElementById('closeViewerBtn');
+    const printDocumentBtn = document.getElementById('printDocumentBtn');
     const readmitModal = document.getElementById('readmitModal');
     const readmitForm = document.getElementById('readmitForm');
     const readmitPatientNameEl = document.getElementById('readmitPatientName');
@@ -37,15 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitHdPrimaryCid = document.getElementById('readmit_hd_primary_cid');
     const readmitAddSecondaryDiagBtn = document.getElementById('readmit_add_secondary_diag_btn');
     const readmitSecondaryDiagnosesContainer = document.getElementById('readmit_secondary_diagnoses_container');
-    
-    const historyList = document.getElementById('historyList');
-    const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
-    const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
-    const historyViewerModal = document.getElementById('historyViewerModal');
-    const viewerTitle = document.getElementById('viewerTitle');
-    const viewerContent = document.getElementById('viewerContent');
-    const closeViewerBtn = document.getElementById('closeViewerBtn');
-    const printDocumentBtn = document.getElementById('printDocumentBtn');
     
     let cid10Data = [];
     let cidTimeout;
@@ -65,8 +69,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // FUNÇÕES DE LÓGICA PRINCIPAL E RENDERIZAÇÃO
     // =================================================================================
     async function loadCidData() {try {const response = await fetch('data/cid10.json'); if (!response.ok) throw new Error('Não foi possível carregar a lista de CIDs.');cid10Data = await response.json();} catch (error) {console.error(error);}}
-    async function loadPageData() {try {const response = await fetch(`/api/patients/${patientId}`);if (!response.ok) throw new Error('Paciente não encontrado ou erro no servidor.');const result = await response.json();const patient = result.data;renderPatientInfo(patient);updateActionLinks(patient.id);loadHistory(patient);} catch (error) {console.error("Erro ao carregar dados da página:", error);}}
     
+    async function loadPageData() {
+        try {
+            const response = await fetch(`/api/patients/${patientId}`);
+            if (!response.ok) throw new Error('Paciente não encontrado ou erro no servidor.');
+            const result = await response.json();
+            const patient = result.data;
+            
+            renderPatientInfo(patient);
+            updateActionLinks(patient.id);
+            loadHistory(patient);
+
+        } catch (error) {
+            console.error("Erro ao carregar dados da página:", error);
+        }
+    }
+
     function renderPatientInfo(patient) {
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
         if(patientAgeEl) patientAgeEl.textContent = calculateAge(patient.dob);
@@ -169,22 +188,24 @@ document.addEventListener('DOMContentLoaded', function() {
             let buttonsHTML = '';
             if (item.type === 'Evolução Médica') {
                 const isDisabled = !!item.deleted_at;
-                buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button> `;
+                buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button>`;
             } else if (item.type === 'Prescrição') {
                 buttonsHTML = `<button class="button-secondary" data-action="view-prescription">Visualizar/Imprimir</button>`;
+            } else if (item.type === 'Receituário') { // Mantido por segurança, caso existam dados antigos
+                 buttonsHTML = `<button class="button-secondary" data-action="view-receita">Visualizar/Imprimir</button>`;
             }
             historyItemDiv.innerHTML = `<div class="history-item-content"><div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div><div class="history-item-actions">${buttonsHTML}</div></div>`;
             historyList.appendChild(historyItemDiv);
         });
     }
 
+    // ATUALIZADO: Habilita todos os links de ação
     function updateActionLinks(pId) {
         if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?patientId=${pId}`;
-        // ATUALIZADO: O link agora aponta para prescricao.html
         if (goToPrescriptionBtn) goToPrescriptionBtn.href = `prescricao.html?patientId=${pId}`;
+        if (goToReceitaBtn) goToReceitaBtn.href = `receita.html?patientId=${pId}`;
     }
 
-    // ... (restante do código, como generateEvolutionReportHTML, listeners de histórico, etc., permanecem os mesmos)
     function generateEvolutionReportHTML(patientData, evolutionContent) {if (!patientData || !evolutionContent) return '<p>Dados insuficientes para gerar o relatório.</p>';const getField = (field) => evolutionContent[field] || 'N/A';const patientDIH = patientData.dih ? new Date(patientData.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';return `<div class="report-header"><h3>Evolução Médica Diária</h3><p>Intensive Care Brasil</p></div><div class="report-id-section"><h4>Identificação do Paciente</h4><div class="report-id-grid"><p><strong>Nome:</strong> ${patientData.name || 'N/A'}</p><p><strong>Idade:</strong> ${calculateAge(patientData.dob)}</p><p><strong>Leito:</strong> ${patientData.bed_number || 'N/A'}</p><p><strong>DIH:</strong> ${patientDIH}</p></div></div><div class="report-section"><h4>Impressão 24h</h4><p>${getField('impressao24h')}</p></div><div class="report-section"><h4>Condutas</h4><p>${getField('condutas')}</p></div><div class="signature-area"><div class="signature-line">${getField('medico_responsavel')}<br>CRM: ${getField('crm_medico')}</div></div>`;}
     function searchCid(query, resultsContainer) {if (!resultsContainer) return;resultsContainer.innerHTML = '';if (query.length < 2) {resultsContainer.classList.remove('active');return;}const lowerCaseQuery = query.toLowerCase();const results = cid10Data.filter(item => (item.display && item.display.toLowerCase().includes(lowerCaseQuery)) || (item.code && item.code.toLowerCase().includes(lowerCaseQuery))).slice(0, 10);if (results.length > 0) {results.forEach(item => {const div = document.createElement('div');div.className = 'autocomplete-item';div.textContent = `${item.code} - ${item.display}`;div.dataset.cid = item.code;div.dataset.nome = item.display;resultsContainer.appendChild(div);});} else {resultsContainer.innerHTML = '<div class="autocomplete-item error-item">Nenhum resultado encontrado.</div>';}resultsContainer.classList.add('active');}
     if (historyList) {historyList.addEventListener('click', async function(event) {const button = event.target.closest('button[data-action]');if (!button) return;const action = button.dataset.action;const historyItemDiv = button.closest('.history-item');const itemData = JSON.parse(historyItemDiv.dataset.item);const patientData = JSON.parse(historyItemDiv.dataset.patient);if (action === 'delete') {if (confirm(`Tem certeza que deseja excluir esta evolução?\n\nEla permanecerá no histórico, mas não poderá ser editada ou copiada.`)) {try {const response = await fetch(`/api/evolutions/${itemData.id}`, { method: 'DELETE' });if (!response.ok) throw new Error('Falha ao excluir a evolução no servidor.');await loadPageData();} catch (error) {console.error('Erro ao excluir evolução:', error);alert(error.message);}}return;}switch(action) {case 'view':viewerTitle.textContent = `Visualizar ${itemData.type}`;let contentHtml = '';if (itemData.type === 'Receituário') {contentHtml = `<div class="report-section"><h4>Medicamento</h4><p>${itemData.medicamento}</p></div><div class="report-section"><h4>Posologia</h4><p>${itemData.posologia}</p></div>`;} else if (itemData.type === 'Evolução Médica') {contentHtml = generateEvolutionReportHTML(patientData, itemData.content);}viewerContent.innerHTML = contentHtml;historyViewerModal.classList.add('active');break;case 'edit':window.location.href = `patient-evolution.html?patientId=${patientId}&evolutionId=${itemData.id}`;break;case 'copy':window.location.href = `patient-evolution.html?patientId=${patientId}&copyFromId=${itemData.id}`;break;}});}
