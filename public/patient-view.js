@@ -1,38 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // =================================================================================
-    // SELEÇÃO DE ELEMENTOS (ATUALIZADA PARA O NOVO LAYOUT)
+    // SELEÇÃO DE ELEMENTOS
     // =================================================================================
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get('patientId');
 
-    // Elementos do Card Principal
     const backLink = document.getElementById('backLink');
     const patientNameHeader = document.getElementById('patientNameHeader');
     const patientAgeEl = document.getElementById('patientAge');
     const patientCnsEl = document.getElementById('patientCns');
     const patientDihEl = document.getElementById('patientDih');
-    const patientDaysInIcuEl = document.getElementById('patientDaysInIcu');
-    const patientMotherNameEl = document.getElementById('patientMotherName'); // NOVO
-    const patientAllergiesEl = document.getElementById('patientAllergies');   // NOVO
     const patientHdEl = document.getElementById('patientHd');
     const patientHppEl = document.getElementById('patientHpp');
+    const patientDaysInIcuEl = document.getElementById('patientDaysInIcu');
+    const patientMotherNameEl = document.getElementById('patientMotherName');
+    const patientAllergiesEl = document.getElementById('patientAllergies');
+    
     const admissionInfoContainer = document.getElementById('admission-info-container');
     const dischargeInfoContainer = document.getElementById('discharge-info-container');
-    const readmitButtonContainer = document.getElementById('readmit-button-container'); // NOVO
+    const readmitButtonContainer = document.getElementById('readmit-button-container');
     const readmitPatientBtn = document.getElementById('readmitPatientBtn');
-
-    // Elementos de Ações e Histórico
-    const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
-    const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
-    const historyList = document.getElementById('historyList');
-
-    // Elementos de Modais (sem alteração)
-    const historyViewerModal = document.getElementById('historyViewerModal');
-    const viewerTitle = document.getElementById('viewerTitle');
-    const viewerContent = document.getElementById('viewerContent');
-    const closeViewerBtn = document.getElementById('closeViewerBtn');
-    const printDocumentBtn = document.getElementById('printDocumentBtn');
+    
     const readmitModal = document.getElementById('readmitModal');
     const readmitForm = document.getElementById('readmitForm');
     const readmitPatientNameEl = document.getElementById('readmitPatientName');
@@ -42,13 +31,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitUnitSelect = document.getElementById('readmitUnitSelect');
     const readmitBedSelect = document.getElementById('readmitBedSelect');
     const readmissionDateInput = document.getElementById('readmissionDate');
+    let unitsWithFreeBeds = [];
     const readmitHdPrimaryDesc = document.getElementById('readmit_hd_primary_desc');
     const readmitHdPrimaryResults = document.getElementById('readmit_hd_primary_results');
     const readmitHdPrimaryCid = document.getElementById('readmit_hd_primary_cid');
     const readmitAddSecondaryDiagBtn = document.getElementById('readmit_add_secondary_diag_btn');
     const readmitSecondaryDiagnosesContainer = document.getElementById('readmit_secondary_diagnoses_container');
     
-    let unitsWithFreeBeds = [];
+    const historyList = document.getElementById('historyList');
+    const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
+    const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
+    const historyViewerModal = document.getElementById('historyViewerModal');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const viewerContent = document.getElementById('viewerContent');
+    const closeViewerBtn = document.getElementById('closeViewerBtn');
+    const printDocumentBtn = document.getElementById('printDocumentBtn');
+    
     let cid10Data = [];
     let cidTimeout;
 
@@ -58,30 +56,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =================================================================================
-    // FUNÇÕES AUXILIARES DE CÁLCULO (SEM ALTERAÇÃO)
+    // FUNÇÕES AUXILIARES DE CÁLCULO
     // =================================================================================
-    function calculateAge(dobString) { /* ...código existente... */ }
-    function calculateIcuDays(admissionDateString) { /* ...código existente... */ }
+    function calculateAge(dobString) {if (!dobString) return 'N/A';const birthDate = new Date(dobString);birthDate.setMinutes(birthDate.getMinutes() + birthDate.getTimezoneOffset());const today = new Date();if (birthDate > today) return 'Data de nascimento futura';let years = today.getFullYear() - birthDate.getFullYear();let months = today.getMonth() - birthDate.getMonth();let days = today.getDate() - birthDate.getDate();if (days < 0) {months--;const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);days += lastMonth.getDate();}if (months < 0) {years--;months += 12;}const parts = [];if (years > 0) parts.push(`${years} ${years > 1 ? 'anos' : 'ano'}`);if (months > 0) parts.push(`${months} ${months > 1 ? 'meses' : 'mês'}`);if (days >= 0 && parts.length < 2) {parts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);}return parts.join(', ') || 'Hoje';}
+    function calculateIcuDays(admissionDateString) {if (!admissionDateString) return 'N/A';const admissionDate = new Date(admissionDateString);const today = new Date();admissionDate.setHours(0, 0, 0, 0);today.setHours(0, 0, 0, 0);if (admissionDate > today) return 'N/A';const diffTime = Math.abs(today - admissionDate);const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;return `${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}`;}
 
     // =================================================================================
-    // FUNÇÕES DE LÓGICA PRINCIPAL E RENDERIZAÇÃO (ATUALIZADAS)
+    // FUNÇÕES DE LÓGICA PRINCIPAL E RENDERIZAÇÃO
     // =================================================================================
-    async function loadPageData() {
-        try {
-            const response = await fetch(`/api/patients/${patientId}`);
-            if (!response.ok) throw new Error('Paciente não encontrado ou erro no servidor.');
-            const result = await response.json();
-            const patient = result.data;
-            renderPatientInfo(patient);
-            updateActionLinks(patient.id);
-            loadHistory(patient);
-        } catch (error) {
-            console.error("Erro ao carregar dados da página:", error);
-        }
-    }
-
+    async function loadCidData() {try {const response = await fetch('data/cid10.json'); if (!response.ok) throw new Error('Não foi possível carregar a lista de CIDs.');cid10Data = await response.json();} catch (error) {console.error(error);}}
+    async function loadPageData() {try {const response = await fetch(`/api/patients/${patientId}`);if (!response.ok) throw new Error('Paciente não encontrado ou erro no servidor.');const result = await response.json();const patient = result.data;renderPatientInfo(patient);updateActionLinks(patient.id);loadHistory(patient);} catch (error) {console.error("Erro ao carregar dados da página:", error);}}
+    
     function renderPatientInfo(patient) {
-        // Preenche os dados cadastrais
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
         if(patientAgeEl) patientAgeEl.textContent = calculateAge(patient.dob);
         if(patientCnsEl) patientCnsEl.textContent = patient.cns || 'N/A';
@@ -90,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if(patientAllergiesEl) patientAllergiesEl.textContent = patient.allergies || 'Nenhuma informada';
         if(patientHppEl) patientHppEl.textContent = patient.hpp || 'Nenhuma informação de HPP cadastrada.';
 
-        // Preenche diagnósticos
         if (patientHdEl) {
             let hdContent = '';
             if (patient.hd_primary_desc) {
@@ -108,19 +93,15 @@ document.addEventListener('DOMContentLoaded', function() {
             patientHdEl.innerHTML = hdContent || '<p>Nenhuma hipótese diagnóstica cadastrada.</p>';
         }
 
-        // Atualiza o link de "Voltar"
         if (backLink) {
             backLink.href = patient.unit_id ? `unit-view.html?unitId=${patient.unit_id}` : 'dashboard.html';
         }
 
-        // Lógica condicional para exibir status e botão de reinternação
         if (patient.discharge_date) {
-            // PACIENTE COM ALTA
+            admissionInfoContainer.style.display = 'none';
             dischargeInfoContainer.textContent = `Alta | Motivo: ${patient.discharge_reason || 'Não especificado'}`;
             dischargeInfoContainer.style.display = 'inline-flex';
-            admissionInfoContainer.style.display = 'none';
             readmitButtonContainer.style.display = 'block';
-
             if (patientDaysInIcuEl) patientDaysInIcuEl.parentElement.style.display = 'none';
             if (patient.discharge_reason === 'obito') {
                 readmitPatientBtn.textContent = 'Paciente em Óbito';
@@ -129,12 +110,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 readmitPatientBtn.addEventListener('click', () => openReadmitModal(patient));
             }
         } else {
-            // PACIENTE INTERNADO
             admissionInfoContainer.textContent = `Internado | ${patient.unit_name || 'Unidade'} - Leito ${patient.bed_number || 'N/A'}`;
             admissionInfoContainer.style.display = 'inline-flex';
             dischargeInfoContainer.style.display = 'none';
             readmitButtonContainer.style.display = 'none';
-            
             if (patientDaysInIcuEl) {
                 patientDaysInIcuEl.parentElement.style.display = 'block';
                 patientDaysInIcuEl.textContent = calculateIcuDays(patient.icu_admission_date);
@@ -142,20 +121,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // O restante das funções (loadHistory, renderHistoryList, listeners, etc.) são preservadas na íntegra.
-    // Cole o código completo abaixo, que inclui todas as funções sem omissão.
+    async function loadHistory(patientData) {
+        try {
+            const [evolutionsResponse, prescriptionsResponse] = await Promise.all([
+                fetch(`/api/patients/${patientData.id}/evolutions`),
+                fetch(`/api/patients/${patientData.id}/prescriptions`)
+            ]);
+            if (!evolutionsResponse.ok || !prescriptionsResponse.ok) {
+                throw new Error('Falha ao buscar o histórico do paciente.');
+            }
+            const evolutionsResult = await evolutionsResponse.json();
+            const prescriptionsResult = await prescriptionsResponse.json();
+            const combinedHistory = [
+                ...(evolutionsResult.data || []).map(item => ({ ...item, type: 'Evolução Médica' })),
+                ...(prescriptionsResult.data || []).map(item => ({ ...item, type: 'Receituário' })) // Mantido como Receituário para o histórico
+            ];
+            renderHistoryList(combinedHistory, patientData);
+        } catch(error) {
+            console.error("Erro ao carregar histórico:", error);
+            if(historyList) historyList.innerHTML = `<p style="color:red;">Não foi possível carregar o histórico.</p>`;
+        }
+    }
     
-    // ... CÓDIGO RESTANTE (COPIADO INTEGRALMENTE DO SEU ARQUIVO) ...
-    // ...
-    // =================================================================================
-    // FUNÇÕES AUXILIARES DE CÁLCULO (COMPLETAS)
-    // =================================================================================
-    function calculateAge(dobString) {if (!dobString) return 'N/A';const birthDate = new Date(dobString);birthDate.setMinutes(birthDate.getMinutes() + birthDate.getTimezoneOffset());const today = new Date();if (birthDate > today) return 'Data de nascimento futura';let years = today.getFullYear() - birthDate.getFullYear();let months = today.getMonth() - birthDate.getMonth();let days = today.getDate() - birthDate.getDate();if (days < 0) {months--;const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);days += lastMonth.getDate();}if (months < 0) {years--;months += 12;}const parts = [];if (years > 0) parts.push(`${years} ${years > 1 ? 'anos' : 'ano'}`);if (months > 0) parts.push(`${months} ${months > 1 ? 'meses' : 'mês'}`);if (days >= 0 && parts.length < 2) {parts.push(`${days} ${days === 1 ? 'dia' : 'dias'}`);}return parts.join(', ') || 'Hoje';}
-    function calculateIcuDays(admissionDateString) {if (!admissionDateString) return 'N/A';const admissionDate = new Date(admissionDateString);const today = new Date();admissionDate.setHours(0, 0, 0, 0);today.setHours(0, 0, 0, 0);if (admissionDate > today) return 'N/A';const diffTime = Math.abs(today - admissionDate);const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;return `${diffDays} ${diffDays === 1 ? 'dia' : 'dias'}`;}
-    async function loadCidData() {try {const response = await fetch('data/cid10.json'); if (!response.ok) throw new Error('Não foi possível carregar a lista de CIDs.');cid10Data = await response.json();} catch (error) {console.error(error);}}
-    async function loadHistory(patientData) {try {const [evolutionsResponse, prescriptionsResponse] = await Promise.all([fetch(`/api/patients/${patientData.id}/evolutions`),fetch(`/api/patients/${patientData.id}/prescriptions`)]);if (!evolutionsResponse.ok || !prescriptionsResponse.ok) {throw new Error('Falha ao buscar o histórico do paciente.');}const evolutionsResult = await evolutionsResponse.json();const prescriptionsResult = await prescriptionsResponse.json();const combinedHistory = [...(evolutionsResult.data || []).map(item => ({ ...item, type: 'Evolução Médica' })),...(prescriptionsResult.data || []).map(item => ({ ...item, type: 'Receituário' }))];renderHistoryList(combinedHistory, patientData);} catch(error) {console.error("Erro ao carregar histórico:", error);if(historyList) historyList.innerHTML = `<p style="color:red;">Não foi possível carregar o histórico.</p>`;}}
-    function renderHistoryList(history, patientData) {if (!historyList) return;historyList.innerHTML = '';if (!history || history.length === 0) {historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';return;}history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));history.forEach(item => {const historyItemDiv = document.createElement('div');historyItemDiv.className = `history-item ${item.deleted_at ? 'deleted' : ''}`;historyItemDiv.dataset.item = JSON.stringify(item); historyItemDiv.dataset.patient = JSON.stringify(patientData);const createdAt = new Date(item.created_at);const updatedAt = item.updated_at ? new Date(item.updated_at) : null;let editedText = '';if (item.type === 'Evolução Médica' && updatedAt && (updatedAt.getTime() - createdAt.getTime() > 60000)) {const formattedEditDate = updatedAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });const formattedEditTime = updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });editedText = `<span class="edited-status">(editada em ${formattedEditDate} às ${formattedEditTime})</span>`;}const formattedCreationDate = createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });const formattedCreationTime = createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });let buttonsHTML = '';if (item.type === 'Evolução Médica') {const isDisabled = !!item.deleted_at;buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button> `;} else if (item.type === 'Receituário') {buttonsHTML = `<button class="button-secondary" data-action="view">Visualizar/Imprimir</button>`;}historyItemDiv.innerHTML = `<div class="history-item-content"><div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div><div class="history-item-actions">${buttonsHTML}</div></div>`;historyList.appendChild(historyItemDiv);});}
-    function updateActionLinks(pId) {if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?patientId=${pId}`;if (goToPrescriptionBtn) goToPrescriptionBtn.href = `receita.html?patientId=${pId}`;}
+    function renderHistoryList(history, patientData) {
+        if (!historyList) return;
+        historyList.innerHTML = '';
+        if (!history || history.length === 0) {
+            historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';
+            return;
+        }
+        history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        history.forEach(item => {
+            const historyItemDiv = document.createElement('div');
+            historyItemDiv.className = `history-item ${item.deleted_at ? 'deleted' : ''}`;
+            historyItemDiv.dataset.item = JSON.stringify(item); 
+            historyItemDiv.dataset.patient = JSON.stringify(patientData);
+            const createdAt = new Date(item.created_at);
+            const updatedAt = item.updated_at ? new Date(item.updated_at) : null;
+            let editedText = '';
+            if (item.type === 'Evolução Médica' && updatedAt && (updatedAt.getTime() - createdAt.getTime() > 60000)) {
+                const formattedEditDate = updatedAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const formattedEditTime = updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                editedText = `<span class="edited-status">(editada em ${formattedEditDate} às ${formattedEditTime})</span>`;
+            }
+            const formattedCreationDate = createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const formattedCreationTime = createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            let buttonsHTML = '';
+            if (item.type === 'Evolução Médica') {
+                const isDisabled = !!item.deleted_at;
+                buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button>`;
+            } else if (item.type === 'Receituário') {
+                buttonsHTML = `<button class="button-secondary" data-action="view">Visualizar/Imprimir</button>`;
+            }
+            historyItemDiv.innerHTML = `<div class="history-item-content"><div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div><div class="history-item-actions">${buttonsHTML}</div></div>`;
+            historyList.appendChild(historyItemDiv);
+        });
+    }
+
+    function updateActionLinks(pId) {
+        if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?patientId=${pId}`;
+        // ATUALIZADO: O link agora aponta para prescricao.html
+        if (goToPrescriptionBtn) goToPrescriptionBtn.href = `prescricao.html?patientId=${pId}`;
+    }
+
+    // ... (restante do código, como generateEvolutionReportHTML, listeners de histórico, etc., permanecem os mesmos)
     function generateEvolutionReportHTML(patientData, evolutionContent) {if (!patientData || !evolutionContent) return '<p>Dados insuficientes para gerar o relatório.</p>';const getField = (field) => evolutionContent[field] || 'N/A';const patientDIH = patientData.dih ? new Date(patientData.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';return `<div class="report-header"><h3>Evolução Médica Diária</h3><p>Intensive Care Brasil</p></div><div class="report-id-section"><h4>Identificação do Paciente</h4><div class="report-id-grid"><p><strong>Nome:</strong> ${patientData.name || 'N/A'}</p><p><strong>Idade:</strong> ${calculateAge(patientData.dob)}</p><p><strong>Leito:</strong> ${patientData.bed_number || 'N/A'}</p><p><strong>DIH:</strong> ${patientDIH}</p></div></div><div class="report-section"><h4>Impressão 24h</h4><p>${getField('impressao24h')}</p></div><div class="report-section"><h4>Condutas</h4><p>${getField('condutas')}</p></div><div class="signature-area"><div class="signature-line">${getField('medico_responsavel')}<br>CRM: ${getField('crm_medico')}</div></div>`;}
     function searchCid(query, resultsContainer) {if (!resultsContainer) return;resultsContainer.innerHTML = '';if (query.length < 2) {resultsContainer.classList.remove('active');return;}const lowerCaseQuery = query.toLowerCase();const results = cid10Data.filter(item => (item.display && item.display.toLowerCase().includes(lowerCaseQuery)) || (item.code && item.code.toLowerCase().includes(lowerCaseQuery))).slice(0, 10);if (results.length > 0) {results.forEach(item => {const div = document.createElement('div');div.className = 'autocomplete-item';div.textContent = `${item.code} - ${item.display}`;div.dataset.cid = item.code;div.dataset.nome = item.display;resultsContainer.appendChild(div);});} else {resultsContainer.innerHTML = '<div class="autocomplete-item error-item">Nenhum resultado encontrado.</div>';}resultsContainer.classList.add('active');}
     if (historyList) {historyList.addEventListener('click', async function(event) {const button = event.target.closest('button[data-action]');if (!button) return;const action = button.dataset.action;const historyItemDiv = button.closest('.history-item');const itemData = JSON.parse(historyItemDiv.dataset.item);const patientData = JSON.parse(historyItemDiv.dataset.patient);if (action === 'delete') {if (confirm(`Tem certeza que deseja excluir esta evolução?\n\nEla permanecerá no histórico, mas não poderá ser editada ou copiada.`)) {try {const response = await fetch(`/api/evolutions/${itemData.id}`, { method: 'DELETE' });if (!response.ok) throw new Error('Falha ao excluir a evolução no servidor.');await loadPageData();} catch (error) {console.error('Erro ao excluir evolução:', error);alert(error.message);}}return;}switch(action) {case 'view':viewerTitle.textContent = `Visualizar ${itemData.type}`;let contentHtml = '';if (itemData.type === 'Receituário') {contentHtml = `<div class="report-section"><h4>Medicamento</h4><p>${itemData.medicamento}</p></div><div class="report-section"><h4>Posologia</h4><p>${itemData.posologia}</p></div>`;} else if (itemData.type === 'Evolução Médica') {contentHtml = generateEvolutionReportHTML(patientData, itemData.content);}viewerContent.innerHTML = contentHtml;historyViewerModal.classList.add('active');break;case 'edit':window.location.href = `patient-evolution.html?patientId=${patientId}&evolutionId=${itemData.id}`;break;case 'copy':window.location.href = `patient-evolution.html?patientId=${patientId}&copyFromId=${itemData.id}`;break;}});}
