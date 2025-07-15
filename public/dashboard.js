@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveUnitButton = document.getElementById('saveUnitButton');
     const unitNameInput = document.getElementById('unitName');
     const unitBedsInput = document.getElementById('unitBeds');
+    const hgrLogoSrc = 'intensivecare.jpeg'; // Caminho para o seu logotipo
 
     // Checagem de segurança para garantir que todos os elementos essenciais existem
     if (!unitListContainer || !addUnitButton || !modalOverlay) {
@@ -24,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadUnits() {
         try {
             // Caminho relativo para a API, funciona tanto localmente quanto no Render
-            const response = await fetch('/api/units'); 
-            
+            const response = await fetch('/api/units');
+
             if (!response.ok) {
                 throw new Error(`Erro de rede ou servidor: ${response.statusText}`);
             }
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             const units = result.data;
 
-            unitListContainer.innerHTML = ''; 
+            unitListContainer.innerHTML = '';
 
             if (units.length === 0) {
                 unitListContainer.innerHTML = '<p>Nenhuma unidade cadastrada. Clique em "+ Adicionar Nova Unidade" para começar.</p>';
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 unitCard.innerHTML = `
                     <div class="unit-info">
-                        <h3>${unit.name}</h3>
+                        <h3><img src="${hgrLogoSrc}" alt="Logo HGR"> ${unit.name}</h3>
                         <p>${totalBeds} Leitos</p>
                     </div>
                     <div class="unit-stats">
@@ -113,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 if (!response.ok) throw new Error('Erro ao criar a unidade no servidor.');
-                
+
                 closeModal();
                 loadUnits();
             } catch (error) {

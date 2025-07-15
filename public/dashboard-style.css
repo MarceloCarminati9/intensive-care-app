@@ -1,56 +1,84 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
+/* Estilos Gerais */
 :root {
     --primary-blue: #4a90e2;
+    --light-blue: #e7f2fb;
     --dark-blue-text: #2c3e50;
-    --light-bg: #F0F5FA;
-    --white-bg: #FFFFFF;
-    --text-primary: #1F2937;
-    --text-secondary: #6B7280;
-    --border-color: #E5E7EB;
-    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
-    --danger-red: #EF4444;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    --white-bg: #ffffff;
+    --light-gray-bg: #f4f6f8;
+    --border-color: #d1d8e2;
+    --text-secondary: #7f8c8d;
+    --success-color: #27ae60;
+    --danger-color: #c0392b;
+    --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--light-bg);
-    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: var(--light-gray-bg);
+    color: var(--dark-blue-text);
+    line-height: 1.6;
 }
 
 .dashboard-container {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--white-bg);
+    box-shadow: var(--card-shadow);
+    border-radius: 8px;
 }
 
-/* Header */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 30px;
 }
 
 .dashboard-header h1 {
-    font-size: 2rem;
-    color: var(--dark-blue-text);
+    margin-bottom: 5px;
+    color: var(--primary-blue);
 }
 
 .dashboard-header p {
     color: var(--text-secondary);
-    font-size: 1.1rem;
+    margin-top: 0;
 }
 
-/* Seções */
+.button-secondary,
+.button-primary {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.button-secondary {
+    background-color: var(--white-bg);
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+}
+
+.button-primary {
+    background-color: var(--primary-blue);
+    color: var(--white-bg);
+}
+
+.button-secondary:hover {
+    background-color: var(--light-blue);
+}
+
+.button-primary:hover {
+    background-color: #357ebd;
+}
+
 .management-section {
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 .section-header {
@@ -58,115 +86,99 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
 }
 
 .section-header h2 {
-    font-size: 1.5rem;
     color: var(--dark-blue-text);
+    margin: 0;
 }
 
-/* Botões */
-.button-primary, .button-secondary, .button-danger {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: background-color 0.3s, color 0.3s;
-    font-family: 'Poppins', sans-serif;
-}
-
-.button-primary {
-    background-color: var(--primary-blue);
-    color: var(--white-bg);
-}
-.button-primary:hover {
-    background-color: #3a7ac8;
-}
-
-.button-secondary {
-    background-color: var(--text-secondary);
-    color: var(--white-bg);
-}
-.button-secondary:hover {
-    background-color: #555;
-}
-
-.button-danger {
-    background-color: transparent;
-    color: var(--text-secondary);
-}
-.button-danger:hover {
-    color: var(--danger-red);
-}
-
-/* Lista de Unidades */
 .unit-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
 }
 
 .unit-card {
     background-color: var(--white-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 15px;
     box-shadow: var(--card-shadow);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    justify-content: space-between;
 }
 
 .unit-info h3 {
-    color: var(--dark-blue-text);
-    font-size: 1.2rem;
+    margin-top: 0;
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center; /* Para alinhar o logo verticalmente */
 }
+
+.unit-info h3 img {
+    height: 30px; /* Ajuste o tamanho conforme necessário */
+    margin-right: 10px;
+}
+
 .unit-info p {
     color: var(--text-secondary);
+    margin-bottom: 10px;
     font-size: 0.9rem;
 }
 
-.unit-stats strong {
-    color: var(--text-primary);
+.unit-stats {
+    font-size: 0.95rem;
+    color: var(--dark-blue-text);
+    margin-bottom: 15px;
 }
 
 .unit-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
+    gap: 10px;
+    justify-content: flex-end;
 }
 
-a.button-manage {
-    background-color: #eef2f7;
-    color: var(--dark-blue-text);
-    flex-grow: 1;
-    text-align: center;
-    margin-right: 10px;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
+.button-manage,
+.button-delete {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
     text-decoration: none;
-    transition: background-color 0.2s ease;
-}
-a.button-manage:hover {
-    background-color: #e1e8f0;
+    color: var(--white-bg);
 }
 
-/* Modal */
+.button-manage {
+    background-color: var(--primary-blue);
+}
+
+.button-manage:hover {
+    background-color: #357ebd;
+}
+
+.button-delete {
+    background-color: var(--danger-color);
+}
+
+.button-delete:hover {
+    background-color: #a93226;
+}
+
+/* Estilos do Modal */
 .modal-overlay {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: none;
+    background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
     z-index: 1000;
@@ -178,59 +190,169 @@ a.button-manage:hover {
 
 .modal-content {
     background-color: var(--white-bg);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    width: 100%;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
     max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 15px;
-    margin-bottom: 20px;
 }
 
 .modal-header h2 {
-    font-size: 1.4rem;
+    color: var(--dark-blue-text);
+    margin: 0;
 }
 
 .close-button {
     background: none;
     border: none;
-    font-size: 2rem;
-    cursor: pointer;
     color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    outline: none;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
-.form-group:last-child {
-    margin-bottom: 0;
+.modal-body .form-group {
+    margin-bottom: 15px;
 }
 
-.form-group label {
+.modal-body label {
     display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
+    color: var(--dark-blue-text);
+    font-weight: bold;
 }
 
-.form-group input {
+.modal-body input {
     width: 100%;
-    padding: 12px 15px;
+    padding: 10px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 5px;
     font-size: 1rem;
-    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    outline: none;
 }
 
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    margin-top: 30px;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* ======================================= */
+/* ESTILOS DA BUSCA DE PACIENTES           */
+/* ======================================= */
+
+.patient-search-section {
+    margin-bottom: 40px;
+}
+
+.search-container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#patientSearchInput {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 50px; /* Bordas arredondadas para um visual moderno */
+    box-shadow: var(--card-shadow);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#patientSearchInput:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--white-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-top: 8px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1100;
+    display: none; /* Começa escondido */
+}
+
+.search-results.active {
+    display: block;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item:hover {
+    background-color: #f3f4f6;
+}
+
+.result-item .info p {
+    margin: 0;
+    font-weight: 600;
+    color: var(--dark-blue-text);
+}
+
+.result-item .info span {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.result-item .status {
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.status.admitted {
+    background-color: #D1FAE5; /* Verde claro */
+    color: #065F46; /* Verde escuro */
+}
+
+.status.discharged {
+    background-color: #FEF3C7; /* Amarelo claro */
+    color: #92400E; /* Marrom escuro */
+}
+
+/* Classe para acessibilidade, para esconder labels visualmente */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
 }
