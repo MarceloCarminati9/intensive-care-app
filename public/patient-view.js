@@ -132,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if(patientDihEl) patientDihEl.textContent = patient.dih ? new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
         if (patientHppEl) patientHppEl.textContent = patient.hpp || 'Nenhuma informação de HPP cadastrada.';
         
-        // CORRIGIDO: Bloco de código para renderizar os diagnósticos foi restaurado
         if (patientHdEl) {
             let hdContent = '';
             if (patient.hd_primary_desc) {
@@ -177,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if(patientBedEl) patientBedEl.textContent = `${patient.unit_name || 'Unidade'} - Leito ${patient.bed_number || 'N/A'}`;
             if (patientDaysInIcuEl) {
                 patientDaysInIcuEl.parentElement.style.display = 'inline';
-                patientDaysInIcuEl.textContent = calculateIcuDays(patient.dih);
+                // ATUALIZADO: Usa a data de criação da internação para o cálculo
+                patientDaysInIcuEl.textContent = calculateIcuDays(patient.icu_admission_date);
             }
         }
     }

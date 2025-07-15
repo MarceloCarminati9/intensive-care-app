@@ -1,4 +1,4 @@
-// VERSÃO COM unit_id NA ROTA DE PACIENTE - 15/07/2025
+// VERSÃO COM DATA CORRETA PARA CÁLCULO DE DIAS NA UTI - 15/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -25,7 +25,6 @@ app.use(express.static(publicPath));
 const apiRouter = express.Router();
 
 // --- ROTAS DE UNIDADES E LEITOS ---
-// (Nenhuma alteração nesta seção)
 apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
@@ -128,8 +127,7 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
 });
 
 
-// --- ROTAS DE PACIENTES (ATUALIZADAS PARA A NOVA ESTRUTURA) ---
-
+// --- ROTAS DE PACIENTES ---
 apiRouter.post('/patients', async (req, res) => {
     const { bed_id, name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies } = req.body;
     if (!bed_id || !name || !dob || !dih) { return res.status(400).json({ error: 'Dados essenciais (leito, nome, data de nascimento, data de internação) são obrigatórios.' }); }
@@ -185,7 +183,7 @@ apiRouter.get('/patients/search', async (req, res) => {
     }
 });
 
-// ATUALIZADO: Buscar os dados de um paciente, incluindo o ID da sua unidade
+// ATUALIZADO: Buscar os dados de um paciente, incluindo a data real de criação da internação na UTI
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const sql = `
@@ -193,8 +191,9 @@ apiRouter.get('/patients/:id', async (req, res) => {
                 p.id, p.name, p.mother_name, p.dob, p.cns, p.hpp, p.allergies, p.current_bed_id,
                 b.bed_number, 
                 u.name as unit_name,
-                u.id as unit_id, -- CAMPO ADICIONADO
-                a.admission_date as dih,
+                u.id as unit_id, 
+                a.admission_date as dih, 
+                a.created_at as icu_admission_date, -- [NOVO] Data real da admissão na UTI
                 a.discharge_date,
                 a.discharge_reason,
                 a.hd_primary_desc,
@@ -205,7 +204,7 @@ apiRouter.get('/patients/:id', async (req, res) => {
             LEFT JOIN (
                 SELECT DISTINCT ON (patient_id) *
                 FROM admissions
-                ORDER BY patient_id, admission_date DESC
+                ORDER BY patient_id, admission_date DESC NULLS LAST
             ) a ON p.id = a.patient_id
             LEFT JOIN beds b ON p.current_bed_id = b.id
             LEFT JOIN units u ON b.unit_id = u.id
