@@ -6,23 +6,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get('patientId');
 
-    // Elementos do Cabeçalho e Detalhes
-    const backLink = document.querySelector('.back-link'); // [NOVO]
+    const backLink = document.querySelector('.back-link');
     const patientNameHeader = document.getElementById('patientNameHeader');
     const patientAgeEl = document.getElementById('patientAge');
     const patientCnsEl = document.getElementById('patientCns');
     const patientDihEl = document.getElementById('patientDih');
     const patientHdEl = document.getElementById('patientHd');
     const patientHppEl = document.getElementById('patientHpp');
-    const patientDaysInIcuEl = document.getElementById('patientDaysInIcu'); 
+    const patientDaysInIcuEl = document.getElementById('patientDaysInIcu');
 
-    // ... (restante da seleção de elementos permanece a mesma)
     const admissionContainer = document.getElementById('admission-info-container');
     const patientBedEl = document.getElementById('patientBed');
     const dischargeContainer = document.getElementById('discharge-info-container');
     const dischargeReasonEl = document.getElementById('dischargeReason');
     const dischargeDateEl = document.getElementById('dischargeDate');
     const readmitPatientBtn = document.getElementById('readmitPatientBtn');
+    
     const readmitModal = document.getElementById('readmitModal');
     const readmitForm = document.getElementById('readmitForm');
     const readmitPatientNameEl = document.getElementById('readmitPatientName');
@@ -38,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitHdPrimaryCid = document.getElementById('readmit_hd_primary_cid');
     const readmitAddSecondaryDiagBtn = document.getElementById('readmit_add_secondary_diag_btn');
     const readmitSecondaryDiagnosesContainer = document.getElementById('readmit_secondary_diagnoses_container');
+    
     const historyList = document.getElementById('historyList');
     const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
     const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewerContent = document.getElementById('viewerContent');
     const closeViewerBtn = document.getElementById('closeViewerBtn');
     const printDocumentBtn = document.getElementById('printDocumentBtn');
+    
     let cid10Data = [];
     let cidTimeout;
-
 
     if (!patientId) {
         document.body.innerHTML = '<h1>Erro: ID do paciente não fornecido.</h1><a href="dashboard.html">Voltar</a>';
@@ -126,28 +126,39 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderPatientInfo(patient) {
-        // Preenche dados gerais
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
         if(patientAgeEl) patientAgeEl.textContent = calculateAge(patient.dob);
         if(patientCnsEl) patientCnsEl.textContent = patient.cns || 'N/A';
         if(patientDihEl) patientDihEl.textContent = patient.dih ? new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
         if (patientHppEl) patientHppEl.textContent = patient.hpp || 'Nenhuma informação de HPP cadastrada.';
-        if (patientHdEl) { /* ... lógica de HD ... */ }
+        
+        // CORRIGIDO: Bloco de código para renderizar os diagnósticos foi restaurado
+        if (patientHdEl) {
+            let hdContent = '';
+            if (patient.hd_primary_desc) {
+                const primaryCid = patient.hd_primary_cid ? `(${patient.hd_primary_cid})` : '';
+                hdContent += `<p><strong>Primário:</strong> ${patient.hd_primary_desc} ${primaryCid}</p>`;
+            }
+            if (patient.secondary_diagnoses && patient.secondary_diagnoses.length > 0) {
+                hdContent += '<strong>Secundários:</strong><ul>';
+                patient.secondary_diagnoses.forEach(diag => {
+                    const secondaryCid = diag.cid ? `(${diag.cid})` : '';
+                    hdContent += `<li>${diag.desc} ${secondaryCid}</li>`;
+                });
+                hdContent += '</ul>';
+            }
+            patientHdEl.innerHTML = hdContent || '<p>Nenhuma hipótese diagnóstica cadastrada.</p>';
+        }
 
-        // ATUALIZADO: Lógica para o link de "Voltar"
         if (backLink) {
             if (patient.unit_id) {
-                // Se o paciente tem um ID de unidade (está internado), aponta para a unit-view
                 backLink.href = `unit-view.html?unitId=${patient.unit_id}`;
             } else {
-                // Se não tem (teve alta), o link padrão para o dashboard é mantido
                 backLink.href = 'dashboard.html';
             }
         }
 
-        // Lógica condicional de status
         if (patient.discharge_date) {
-            // PACIENTE COM ALTA
             admissionContainer.style.display = 'none';
             dischargeContainer.style.display = 'block';
             if (patientDaysInIcuEl) patientDaysInIcuEl.parentElement.style.display = 'none';
@@ -161,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 readmitPatientBtn.addEventListener('click', () => openReadmitModal(patient));
             }
         } else {
-            // PACIENTE INTERNADO
             admissionContainer.style.display = 'block';
             dischargeContainer.style.display = 'none';
             if(patientBedEl) patientBedEl.textContent = `${patient.unit_name || 'Unidade'} - Leito ${patient.bed_number || 'N/A'}`;
@@ -172,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ... (O restante do arquivo, incluindo loadHistory, renderHistoryList, e toda a lógica dos modais e eventos, permanece exatamente o mesmo)
     async function loadHistory(patientData) {
         try {
             const [evolutionsResponse, prescriptionsResponse] = await Promise.all([
