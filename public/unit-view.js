@@ -407,15 +407,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (addSecondaryDiagBtn) {
         addSecondaryDiagBtn.addEventListener('click', () => {
+            // Gera um ID único baseado no tempo atual para garantir que nunca se repita
+            const uniqueId = 'sec_diag_' + Date.now(); 
+
             const newEntry = document.createElement('div');
             newEntry.className = 'secondary-diagnosis-entry';
+            
+            // CORRIGIDO: Adicionado 'id' e 'name' aos inputs e o atributo 'for' ao label
             newEntry.innerHTML = `
                 <div class="autocomplete-container">
-                    <textarea class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                    <label for="${uniqueId}_desc" class="sr-only">Diagnóstico Secundário</label> 
+                    <textarea id="${uniqueId}_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
                     <div class="autocomplete-results"></div>
                 </div>
-                <label class="cid-label">CID-10</label>
-                <input type="text" class="secondary_cid" placeholder="Ex: A00.1">
+                <label for="${uniqueId}_cid" class="cid-label">CID-10</label>
+                <input type="text" id="${uniqueId}_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1">
                 <button type="button" class="remove-diag-btn">&times;</button>
             `;
             if (secondaryDiagnosesContainer) secondaryDiagnosesContainer.appendChild(newEntry);
