@@ -1,4 +1,4 @@
-// VERSÃO DEFINITIVA, COMPLETA E CORRIGIDA - 14/07/2025
+// VERSÃO COM CORREÇÃO FINAL NA BUSCA - 14/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -186,7 +186,7 @@ apiRouter.get('/patients/search', async (req, res) => {
     try {
         const searchTerm = `%${q}%`;
         
-        // CORREÇÃO FINAL: Adicionado "::text" ao parâmetro $1 para forçar o tipo correto
+        // CORREÇÃO DEFINITIVA: Usando parâmetros separados ($1 e $2) para evitar ambiguidade de tipo.
         const query = `
             SELECT 
                 p.id, p.name, p.dob, p.cns,
@@ -203,13 +203,14 @@ apiRouter.get('/patients/search', async (req, res) => {
             LEFT JOIN 
                 units u ON b.unit_id = u.id
             WHERE 
-                p.name ILIKE $1::text OR p.cns::text ILIKE $1::text
+                p.name ILIKE $1 OR p.cns::text ILIKE $2
             ORDER BY
                 p.name ASC
             LIMIT 10; 
         `;
         
-        const result = await pool.query(query, [searchTerm]);
+        const result = await pool.query(query, [searchTerm, searchTerm]);
+        
         res.json({ data: result.rows });
 
     } catch (error) {
