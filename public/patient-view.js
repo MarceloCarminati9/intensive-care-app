@@ -1,16 +1,44 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // =================================================================================
+    // SELEÇÃO DE ELEMENTOS (EXISTENTES E NOVOS)
+    // =================================================================================
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get('patientId');
 
+    // Elementos existentes do cabeçalho e histórico
     const patientNameHeader = document.getElementById('patientNameHeader');
     const historyList = document.getElementById('historyList');
     const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
     const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
+    
+    // Elementos existentes do modal de visualização de histórico
     const historyViewerModal = document.getElementById('historyViewerModal');
     const viewerTitle = document.getElementById('viewerTitle');
     const viewerContent = document.getElementById('viewerContent');
     const closeViewerBtn = document.getElementById('closeViewerBtn');
     const printDocumentBtn = document.getElementById('printDocumentBtn');
+
+    // [NOVO] Elementos para a lógica de status (Internado vs Alta)
+    const admissionContainer = document.getElementById('admission-info-container');
+    const dischargeContainer = document.getElementById('discharge-info-container');
+    const dischargeReasonEl = document.getElementById('dischargeReason');
+    const dischargeDateEl = document.getElementById('dischargeDate');
+    const readmitPatientBtn = document.getElementById('readmitPatientBtn');
+
+    // [NOVO] Elementos para o modal de Reinternação
+    const readmitModal = document.getElementById('readmitModal');
+    const readmitPatientNameEl = document.getElementById('readmitPatientName');
+    const closeReadmitModalBtn = document.getElementById('closeReadmitModal');
+    const cancelReadmitBtn = document.getElementById('cancelReadmitBtn');
+    const confirmReadmitBtn = document.getElementById('confirmReadmitBtn');
+    const readmitUnitSelect = document.getElementById('readmitUnitSelect');
+    const readmitBedSelect = document.getElementById('readmitBedSelect');
+    const readmissionDateInput = document.getElementById('readmissionDate');
+    let unitsWithFreeBeds = [];
+
+    // =================================================================================
+    // FUNÇÕES EXISTENTES (PRESERVADAS)
+    // =================================================================================
 
     function generateEvolutionReportHTML(patientData, evolutionContent) {
         if (!patientData || !evolutionContent) return '<p>Dados insuficientes para gerar o relatório.</p>';
@@ -50,7 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const patientResult = await patientResponse.json();
             const patient = patientResult.data;
 
+            // ATUALIZADO: Chamadas separadas para clareza
             updateHeaders(patient);
+            renderPatientStatus(patient); // [NOVO] Renderiza o card de status correto
             updateActionLinks(patientId);
 
             const [evolutionsResponse, prescriptionsResponse] = await Promise.all([
@@ -80,32 +110,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateHeaders(patient) {
-        const patientBed = document.getElementById('patientBed');
+        // Esta função agora cuida apenas dos dados gerais do paciente
         const patientAge = document.getElementById('patientAge');
         const patientCns = document.getElementById('patientCns');
-        const patientDih = document.getElementById('patientDih');
         const patientHpp = document.getElementById('patientHpp');
-        const patientHd = document.getElementById('patientHd'); // Variável declarada
+        const patientHd = document.getElementById('patientHd');
 
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
-        if(patientBed) patientBed.textContent = `${patient.unit_name || 'Unidade'} - Leito ${patient.bed_number || 'N/A'}`;
         if(patientAge) patientAge.textContent = patient.age ? `${patient.age} anos` : 'N/A';
         if(patientCns) patientCns.textContent = patient.cns || 'N/A';
-        if (patientDih) {
-            patientDih.textContent = patient.dih ? new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
-        }
         if (patientHpp) patientHpp.textContent = patient.hpp || 'Nenhuma informação de HPP cadastrada.';
         
-        // Bloco de código corrigido e unificado para exibir diagnósticos
         if (patientHd) {
             let hdContent = '';
-            // Diagnóstico Primário
             if (patient.hd_primary_desc) {
                 const primaryCid = patient.hd_primary_cid ? `(${patient.hd_primary_cid})` : '';
                 hdContent += `<p><strong>Primário:</strong> ${patient.hd_primary_desc} ${primaryCid}</p>`;
             }
-
-            // Diagnósticos Secundários (agora um array)
             if (patient.secondary_diagnoses && patient.secondary_diagnoses.length > 0) {
                 hdContent += '<strong>Secundários:</strong><ul>';
                 patient.secondary_diagnoses.forEach(diag => {
@@ -114,22 +135,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 hdContent += '</ul>';
             }
-
-            if (hdContent === '') {
-                patientHd.innerHTML = '<p>Nenhuma hipótese diagnóstica cadastrada.</p>';
-            } else {
-                // Usamos .innerHTML porque estamos inserindo tags HTML (p, ul, li)
-                patientHd.innerHTML = hdContent;
-            }
+            patientHd.innerHTML = hdContent || '<p>Nenhuma hipótese diagnóstica cadastrada.</p>';
         }
     }
-
+    
     function updateActionLinks(pId) {
         if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?patientId=${pId}`;
         if (goToPrescriptionBtn) goToPrescriptionBtn.href = `receita.html?patientId=${pId}`; 
     }
 
     function renderHistory(history, patientData) {
+        // NENHUMA ALTERAÇÃO AQUI - Função de histórico preservada
         historyList.innerHTML = '';
         if (!history || history.length === 0) {
             historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';
@@ -143,20 +159,13 @@ document.addEventListener('DOMContentLoaded', function() {
             historyItemDiv.className = `history-item ${item.deleted_at ? 'deleted' : ''}`;
             historyItemDiv.dataset.item = JSON.stringify(item); 
             historyItemDiv.dataset.patient = JSON.stringify(patientData);
-
             const createdAt = new Date(item.created_at);
             const updatedAt = item.updated_at ? new Date(item.updated_at) : null;
             let editedText = '';
-
             if (item.type === 'Evolução Médica' && updatedAt && (updatedAt.getTime() - createdAt.getTime() > 60000)) {
-                const formattedEditDate = updatedAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                const formattedEditTime = updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                editedText = `<span class="edited-status">(editada em ${formattedEditDate} às ${formattedEditTime})</span>`;
+                editedText = `<span class="edited-status">(editada em ${updatedAt.toLocaleDateString('pt-BR')} às ${updatedAt.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})})</span>`;
             }
-            
-            const formattedCreationDate = createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const formattedCreationTime = createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
+            const formattedDate = `${createdAt.toLocaleDateString('pt-BR')} às ${createdAt.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}`;
             let buttonsHTML = '';
             if (item.type === 'Evolução Médica') {
                 const isDisabled = !!item.deleted_at;
@@ -169,17 +178,147 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (item.type === 'Receituário') {
                 buttonsHTML = `<button class="button-secondary" data-action="view">Visualizar/Imprimir</button>`;
             }
-
-            historyItemDiv.innerHTML = `
-                <div class="history-item-content">
-                    <div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div>
-                    <div class="history-item-actions">${buttonsHTML}</div>
-                </div>
-            `;
+            historyItemDiv.innerHTML = `<div class="history-item-content"><div class="history-item-title">${item.type} - ${formattedDate}${editedText}</div><div class="history-item-actions">${buttonsHTML}</div></div>`;
             historyList.appendChild(historyItemDiv);
         });
     }
 
+    // =================================================================================
+    // [NOVA] LÓGICA DE STATUS E REINTERNAÇÃO
+    // =================================================================================
+
+    function renderPatientStatus(patient) {
+        // Pega os elementos do DOM aqui para manter a função auto-contida
+        const patientBed = document.getElementById('patientBed');
+        const patientUnit = document.getElementById('patientUnit');
+        const patientDih = document.getElementById('patientDih');
+
+        if (patient.discharge_date) {
+            // PACIENTE COM ALTA
+            admissionContainer.style.display = 'none';
+            dischargeContainer.style.display = 'block';
+
+            const dischargeReasons = {
+                'alta_enfermaria': 'Alta para Enfermaria',
+                'alta_domiciliar': 'Alta Domiciliar',
+                'obito': 'Óbito',
+                'transferencia_externa': 'Transferência Externa'
+            };
+            dischargeReasonEl.textContent = dischargeReasons[patient.discharge_reason] || patient.discharge_reason;
+            dischargeDateEl.textContent = new Date(patient.discharge_date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+
+            if (patient.discharge_reason === 'obito') {
+                readmitPatientBtn.textContent = 'Paciente em Óbito';
+                readmitPatientBtn.disabled = true;
+            } else {
+                readmitPatientBtn.addEventListener('click', () => openReadmitModal(patient));
+            }
+        } else {
+            // PACIENTE INTERNADO
+            admissionContainer.style.display = 'block';
+            dischargeContainer.style.display = 'none';
+
+            if(patientUnit) patientUnit.textContent = patient.unit_name || 'Unidade não informada';
+            if(patientBed) patientBed.textContent = `Leito ${patient.bed_number || 'N/A'}`;
+            if(patientDih) patientDih.textContent = patient.dih ? new Date(patient.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';
+        }
+    }
+
+    async function openReadmitModal(patient) {
+        readmitPatientNameEl.textContent = patient.name;
+        
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        readmissionDateInput.value = now.toISOString().slice(0, 16);
+
+        try {
+            const response = await fetch('/api/units-with-free-beds');
+            if (!response.ok) throw new Error('Falha ao buscar unidades');
+            const result = await response.json();
+            unitsWithFreeBeds = result.data;
+
+            readmitUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
+            unitsWithFreeBeds.forEach(unit => {
+                const option = document.createElement('option');
+                option.value = unit.id;
+                option.textContent = `${unit.name} (${unit.free_beds ? unit.free_beds.length : 0} leitos livres)`;
+                option.disabled = !unit.free_beds || unit.free_beds.length === 0;
+                readmitUnitSelect.appendChild(option);
+            });
+        } catch (error) {
+            alert('Não foi possível carregar as unidades para reinternação.');
+            return;
+        }
+
+        if(readmitModal) readmitModal.classList.add('active');
+    }
+
+    function closeReadmitModal() {
+        if(readmitModal) {
+            readmitModal.classList.remove('active');
+            readmitBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+            readmitBedSelect.disabled = true;
+        }
+    }
+
+    if(readmitUnitSelect) {
+        readmitUnitSelect.addEventListener('change', () => {
+            const selectedUnitId = readmitUnitSelect.value;
+            const selectedUnit = unitsWithFreeBeds.find(u => u.id == selectedUnitId);
+            
+            readmitBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
+            if(selectedUnit && selectedUnit.free_beds) {
+                selectedUnit.free_beds.forEach(bed => {
+                    const option = document.createElement('option');
+                    option.value = bed.id;
+                    option.textContent = `Leito ${bed.bed_number}`;
+                    readmitBedSelect.appendChild(option);
+                });
+                readmitBedSelect.disabled = false;
+            } else {
+                readmitBedSelect.disabled = true;
+            }
+        });
+    }
+    
+    if(confirmReadmitBtn) {
+        confirmReadmitBtn.addEventListener('click', async () => {
+            const newBedId = readmitBedSelect.value;
+            const newAdmissionDate = readmissionDateInput.value;
+
+            if (!newBedId || !newAdmissionDate) {
+                alert('Por favor, selecione a unidade, o leito e a data de reinternação.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/patients/${patientId}/readmit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bed_id: newBedId, dih: newAdmissionDate })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Falha ao processar reinternação.');
+                }
+                alert('Paciente reinternado com sucesso!');
+                window.location.reload();
+
+            } catch (error) {
+                console.error('Erro na reinternação:', error);
+                alert(`Erro: ${error.message}`);
+            }
+        });
+    }
+
+    if(closeReadmitModalBtn) closeReadmitModalBtn.addEventListener('click', closeReadmitModal);
+    if(cancelReadmitBtn) cancelReadmitBtn.addEventListener('click', closeReadmitModal);
+
+
+    // =================================================================================
+    // EVENT LISTENERS EXISTENTES (PRESERVADOS)
+    // =================================================================================
     historyList.addEventListener('click', async function(event) {
         const button = event.target.closest('button[data-action]');
         if (!button) return;
@@ -228,12 +367,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (printDocumentBtn) {
         printDocumentBtn.addEventListener('click', () => {
             const printWindow = window.open('', '_blank');
-            const styles = document.querySelector('link[href="patient-view-style.css"]').outerHTML;
+            const styles = Array.from(document.styleSheets)
+                .map(sheet => `<link rel="stylesheet" href="${sheet.href}">`)
+                .join('');
             printWindow.document.write(`<html><head><title>Imprimir</title>${styles}</head><body>${viewerContent.innerHTML}</body></html>`);
             printWindow.document.close();
-            setTimeout(() => printWindow.print(), 500);
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
         });
     }
 
+    // =================================================================================
+    // INICIALIZAÇÃO
+    // =================================================================================
     loadPageData();
 });

@@ -9,63 +9,99 @@
 </head>
 <body>
     <div class="patient-view-container">
-      <header class="patient-header">
-        <div class="patient-info-main">
-            <a href="dashboard.html" class="back-link">&larr; Voltar ao Dashboard</a>
-            <h1 id="patientNameHeader">Carregando...</h1>
-            <div class="patient-details-grid">
-                <p><strong>Leito:</strong> <span id="patientBed">N/A</span></p>
-                <p><strong>Idade:</strong> <span id="patientAge">N/A</span></p>
-                <p><strong>CNS:</strong> <span id="patientCns">N/A</span></p>
-                <p><strong>DIH:</strong> <span id="patientDih">N/A</span></p>
+        <header class="patient-header">
+            <div class="patient-info-main">
+                <a href="dashboard.html" class="back-link">&larr; Voltar para o Dashboard</a>
+                <h1 id="patientName">Carregando paciente...</h1>
+                <div class="patient-details">
+                    <span><strong>Nasc:</strong> <span id="patientDob">--/--/----</span></span>
+                    <span><strong>Mãe:</strong> <span id="patientMotherName">Não informado</span></span>
+                    <span><strong>CNS:</strong> <span id="patientCns">Não informado</span></span>
+                </div>
             </div>
-        </div>
-        <div class="patient-info-secondary">
-            <details>
-                <summary><strong>Ver Histórico Patológico Pregresso (HPP)</strong></summary>
-                <p id="patientHpp">Nenhuma informação de HPP cadastrada.</p>
-            </details>
-            <details>
-                <summary><strong>Ver Hipótese Diagnóstica (HD)</strong></summary>
-                <p id="patientHd">Nenhuma hipótese diagnóstica cadastrada.</p>
-            </details>
-        </div>
-    </header>
 
-        <main>
-            <section class="actions-section">
-                <h2>Ações Rápidas</h2>
-                <div class="actions-grid">
-                    <a href="#" class="action-card" id="goToEvolutionBtn">Nova Evolução Médica</a>
-                    <a href="#" class="action-card" id="goToPrescriptionBtn">Novo Receituário</a>
-                    <a href="#" class="action-card disabled">Resumo de Admissão</a>
-                    <a href="#" class="action-card disabled">Resumo de Alta</a>
+            <div id="admission-info-container" class="status-card admitted">
+                <h2>Status Atual</h2>
+                <p>
+                    <strong id="patientUnit">Carregando...</strong>
+                    <span class="separator">/</span>
+                    <span id="patientBed">Leito ...</span>
+                </p>
+                <div class="admission-details">
+                    Data de Internação: <strong id="patientAdmissionDate">--/--/----</strong>
                 </div>
-            </section>
+            </div>
 
-            <section class="history-section">
-                <h2>Histórico do Paciente</h2>
-                <div id="historyList" class="history-list">
-                    <p>Carregando histórico...</p>
+            <div id="discharge-info-container" class="status-card discharged" style="display: none;">
+                <h2>Status Atual: ALTA</h2>
+                <p>
+                    <strong>Motivo:</strong> <span id="dischargeReason"></span>
+                </p>
+                <div class="admission-details">
+                    Data da Alta: <strong id="dischargeDate">--/--/----</strong>
                 </div>
-            </section>
+                <div class="patient-actions">
+                    <button id="readmitPatientBtn" class="button-primary">Reinternar Paciente</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="patient-content">
+            <nav class="content-tabs">
+                <button class="tab-link active" data-tab="evolutions">Evoluções</button>
+                <button class="tab-link" data-tab="prescriptions">Receitas</button>
+                <button class="tab-link" data-tab="exams">Exames</button>
+                <button class="tab-link" data-tab="summary">Resumo do Caso</button>
+            </nav>
+
+            <div id="evolutions" class="tab-content active">
+                <p>Carregando evoluções...</p>
+            </div>
+            <div id="prescriptions" class="tab-content">
+                <p>Carregando receitas...</p>
+            </div>
+            <div id="exams" class="tab-content">
+                <p>Carregando exames...</p>
+            </div>
+            <div id="summary" class="tab-content">
+                <p>Carregando resumo do caso...</p>
+            </div>
         </main>
     </div>
 
-    <div id="historyViewerModal" class="modal-overlay">
-        <div class="modal-content wide">
+    <div id="readmitModal" class="modal-overlay">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 id="viewerTitle">Visualizar Documento</h2>
-                <button id="closeViewerBtn" class="close-button">&times;</button>
+                <h2>Reinternar Paciente</h2>
+                <button id="closeReadmitModal" class="close-button">&times;</button>
             </div>
-            <div id="viewerContent" class="modal-body">
+            <div class="modal-body">
+                <p>Reinternando o paciente <strong id="readmitPatientName"></strong>.</p>
+                <div class="form-group">
+                    <label for="readmitUnitSelect">Nova Unidade de Destino</label>
+                    <select id="readmitUnitSelect">
+                        <option value="">Selecione a unidade...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="readmitBedSelect">Novo Leito de Destino</label>
+                    <select id="readmitBedSelect" disabled>
+                        <option value="">Selecione um leito livre...</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="readmissionDate">Nova Data de Internação</label>
+                    <input type="datetime-local" id="readmissionDate">
+                </div>
             </div>
             <div class="modal-footer">
-                <button id="printDocumentBtn" class="button-primary">Imprimir</button>
+                <button id="cancelReadmitBtn" class="button-secondary">Cancelar</button>
+                <button id="confirmReadmitBtn" class="button-primary">Confirmar Reinternação</button>
             </div>
         </div>
     </div>
-    
+
+
     <script src="patient-view.js"></script>
 </body>
 </html>

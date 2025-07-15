@@ -1,4 +1,4 @@
-// VERSÃO COM CORREÇÃO FINAL NA LEITURA DO PARÂMETRO DE BUSCA - 14/07/2025
+// VERSÃO FINAL COM REINTERNAÇÃO - 14/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -159,7 +159,6 @@ apiRouter.post('/patients', async (req, res) => {
 
 // A ROTA DE BUSCA (/search) DEVE VIR ANTES da rota genérica (/:id)
 apiRouter.get('/patients/search', async (req, res) => {
-    // CORREÇÃO FINAL: Usando req.query para buscar o parâmetro da URL
     const { q } = req.query; 
 
     if (!q || q.length < 3) {
@@ -199,7 +198,6 @@ apiRouter.get('/patients/search', async (req, res) => {
         res.status(500).json({ error: 'Erro interno do servidor ao buscar pacientes.' });
     }
 });
-
 
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
@@ -260,8 +258,59 @@ apiRouter.post('/patients/:id/transfer', async (req, res) => {
     }
 });
 
+// =================================================================================
+// [NOVO] ROTA DA API PARA REINTERNAR UM PACIENTE
+// =================================================================================
+apiRouter.post('/patients/:id/readmit', async (req, res) => {
+    const { id } = req.params; // ID do paciente
+    const { bed_id, dih } = req.body; // ID do novo leito e nova data de internação
+
+    if (!bed_id || !dih) {
+        return res.status(400).json({ error: 'O ID do novo leito e a nova data de internação são obrigatórios.' });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. Atualiza o paciente: limpa a alta e seta o novo leito e data de internação
+        const patientUpdateSql = `
+            UPDATE patients 
+            SET 
+                current_bed_id = $1, 
+                dih = $2, 
+                discharge_date = NULL, 
+                discharge_reason = NULL 
+            WHERE id = $3 
+            RETURNING name;
+        `;
+        const patientResult = await client.query(patientUpdateSql, [bed_id, dih, id]);
+
+        if (patientResult.rowCount === 0) {
+            throw new Error('Paciente não encontrado para reinternação.');
+        }
+        const patientName = patientResult.rows[0].name;
+
+        // 2. Atualiza o novo leito para 'ocupado'
+        const bedUpdateSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3;`;
+        await client.query(bedUpdateSql, [id, patientName, bed_id]);
+
+        // 3. Confirma a transação
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Paciente reinternado com sucesso!' });
+
+    } catch(err) {
+        await client.query('ROLLBACK');
+        console.error("Erro na reinternação:", err);
+        res.status(500).json({ error: 'Erro no servidor ao reinternar o paciente.' });
+    } finally {
+        client.release();
+    }
+});
+
 
 // --- ROTAS DE HISTÓRICO ---
+// (O restante do código de histórico permanece o mesmo)
 apiRouter.post('/patients/:id/evolutions', async (req, res) => {
     const { id } = req.params;
     const evolutionData = req.body;
