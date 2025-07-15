@@ -162,15 +162,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     
     if (bedGridContainer) {
-        // CORREÇÃO CRÍTICA: A função de clique NÃO é mais 'async'.
         bedGridContainer.addEventListener('click', function(event) {
             const target = event.target;
             const bedCard = target.closest('.bed-card');
             if (!bedCard) return;
-
+    
             const patientInfoP = bedCard.querySelector('.patient-info p');
             const patientName = patientInfoP && patientInfoP.lastChild ? patientInfoP.lastChild.textContent.trim() : 'Paciente';
-
+    
+            // Lógica para CADASTRO
             if (target.closest('.cadastrar-paciente-btn')) {
                 if (patientModal) {
                     const bedNumberSpan = document.getElementById('modalLeitoNum');
@@ -182,23 +182,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            // Lógica para ACESSAR PRONTUÁRIO
             else if (target.closest('.acessar-paciente-btn')) {
                 const patientId = bedCard.dataset.patientId;
                 if (patientId) window.location.href = `patient-view.html?patientId=${patientId}`;
             }
-
+    
+            // Lógica para DAR ALTA
             else if (target.closest('.dar-alta-btn')) {
                 if (dischargeModal && dischargePatientName && dischargeDateInput) {
                     dischargePatientName.textContent = patientName;
                     dischargeModal.dataset.patientId = bedCard.dataset.patientId;
                     dischargeModal.dataset.bedId = bedCard.dataset.bedId;
+                    
                     const now = new Date();
                     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                     dischargeDateInput.value = now.toISOString().slice(0, 16);
+                    
                     dischargeModal.classList.add('active');
                 }
             }
-
+    
+            // Lógica para TRANSFERIR
             else if (target.closest('.transferir-paciente-btn')) {
                 if (transferModal && transferPatientName && destinationUnitSelect && destinationBedSelect) {
                     transferPatientName.textContent = patientName;
@@ -213,8 +218,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
                             if (!response.ok) throw new Error('Falha ao buscar unidades de destino.');
+                            
                             const result = await response.json();
                             unitsWithFreeBeds = result.data;
+                            
                             if(destinationUnitSelect) {
                                 destinationUnitSelect.innerHTML = '<option value="">Selecione a unidade...</option>';
                                 unitsWithFreeBeds.forEach(unit => {
@@ -225,13 +232,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                     destinationUnitSelect.appendChild(option);
                                 });
                             }
+                           
                            if(destinationBedSelect) {
                                 destinationBedSelect.innerHTML = '<option value="">Selecione um leito livre...</option>';
                                 destinationBedSelect.disabled = true;
                            }
                         } catch(error) {
                             console.error("Erro ao carregar dados para transferência:", error);
-                            alert("Não foi possível carregar as unidades de destino.");
+                            alert("Não foi possível carregar as unidades de destino. Por favor, tente novamente.");
                             closeModal(transferModal); 
                         }
                     })();
