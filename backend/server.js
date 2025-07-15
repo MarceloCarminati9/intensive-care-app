@@ -1,4 +1,4 @@
-// VERSÃO FINAL COM HISTÓRICO DE INTERNAÇÕES - 14/07/2025
+// VERSÃO COM CORREÇÃO DEFINITIVA NA ORDEM DAS ROTAS - 14/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -25,7 +25,6 @@ app.use(express.static(publicPath));
 const apiRouter = express.Router();
 
 // --- ROTAS DE UNIDADES E LEITOS ---
-// (Nenhuma alteração nesta seção)
 apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
@@ -72,7 +71,6 @@ apiRouter.delete('/units/:id', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        // Ao deletar uma unidade, as foreign keys na tabela 'admissions' para os leitos serão setadas para NULL
         await client.query('DELETE FROM beds WHERE unit_id = $1', [id]);
         await client.query('DELETE FROM units WHERE id = $1', [id]);
         await client.query('COMMIT');
@@ -131,7 +129,6 @@ apiRouter.get('/units/:id/beds', async (req, res) => {
 
 // --- ROTAS DE PACIENTES (ATUALIZADAS PARA A NOVA ESTRUTURA) ---
 
-// ATUALIZADO: Cadastrar um novo paciente
 apiRouter.post('/patients', async (req, res) => {
     const { bed_id, name, mother_name, dob, cns, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses, hpp, allergies } = req.body;
     if (!bed_id || !name || !dob || !dih) { return res.status(400).json({ error: 'Dados essenciais (leito, nome, data de nascimento, data de internação) são obrigatórios.' }); }
@@ -139,14 +136,11 @@ apiRouter.post('/patients', async (req, res) => {
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-
-        // 1. Cria o registro permanente do paciente
         const patientSql = `INSERT INTO patients (name, mother_name, dob, cns, hpp, allergies, current_bed_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`;
         const patientParams = [name, mother_name, dob, cns, hpp, allergies, bed_id];
         const patientResult = await client.query(patientSql, patientParams);
         const newPatientId = patientResult.rows[0].id;
 
-        // 2. Cria o primeiro registro de internação para este paciente
         const admissionSql = `
             INSERT INTO admissions (patient_id, bed_id, admission_date, hd_primary_desc, hd_primary_cid, secondary_diagnoses)
             VALUES ($1, $2, $3, $4, $5, $6);
@@ -154,7 +148,6 @@ apiRouter.post('/patients', async (req, res) => {
         const admissionParams = [newPatientId, bed_id, dih, hd_primary_desc, hd_primary_cid, JSON.stringify(secondary_diagnoses || [])];
         await client.query(admissionSql, admissionParams);
 
-        // 3. Ocupa o leito
         const bedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3;`;
         await client.query(bedSql, [newPatientId, name, bed_id]);
         
@@ -169,43 +162,9 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
-// ATUALIZADO: Buscar os dados de um paciente e sua ÚLTIMA internação
-apiRouter.get('/patients/:id', async (req, res) => {
-    try {
-        const sql = `
-            SELECT 
-                p.id, p.name, p.mother_name, p.dob, p.cns, p.hpp, p.allergies, p.current_bed_id,
-                b.bed_number, 
-                u.name as unit_name,
-                a.admission_date as dih, -- Pega a data de internação da última admissão
-                a.discharge_date,
-                a.discharge_reason,
-                a.hd_primary_desc,
-                a.hd_primary_cid,
-                a.secondary_diagnoses
-            FROM 
-                patients p
-            LEFT JOIN (
-                -- Subquery para encontrar a última admissão de cada paciente
-                SELECT DISTINCT ON (patient_id) *
-                FROM admissions
-                ORDER BY patient_id, admission_date DESC
-            ) a ON p.id = a.patient_id
-            LEFT JOIN beds b ON p.current_bed_id = b.id
-            LEFT JOIN units u ON b.unit_id = u.id
-            WHERE p.id = $1;
-        `;
-        const { rows } = await pool.query(sql, [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
-        res.json({ data: rows[0] });
-    } catch (err) {
-        console.error("Erro ao buscar paciente:", err);
-        res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
-    }
-});
-
-
-// Rota de busca não precisa de alterações, já está correta
+// =================================================================================
+// CORREÇÃO DEFINITIVA DE ORDEM: A rota '/search' PRECISA vir antes da rota '/:id'
+// =================================================================================
 apiRouter.get('/patients/search', async (req, res) => {
     const { q } = req.query; 
     if (!q || q.length < 3) { return res.status(400).json({ error: 'O termo de busca deve ter pelo menos 3 caracteres.' }); }
@@ -230,27 +189,53 @@ apiRouter.get('/patients/search', async (req, res) => {
     }
 });
 
-// ATUALIZADO: Dar alta a um paciente
+apiRouter.get('/patients/:id', async (req, res) => {
+    try {
+        const sql = `
+            SELECT 
+                p.id, p.name, p.mother_name, p.dob, p.cns, p.hpp, p.allergies, p.current_bed_id,
+                b.bed_number, 
+                u.name as unit_name,
+                a.admission_date as dih,
+                a.discharge_date,
+                a.discharge_reason,
+                a.hd_primary_desc,
+                a.hd_primary_cid,
+                a.secondary_diagnoses
+            FROM 
+                patients p
+            LEFT JOIN (
+                SELECT DISTINCT ON (patient_id) *
+                FROM admissions
+                ORDER BY patient_id, admission_date DESC
+            ) a ON p.id = a.patient_id
+            LEFT JOIN beds b ON p.current_bed_id = b.id
+            LEFT JOIN units u ON b.unit_id = u.id
+            WHERE p.id = $1;
+        `;
+        const { rows } = await pool.query(sql, [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
+        res.json({ data: rows[0] });
+    } catch (err) {
+        console.error("Erro ao buscar paciente:", err);
+        res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
+    }
+});
+
+
 apiRouter.post('/patients/:id/discharge', async (req, res) => {
     const { id } = req.params;
     const { bedId, reason, date } = req.body;
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        
-        // 1. Atualiza o registro da internação ATIVA com os dados da alta
         const admissionUpdateSql = `
             UPDATE admissions 
             SET discharge_date = $1, discharge_reason = $2 
             WHERE patient_id = $3 AND discharge_date IS NULL;`;
         await client.query(admissionUpdateSql, [date, reason, id]);
-        
-        // 2. Tira o paciente do leito na tabela de pacientes
         await client.query(`UPDATE patients SET current_bed_id = NULL WHERE id = $1`, [id]);
-        
-        // 3. Libera o leito na tabela de leitos
         await client.query(`UPDATE beds SET status = 'free', patient_id = NULL, patient_name = NULL WHERE id = $1`, [bedId]);
-        
         await client.query('COMMIT');
         res.status(200).json({ message: 'Alta registrada com sucesso!' });
     } catch(err) {
@@ -262,28 +247,18 @@ apiRouter.post('/patients/:id/discharge', async (req, res) => {
     }
 });
 
-// ATUALIZADO: Transferir um paciente
 apiRouter.post('/patients/:id/transfer', async (req, res) => {
     const { id } = req.params;
     const { oldBedId, newBedId } = req.body;
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        
-        // 1. Atualiza a tabela de pacientes com o novo leito
         await client.query(`UPDATE patients SET current_bed_id = $1 WHERE id = $2`, [newBedId, id]);
-        
-        // 2. Atualiza o registro da internação ATIVA com o novo leito
         await client.query(`UPDATE admissions SET bed_id = $1 WHERE patient_id = $2 AND discharge_date IS NULL`, [newBedId, id]);
-        
-        // 3. Libera o leito antigo
         await client.query(`UPDATE beds SET status = 'free', patient_id = NULL, patient_name = NULL WHERE id = $1`, [oldBedId]);
-        
-        // 4. Ocupa o novo leito
         const patientResult = await client.query('SELECT name FROM patients WHERE id = $1', [id]);
         const patientName = patientResult.rows[0].name;
         await client.query(`UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3`, [id, patientName, newBedId]);
-
         await client.query('COMMIT');
         res.status(200).json({ message: 'Paciente transferido com sucesso!' });
     } catch(err) {
@@ -295,39 +270,28 @@ apiRouter.post('/patients/:id/transfer', async (req, res) => {
     }
 });
 
-// NOVO: Rota para reinternar um paciente
 apiRouter.post('/patients/:id/readmit', async (req, res) => {
     const { id } = req.params;
     const { bed_id, dih, hd_primary_desc, hd_primary_cid, secondary_diagnoses } = req.body;
-
     if (!bed_id || !dih) {
         return res.status(400).json({ error: 'O ID do novo leito e a nova data de internação são obrigatórios.' });
     }
-
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-
-        // 1. Cria um NOVO registro de internação
         const admissionSql = `
             INSERT INTO admissions (patient_id, bed_id, admission_date, hd_primary_desc, hd_primary_cid, secondary_diagnoses)
             VALUES ($1, $2, $3, $4, $5, $6);
         `;
         const admissionParams = [id, bed_id, dih, hd_primary_desc, hd_primary_cid, JSON.stringify(secondary_diagnoses || [])];
         await client.query(admissionSql, admissionParams);
-
-        // 2. Atualiza o status geral do paciente com o novo leito
         const patientUpdateSql = `UPDATE patients SET current_bed_id = $1 WHERE id = $2 RETURNING name;`;
         const patientResult = await client.query(patientUpdateSql, [bed_id, id]);
         const patientName = patientResult.rows[0].name;
-
-        // 3. Ocupa o novo leito
         const bedUpdateSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3;`;
         await client.query(bedUpdateSql, [id, patientName, bed_id]);
-
         await client.query('COMMIT');
         res.status(200).json({ message: 'Paciente reinternado com sucesso!' });
-
     } catch(err) {
         await client.query('ROLLBACK');
         console.error("Erro na reinternação:", err);
@@ -337,8 +301,8 @@ apiRouter.post('/patients/:id/readmit', async (req, res) => {
     }
 });
 
+
 // --- ROTAS DE HISTÓRICO ---
-// (Nenhuma alteração nesta seção)
 apiRouter.post('/patients/:id/evolutions', async (req, res) => {
     const { id } = req.params;
     const evolutionData = req.body;
