@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveUnitButton = document.getElementById('saveUnitButton');
     const unitNameInput = document.getElementById('unitName');
     const unitBedsInput = document.getElementById('unitBeds');
-    const hgrLogoSrc = 'intensivecare.jpeg'; // Caminho para o seu logotipo
+    
+    // CORRIGIDO: Caminho para o logotipo correto na pasta public
+    const hgrLogoSrc = 'logohgr.png'; 
 
     // Checagem de segurança para garantir que todos os elementos essenciais existem
     if (!unitListContainer || !addUnitButton || !modalOverlay) {
@@ -24,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =================================================================================
     async function loadUnits() {
         try {
-            // Caminho relativo para a API, funciona tanto localmente quanto no Render
             const response = await fetch('/api/units');
 
             if (!response.ok) {
@@ -47,11 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 unitCard.dataset.unitId = unit.id;
                 unitCard.dataset.unitName = unit.name;
 
-                // A contagem de ocupação virá do backend
                 const occupiedBeds = unit.occupied_beds || 0;
                 const totalBeds = unit.total_beds || 0;
                 const occupancyPercentage = totalBeds > 0 ? ((occupiedBeds / totalBeds) * 100).toFixed(0) : 0;
 
+                // CORRIGIDO: Adiciona o logotipo HGR antes do nome da unidade
                 unitCard.innerHTML = `
                     <div class="unit-info">
                         <h3><img src="${hgrLogoSrc}" alt="Logo HGR"> ${unit.name}</h3>
@@ -106,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                // Caminho relativo para a API
                 const response = await fetch('/api/units', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -145,7 +145,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (confirm(`Tem certeza que deseja excluir a unidade "${unitName}"?\n\nEsta ação é permanente e não pode ser desfeita.`)) {
                 try {
-                    // Caminho relativo para a API
                     const response = await fetch(`/api/units/${unitId}`, {
                         method: 'DELETE',
                     });
@@ -159,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // =================================================================================
-    // NOVA LÓGICA DA BUSCA DE PACIENTES
+    // LÓGICA DA BUSCA DE PACIENTES
     // =================================================================================
     const searchInput = document.getElementById('patientSearchInput');
     const searchResultsContainer = document.getElementById('patientSearchResults');
@@ -175,10 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Espera 300ms após o usuário parar de digitar para fazer a busca
             searchTimeout = setTimeout(async () => {
                 try {
-                    // Futura rota de API para buscar pacientes
                     const response = await fetch(`/api/patients/search?q=${encodeURIComponent(query)}`);
                     if (!response.ok) throw new Error('Falha na busca.');
 
@@ -192,7 +189,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         });
 
-        // Esconde os resultados se o usuário clicar fora da área de busca
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.search-container')) {
                 searchResultsContainer.classList.remove('active');
@@ -210,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
             patients.forEach(patient => {
                 const item = document.createElement('div');
                 item.className = 'result-item';
-                item.dataset.patientId = patient.id; // Armazena o ID do paciente
+                item.dataset.patientId = patient.id; 
 
                 const dob = new Date(patient.dob).toLocaleDateString('pt-BR');
                 const statusClass = patient.status === 'admitted' ? 'admitted' : 'discharged';

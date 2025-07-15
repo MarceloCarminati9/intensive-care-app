@@ -176,7 +176,7 @@ apiRouter.get('/patients/:id', async (req, res) => {
 });
 
 // =================================================================================
-// [NOVO] ROTA DA API PARA BUSCAR PACIENTES
+// ROTA DE BUSCA DE PACIENTES (CORRIGIDA)
 // =================================================================================
 apiRouter.get('/patients/search', async (req, res) => {
     const { q } = req.query; 
@@ -188,6 +188,7 @@ apiRouter.get('/patients/search', async (req, res) => {
     try {
         const searchTerm = `%${q}%`;
 
+        // CORRIGIDO: Adicionado "p.cns::text" para evitar erro de tipo de dado na busca
         const query = `
             SELECT 
                 p.id,
@@ -207,7 +208,7 @@ apiRouter.get('/patients/search', async (req, res) => {
             LEFT JOIN 
                 units u ON b.unit_id = u.id
             WHERE 
-                p.name ILIKE $1 OR p.cns ILIKE $1
+                p.name ILIKE $1 OR p.cns::text ILIKE $1
             ORDER BY
                 p.name ASC
             LIMIT 10; 
