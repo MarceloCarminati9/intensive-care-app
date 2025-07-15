@@ -1,4 +1,4 @@
-// VERSÃO DEFINITIVA, COMPLETA E CORRIGIDA - 11/07/2025
+// VERSÃO DEFINITIVA, COMPLETA E CORRIGIDA - 14/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -175,9 +175,7 @@ apiRouter.get('/patients/:id', async (req, res) => {
     }
 });
 
-// =================================================================================
-// ROTA DE BUSCA DE PACIENTES (COM LOG DE ERRO DETALHADO)
-// =================================================================================
+
 apiRouter.get('/patients/search', async (req, res) => {
     const { q } = req.query; 
 
@@ -187,6 +185,8 @@ apiRouter.get('/patients/search', async (req, res) => {
 
     try {
         const searchTerm = `%${q}%`;
+        
+        // CORREÇÃO FINAL: Adicionado "::text" ao parâmetro $1 para forçar o tipo correto
         const query = `
             SELECT 
                 p.id, p.name, p.dob, p.cns,
@@ -203,7 +203,7 @@ apiRouter.get('/patients/search', async (req, res) => {
             LEFT JOIN 
                 units u ON b.unit_id = u.id
             WHERE 
-                p.name ILIKE $1 OR p.cns::text ILIKE $1
+                p.name ILIKE $1::text OR p.cns::text ILIKE $1::text
             ORDER BY
                 p.name ASC
             LIMIT 10; 
@@ -213,7 +213,6 @@ apiRouter.get('/patients/search', async (req, res) => {
         res.json({ data: result.rows });
 
     } catch (error) {
-        // LOG DE ERRO DETALHADO
         console.error("--- ERRO DETALHADO NA BUSCA DE PACIENTES ---");
         console.error("Termo Buscado:", q);
         console.error("Mensagem do Erro:", error.message);
