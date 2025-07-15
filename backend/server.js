@@ -1,4 +1,4 @@
-// VERSÃO COM DATA CORRETA PARA CÁLCULO DE DIAS NA UTI - 15/07/2025
+// VERSÃO FINAL COM ROTA PARA SALVAR PRESCRIÇÃO - 15/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -139,14 +139,17 @@ apiRouter.post('/patients', async (req, res) => {
         const patientParams = [name, mother_name, dob, cns, hpp, allergies, bed_id];
         const patientResult = await client.query(patientSql, patientParams);
         const newPatientId = patientResult.rows[0].id;
+
         const admissionSql = `
             INSERT INTO admissions (patient_id, bed_id, admission_date, hd_primary_desc, hd_primary_cid, secondary_diagnoses)
             VALUES ($1, $2, $3, $4, $5, $6);
         `;
         const admissionParams = [newPatientId, bed_id, dih, hd_primary_desc, hd_primary_cid, JSON.stringify(secondary_diagnoses || [])];
         await client.query(admissionSql, admissionParams);
+
         const bedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3;`;
         await client.query(bedSql, [newPatientId, name, bed_id]);
+        
         await client.query('COMMIT');
         res.status(201).json({ message: 'Paciente admitido com sucesso!', patientId: newPatientId });
     } catch (err) {
@@ -158,7 +161,6 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
-// A ROTA DE BUSCA (/search) DEVE VIR ANTES da rota genérica (/:id)
 apiRouter.get('/patients/search', async (req, res) => {
     const { q } = req.query; 
     if (!q || q.length < 3) { return res.status(400).json({ error: 'O termo de busca deve ter pelo menos 3 caracteres.' }); }
@@ -183,7 +185,6 @@ apiRouter.get('/patients/search', async (req, res) => {
     }
 });
 
-// ATUALIZADO: Buscar os dados de um paciente, incluindo a data real de criação da internação na UTI
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const sql = `
@@ -191,9 +192,9 @@ apiRouter.get('/patients/:id', async (req, res) => {
                 p.id, p.name, p.mother_name, p.dob, p.cns, p.hpp, p.allergies, p.current_bed_id,
                 b.bed_number, 
                 u.name as unit_name,
-                u.id as unit_id, 
-                a.admission_date as dih, 
-                a.created_at as icu_admission_date, -- [NOVO] Data real da admissão na UTI
+                u.id as unit_id,
+                a.admission_date as dih,
+                a.created_at as icu_admission_date,
                 a.discharge_date,
                 a.discharge_reason,
                 a.hd_primary_desc,
@@ -218,7 +219,6 @@ apiRouter.get('/patients/:id', async (req, res) => {
         res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
     }
 });
-
 
 apiRouter.post('/patients/:id/discharge', async (req, res) => {
     const { id } = req.params;
@@ -314,16 +314,44 @@ apiRouter.post('/patients/:id/evolutions', async (req, res) => {
     }
 });
 
+// ROTA ATUALIZADA: Agora é para a PRESCRIÇÃO
 apiRouter.post('/prescriptions', async (req, res) => {
-    const { patient_id, medicamento, posologia, via_administracao, quantidade } = req.body;
-    if (!patient_id || !medicamento || !posologia) { return res.status(400).json({ message: 'Campos obrigatórios (paciente, medicamento, posologia) estão faltando.' }); }
+    const { patient_id, diet_description, hydration_items, medication_items } = req.body;
+    if (!patient_id) {
+        return res.status(400).json({ error: 'ID do paciente é obrigatório.' });
+    }
+    const client = await pool.connect();
     try {
-        const sql = `INSERT INTO prescriptions (patient_id, medicamento, posologia, via_administracao, quantidade) VALUES ($1, $2, $3, $4, $5) RETURNING *;`;
-        const { rows } = await pool.query(sql, [patient_id, medicamento, posologia, via_administracao, quantidade]);
-        res.status(201).json({ message: 'Receita salva com sucesso!', data: rows[0] });
+        await client.query('BEGIN');
+        const prescriptionSql = `INSERT INTO prescriptions (patient_id, diet_description) VALUES ($1, $2) RETURNING id;`;
+        const prescriptionResult = await client.query(prescriptionSql, [patient_id, diet_description]);
+        const newPrescriptionId = prescriptionResult.rows[0].id;
+
+        const itemSql = `
+            INSERT INTO prescription_items (prescription_id, item_type, name, dose, via, frequency, notes) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7);
+        `;
+
+        if (hydration_items && hydration_items.length > 0) {
+            for (const item of hydration_items) {
+                const itemParams = [newPrescriptionId, 'hydration', item.name, item.dose, item.via, item.frequency, item.obs];
+                await client.query(itemSql, itemParams);
+            }
+        }
+        if (medication_items && medication_items.length > 0) {
+            for (const item of medication_items) {
+                const itemParams = [newPrescriptionId, 'medication', item.name, item.dose, item.via, item.frequency, item.obs];
+                await client.query(itemSql, itemParams);
+            }
+        }
+        await client.query('COMMIT');
+        res.status(201).json({ message: 'Prescrição salva com sucesso!', prescriptionId: newPrescriptionId });
     } catch (err) {
-        console.error('Erro ao salvar receita:', err);
-        res.status(500).json({ error: 'Falha ao salvar a receita no servidor.' });
+        await client.query('ROLLBACK');
+        console.error('Erro ao salvar prescrição:', err);
+        res.status(500).json({ error: 'Erro no servidor ao salvar a prescrição.' });
+    } finally {
+        client.release();
     }
 });
 
@@ -338,13 +366,15 @@ apiRouter.get('/patients/:id/evolutions', async (req, res) => {
     }
 });
 
+// ATUALIZADO: Rota para buscar as prescrições
 apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
     try {
+        // Query para buscar as "capas" das prescrições
         const { rows } = await pool.query('SELECT * FROM prescriptions WHERE patient_id = $1 ORDER BY created_at DESC', [req.params.id]);
         res.json({ data: rows });
     } catch (err) {
-        console.error('Erro ao buscar receitas:', err);
-        res.status(500).json({ error: 'Falha ao buscar receitas.' });
+        console.error('Erro ao buscar prescrições:', err);
+        res.status(500).json({ error: 'Falha ao buscar prescrições.' });
     }
 });
 

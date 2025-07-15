@@ -1,0 +1,219 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ======================= VARIÁVEIS E ESTILOS GERAIS ======================= */
+:root {
+    --primary-blue: #4a90e2;
+    --dark-blue-text: #2c3e50;
+    --light-bg: #F0F5FA;
+    --white-bg: #FFFFFF;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --border-color: #E5E7EB;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    --danger-red: #EF4444;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-primary);
+}
+
+.prescription-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+/* ======================= CABEÇALHO DA PRESCRIÇÃO ======================= */
+.prescription-header {
+    background-color: var(--white-bg);
+    padding: 20px 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.back-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.patient-info-main h1 {
+    font-size: 1.8rem;
+    color: var(--dark-blue-text);
+    margin: 0 0 10px 0;
+}
+
+.header-details {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.header-details strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* ======================= CORPO E SEÇÕES DA PRESCRIÇÃO ======================= */
+.prescription-body {
+    background-color: var(--white-bg);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.prescription-section {
+    margin-bottom: 30px;
+}
+
+.prescription-section:last-of-type {
+    margin-bottom: 0;
+}
+
+.prescription-section h2 {
+    font-size: 1.3rem;
+    color: var(--dark-blue-text);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    resize: vertical;
+    min-height: 50px;
+}
+
+.button-add-item {
+    background: none;
+    border: 1px dashed var(--primary-blue);
+    color: var(--primary-blue);
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+}
+
+.button-add-item:hover {
+    background-color: var(--light-bg);
+}
+
+
+/* ======================= ITENS DA PRESCRIÇÃO (LINHAS DINÂMICAS) ======================= */
+.prescription-item {
+    display: grid;
+    grid-template-columns: 3fr 1.5fr 1.5fr 1.5fr 2fr 40px;
+    gap: 15px;
+    align-items: flex-start;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.prescription-item:first-of-type {
+    padding-top: 0;
+}
+
+.prescription-item .form-group {
+    margin: 0;
+}
+
+.prescription-item label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.prescription-item input, .prescription-item select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.autocomplete-container {
+    position: relative;
+}
+
+.autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--white-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1010;
+    display: none;
+}
+.autocomplete-results.active { display: block; }
+.autocomplete-item { padding: 10px; cursor: pointer; border-bottom: 1px solid var(--border-color); }
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background-color: #f3f4f6; }
+
+
+.remove-item-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--danger-red);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 21px; /* Alinha com os inputs */
+    transition: all 0.2s;
+}
+
+.remove-item-btn:hover {
+    background-color: var(--danger-red);
+    color: var(--white-bg);
+    border-color: var(--danger-red);
+}
+
+
+/* ======================= RODAPÉ COM BOTÕES DE AÇÃO ======================= */
+.prescription-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.button-primary, .button-secondary {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+.button-primary { background-color: var(--primary-blue); color: var(--white-bg); }
+.button-primary:hover { background-color: #3a7ac8; }
+.button-secondary { background-color: #eef2f7; color: var(--dark-blue-text); }
+.button-secondary:hover { background-color: #e1e8f0; }

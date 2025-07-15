@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Prescrição - Intensive Care Brasil</title>
+    <link rel="stylesheet" href="prescricao-style.css"> <link rel="icon" href="intensivecare.jpeg" type="image/jpeg">
+</head>
+<body>
+    <div class="prescription-container">
+        <header class="prescription-header">
+            <div class="patient-info-main">
+                <a href="#" id="backLink" class="back-link">&larr; Voltar para o Prontuário</a>
+                <h1>Nova Prescrição</h1>
+                <div class="header-details">
+                    <span><strong>Paciente:</strong> <span id="patientNameHeader">Carregando...</span></span>
+                    <span><strong>Leito:</strong> <span id="patientBedHeader">...</span></span>
+                    <span><strong>Data:</strong> <span id="prescriptionDate">--/--/----</span></span>
+                </div>
+            </div>
+        </header>
+
+        <main class="prescription-body">
+            <section class="prescription-section">
+                <h2>1. Dieta</h2>
+                <div class="form-group">
+                    <textarea id="dietaDesc" rows="2" placeholder="Descreva a dieta (ex: Dieta zero, Dieta livre, Dieta para diabéticos...)"></textarea>
+                </div>
+            </section>
+
+            <section class="prescription-section">
+                <h2>2. Hidratação Venosa</h2>
+                <div id="hydration-items-container">
+                    </div>
+                <button type="button" id="addHydrationBtn" class="button-add-item">[+] Adicionar Solução</button>
+            </section>
+
+            <section class="prescription-section">
+                <h2>3. Medicamentos</h2>
+                <div id="medication-items-container">
+                    </div>
+                <button type="button" id="addMedicationBtn" class="button-add-item">[+] Adicionar Medicamento</button>
+            </section>
+            
+        </main>
+
+        <footer class="prescription-footer">
+            <button type="button" id="cancelPrescriptionBtn" class="button-secondary">Cancelar</button>
+            <button type="button" id="savePrescriptionBtn" class="button-primary">Salvar Prescrição</button>
+        </footer>
+    </div>
+
+    <script src="prescricao.js"></script> </body>
+</html>

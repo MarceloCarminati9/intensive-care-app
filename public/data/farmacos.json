@@ -1,0 +1,366 @@
+[
+  {
+    "medicamento": "Dieta enteral via sonda nasoentérica",
+    "posologia_completa": "Dieta enteral via sonda nasoentérica (META: 700kcal/dia + 40g proteína/dia), infusão contínua"
+  },
+  {
+    "medicamento": "Água filtrada via sonda nasoentérica",
+    "posologia_completa": "Água filtrada via sonda nasoentérica, 150mL de 4/4 horas"
+  },
+  {
+    "medicamento": "Água filtrada via sonda nasoentérica com Whey Protein",
+    "posologia_completa": "Água filtrada via sonda nasoentérica, 150mL + 1 colher de sopa de Whey Protein de 4/4 horas"
+  },
+  {
+    "medicamento": "SF 0,9% 500mL",
+    "posologia_completa": "SF 0,9% 500mL, via EV, ACM"
+  },
+  {
+    "medicamento": "SF 0,9% 500mL + Eletrólitos",
+    "posologia_completa": "SF 0,9% 500mL + Cloreto de potássio 10% 10mL + Gluconato de cálcio 10% 10mL + Sulfato de magnésio 10% 10mL, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "SF 0,9% 500mL + Glicose 50%",
+    "posologia_completa": "SF 0,9% 500mL + Glicose 50% 50mL, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "SRL 500mL",
+    "posologia_completa": "SRL 500mL, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "SRL 500mL + Eletrólitos",
+    "posologia_completa": "SRL 500mL + Cloreto de potássio 10% 10mL + Gluconato de cálcio 10% 10mL + Sulfato de magnésio 10% 10mL, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "SRL 500mL + Glicose 50%",
+    "posologia_completa": "SRL 500mL + Glicose 50% 50mL, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "Gluconato de cálcio 10%",
+    "posologia_completa": "Gluconato de cálcio 10%, diluir 20mL em SF 0,9% 100mL, via EV em 20 minutos"
+  },
+  {
+    "medicamento": "Sulfato de magnésio 10%",
+    "posologia_completa": "Sulfato de magnésio 10%, diluir 20mL em SF 0,9% 100mL, via EV em 1 hora"
+  },
+  {
+    "medicamento": "Sulfato de magnésio 50%",
+    "posologia_completa": "Sulfato de magnésio 50%, diluir 5mL em SF 0,9% 100mL, via EV em 1 hora"
+  },
+  {
+    "medicamento": "Cloreto de potássio 10%",
+    "posologia_completa": "Cloreto de potássio 10% (100mg/mL), diluir 30mL em 220 mL de SF 0,9%, via EV, infundir em 3h ACM"
+  },
+  {
+    "medicamento": "Rosuvastatina",
+    "posologia_completa": "Rosuvastatina [20mg] VSNE 01x/dia"
+  },
+  {
+    "medicamento": "Aciclovir",
+    "posologia_completa": "Aciclovir (FA de 250mg), diluir em AD 20mL, diluir em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 1 hora"
+  },
+  {
+    "medicamento": "Amicacina",
+    "posologia_completa": "Amicacina (1g), diluir em SF 0,9% 100mL, via EV 1x/dia, infundir em 1 hora"
+  },
+  {
+    "medicamento": "Ampicilina + Sulbactam",
+    "posologia_completa": "Ampicilina + Sulbactam (3g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 4 oras"
+  },
+  {
+    "medicamento": "Clavulin (Amoxicilina + Clavulanato)",
+    "posologia_completa": "Clavulin (1,2g), reconstituir em AD 20mL, diluir em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 30 minutos"
+  },
+  {
+    "medicamento": "Anfotericina B",
+    "posologia_completa": "Anfotericina B (50mg), reconstituir em AD 10mL, diluir em SG 5% 250mL, via EV 1x/dia, infundir em 4 horas"
+  },
+  {
+    "medicamento": "Azitromicina",
+    "posologia_completa": "Azitromicina (500mg), reconstituir em AD 5mL, diluir em SF 0,9% 250mL, via EV 1x/dia, infundir em 1 hora"
+  },
+  {
+    "medicamento": "Cefalotina",
+    "posologia_completa": "Cefalotina (1g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 30 minutos"
+  },
+  {
+    "medicamento": "Claritromicina",
+    "posologia_completa": "Claritromicina (500mg/10ml) diluir em SF 0,9% 250mL, via EV de 12/12 horas, infundir em 60 minutos"
+  },
+  {
+    "medicamento": "Cefepime",
+    "posologia_completa": "Cefepime (2g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 4 horas"
+  },
+  {
+    "medicamento": "Caspofungina",
+    "posologia_completa": "Caspofungina 70mg- 01FA + 10ml de AD. Reconstituir para 150ml de sf0.9% EV 1xdia. Infusão em 1 hora"
+  },
+  {
+    "medicamento": "Gentamicina",
+    "posologia_completa": "Gentamicina (80mg/2ml ), diluir em 200mL de SF 0,9%, infundir em 30min, EV 8/8hs"
+  },
+  {
+    "medicamento": "Ceftriaxona",
+    "posologia_completa": "Ceftriaxona (1g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 12/12 horas, infundir em 30 minutos"
+  },
+  {
+    "medicamento": "Ciprofloxacina",
+    "posologia_completa": "Ciprofloxacina (400mg), via EV de 12/12 horas, infundir em 1 hora"
+  },
+  {
+    "medicamento": "Clindamicina",
+    "posologia_completa": "Clindamicina (600mg), diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 1 hora"
+  },
+  {
+    "medicamento": "Linezolida",
+    "posologia_completa": "Linezolida (2mg/ml), infundir 600mg via Endovenosa de 12 em 12 horas, tempo de infusão 1h"
+  },
+  {
+    "medicamento": "Fluconazol EV",
+    "posologia_completa": "Fluconazol 200mg/100mL, via EV 1x/dia, infundir em 1 hora"
+  },
+  {
+    "medicamento": "Fluconazol SNE",
+    "posologia_completa": "Fluconazol 150mg por SNE 1x/dia"
+  },
+  {
+    "medicamento": "Imipenem",
+    "posologia_completa": "Imipenem (1g), diluir em SG 5% 100mL, via EV de 8/8 horas, infundir em 3 horas"
+  },
+  {
+    "medicamento": "Metronidazol",
+    "posologia_completa": "Metronidazol (500mg), administrar a solução pronta, via EV de 8/8 horas, infundir lento"
+  },
+  {
+    "medicamento": "Levofloxacina",
+    "posologia_completa": "Levofloxacina (750mg), via EV 1x/dia, infundir em 1 hora"
+  },
+  {
+    "medicamento": "Meropenem",
+    "posologia_completa": "Meropenem (1g), diluir em SG 5% 100mL, via EV de 8/8 horas, infundir em 3 horas"
+  },
+  {
+    "medicamento": "Artesunato",
+    "posologia_completa": "Artesunato 170mg (3 frascos), reconstitua cada frasco em 1mL da ampola de bicarbonato, dilua em 5mL da solução salina, administre 17mL, via EV 1x/dia, em 1 hora"
+  },
+  {
+    "medicamento": "Polimixina B",
+    "posologia_completa": "Polimixina B 500.000 UI (02 Frascos- DOSE TOTAL 1.000.000 UI) + SG5% 500 ml, via EV em BIC de 12/12hs infundir em 60min"
+  },
+  {
+    "medicamento": "Tazocin (Piperacilina/Tazobactam)",
+    "posologia_completa": "Tazocin (4,5g), reconstituir em SF 0,9% 20mL, diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 3H"
+  },
+  {
+    "medicamento": "Teicoplamina",
+    "posologia_completa": "Teicoplamina 400mg, reconstituir em 3ml de AD, diluir em SF 0,9% 100ml e infudir EV 12/12hs a correr em 20 minutos"
+  },
+  {
+    "medicamento": "Tigeciclina",
+    "posologia_completa": "Tigeciclina 50mg + SG5% 100ml a correr 1h EV 12/12hs"
+  },
+  {
+    "medicamento": "Vancomicina",
+    "posologia_completa": "Vancomicina (1g), reconstituir em AD 10mL, diluir em SF 0,9% 250mL, via EV de 12/12 horas e infundir em 1 hora"
+  },
+  {
+    "medicamento": "Noradrenalina",
+    "posologia_completa": "Noradrenalina (4mg/4mL), diluir 5 ampolas em SG 5% 80mL, via EV (acesso venoso central), infundir em BIC"
+  },
+  {
+    "medicamento": "Adrenalina (Epinefrina)",
+    "posologia_completa": "Adrenalina (1mg/mL), diluir 4 ampolas em SG 5% 100mL, via EV (acesso venoso central), infundir em BIC"
+  },
+  {
+    "medicamento": "Dobutamina",
+    "posologia_completa": "Dobutamina (250mg/20mL), diluir 80 ml em SF 0,9% 170mL, via EV, infundir em BIC"
+  },
+  {
+    "medicamento": "Nitroglicerina (Tridil)",
+    "posologia_completa": "Nitroglicerina (Tridil 50mg/10mL), diluir 1 ampola em SG 5% 250mL, via EV, infundir em BIC"
+  },
+  {
+    "medicamento": "Nitroprussiato (Nipride)",
+    "posologia_completa": "Nitroprussiato (Niprid 50mg/2mL), diluir 1 ampola em SG 5% 250ml, via EV, infundir em BIC"
+  },
+  {
+    "medicamento": "Vasopressina",
+    "posologia_completa": "Vasopressina 20U/mL – 1 ampola + 99mL de SG 5% (vazão de 6mL a 24mL/h)"
+  },
+  {
+    "medicamento": "Amiodarona (Ataque)",
+    "posologia_completa": "Amiodarona (150mg/3mL), diluir em SG 5% 100mL, via EV em 15 minutos"
+  },
+  {
+    "medicamento": "Amiodarona (Manutenção)",
+    "posologia_completa": "Amiodarona (150mg/3mL), diluir 6 ampolas em SG 5% 250mL, via EV em BIC, 18mL/h nas primeiras 6 horas e 9mL/h por 18 horas"
+  },
+  {
+    "medicamento": "Propofol",
+    "posologia_completa": "Propofol (10mg/mL), sem diluição, via EV, em BIC, 10mL/h ou ACM"
+  },
+  {
+    "medicamento": "Remifentanila",
+    "posologia_completa": "Remifentanila 02 Amp + SF0,9% 80 ml via EV em BIC"
+  },
+  {
+    "medicamento": "Fentanil",
+    "posologia_completa": "Fentanil (50mcg/mL), sem diluição, via EV, em BIC, 3mL/h"
+  },
+  {
+    "medicamento": "Midazolam",
+    "posologia_completa": "Midazolam (5mg/mL), diluir 4 amp + SF09% 160ml , via EV, em BIC"
+  },
+  {
+    "medicamento": "Dexmedetomidina",
+    "posologia_completa": "Dexmedetomidina (200mcg/2mL), diluir 2 ampolas em SF 0,9% 100mL, via EV, em BIC"
+  },
+  {
+    "medicamento": "Tramadol",
+    "posologia_completa": "Tramadol (100mg/2mL), diluir 1 ampola em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 30 minutos"
+  },
+  {
+    "medicamento": "Suxametonio",
+    "posologia_completa": "Suxametonio (500mg) Diluir 2 FA 1g + SG5% 500ml X BIC"
+  },
+  {
+    "medicamento": "Rocuronio",
+    "posologia_completa": "Rocuronio (50mg/5mL) 4 ampolas + SG 5% 100mL, via EV em BIC"
+  },
+  {
+    "medicamento": "Lidocaína (Sem vasoconstritor)",
+    "posologia_completa": "Lidocaína (Sem vasoconstritor) diluir 20ml em SF0,9% 200mL, via EV em BIC"
+  },
+  {
+    "medicamento": "Haldol + Prometazina",
+    "posologia_completa": "Prometazina (50mgr)+haldol (5mgr) +18ml AD EV 8/8h Na Falta de Bloqueador Neuromuscular"
+  },
+  {
+    "medicamento": "Morfina (BIC)",
+    "posologia_completa": "Morfina 4 amp + 100ml de SF0,9%, EV em BIC, em falta de Fentanil e Remifentanila"
+  },
+  {
+    "medicamento": "Ketodex (Cetamina + Dexmedetomidina)",
+    "posologia_completa": "Ketodex (solução padrão) Dexmedetomidina (200mcg/2mL) 4 ampolas + Cetamina (500mg/10mL) 4 ampolas diluídos em SF 0,9% 200mL, via EV, em BIC"
+  },
+  {
+    "medicamento": "Cisatracurio",
+    "posologia_completa": "Cisatracurio 5 Amp + SF09% 250ml X BIC"
+  },
+  {
+    "medicamento": "Heparina não fracionada (Bomba de Infusão)",
+    "posologia_completa": "Heparina não fracionada (5000UI/1mL)-5ml + 245ml SG5%, EV em BIC (Concentração final= 100UI/mL)"
+  },
+  {
+    "medicamento": "Enoxaparina sódica",
+    "posologia_completa": "Enoxaparina sódica (20mg/0,2mL), administrar 0,2mL via SC de 1x/dia Gelo Antes e Após"
+  },
+  {
+    "medicamento": "Heparina não fracionada (SC)",
+    "posologia_completa": "Heparina não fracionada (5.000UI/0,25mL) administrar 0,25mL, via SC de 12/12 horas (gelo antes e após aplicação)"
+  },
+  {
+    "medicamento": "Insulina regular (Bomba de Infusão)",
+    "posologia_completa": "Insulina regular 100UI (1mL) diluir em SF 0,9% 100mL, via EV, em BIC conforme protocolo de correção"
+  },
+  {
+    "medicamento": "Ranitidina",
+    "posologia_completa": "Ranitidina (50mg/mL), diluir 1 ampola de AD 10mL, via EV de 8/8 horas"
+  },
+  {
+    "medicamento": "Omeprazol EV",
+    "posologia_completa": "Omeprazol (frasco 40mg), reconstituir o frasco em diluente próprio, via EV 1x/dia, infundir lento"
+  },
+  {
+    "medicamento": "Omeprazol SNE",
+    "posologia_completa": "Omeprazol 40mg, comprimido via SNE, 1x/dia, SE AUSÊNCIA DA APRESENTAÇÃO INJETÁVEL"
+  },
+  {
+    "medicamento": "Dipirona",
+    "posologia_completa": "Dipirona [500mg/ml] diluir 2ml em AD 10ml via EV de 6/6h, SE DOR OU FEBRE"
+  },
+  {
+    "medicamento": "Metoclopramida",
+    "posologia_completa": "Metoclopramida (5mg/mL), diluir 2mL em 10mL de AD, via EV de 8/8 horas, infundir lento, se náuseas ou vômitos"
+  },
+  {
+    "medicamento": "Bromoprida",
+    "posologia_completa": "Bromoprida (10mg/2mL), diluir 2mL em 10mL de AD, via EV de 8/8 horas, infundir lento"
+  },
+  {
+    "medicamento": "Hidrocortisona",
+    "posologia_completa": "Hidrocortisona (100mg), reconstituir em AD 10mL, diluir em SF 0,9% 10mL, via EV de 8/8 horas, infundir lento"
+  },
+  {
+    "medicamento": "Dexametasona",
+    "posologia_completa": "Dexametasona (4mg/mL), diluir 1,5mL (6 mg) em 10mL de SF 0,9%, via EV 1x/dia, infundir lento"
+  },
+  {
+    "medicamento": "NBZ com Atrovent",
+    "posologia_completa": "NBZ: Atrovent 40 gotas + SF 0,9% 05 ml, de 20/20 minutos até 03x em 01 hora, em aeroneb"
+  },
+  {
+    "medicamento": "Hidralazina",
+    "posologia_completa": "Hidralazina (20mg/mL), diluir em AD 10mL, via EV ACM"
+  },
+  {
+    "medicamento": "Glicemia capilar",
+    "posologia_completa": "Glicemia capilar de 4/4 horas. Correções conforme tabela na folha de balanço"
+  },
+  {
+    "medicamento": "Hipromelose 0,5%",
+    "posologia_completa": "Hipromelose 0,5% 2 gotas em cada olho de 4/4h."
+  },
+  {
+    "medicamento": "Banho com clorexidine",
+    "posologia_completa": "Banho diário com clorexidine 2 ou 4%"
+  },
+  {
+    "medicamento": "Higiene oral com clorexidina",
+    "posologia_completa": "Higiene oral com clorexidina 0,12% 3x/dia"
+  },
+  {
+    "medicamento": "Mudança de decúbito",
+    "posologia_completa": "Mudança de decúbito de 2/2 horas, conforme protocolo da instituição"
+  },
+  {
+    "medicamento": "Cabeceira elevada",
+    "posologia_completa": "Cabeceira elevada 35º"
+  },
+  {
+    "medicamento": "FST Motora e Respiratória",
+    "posologia_completa": "FST Motora e Resp"
+  },
+  {
+    "medicamento": "Buscopan composto",
+    "posologia_completa": "Buscopan composto (4mg/ml + 500mg/ml) 1 ampola + SG 5% 20 ml EV lento 8/8 horas"
+  },
+  {
+    "medicamento": "Vitamina K",
+    "posologia_completa": "Vit K 1 Amp IM 12/12hs"
+  },
+  {
+    "medicamento": "Ácido Tranexâmico (Transamin)",
+    "posologia_completa": "Transamin 50mg/ml Fazer 10ml(500mg) + SF09% 100ml EV 8/8hs"
+  },
+  {
+    "medicamento": "Fenitoina",
+    "posologia_completa": "Fenitoina (50mg/mL), diluir 2mL em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 30 minutos"
+  },
+  {
+    "medicamento": "Cetoprofeno",
+    "posologia_completa": "Cetoprofeno 100 mg - reconstituir em 10 ml de AD e diluir em 100 ml de SF 0,9% - via EV 8/8h"
+  },
+  {
+    "medicamento": "Ondansetrona",
+    "posologia_completa": "Ondansetrona 2 mg/ml (1 ampola 4ml- 8 mg) + SF 0,9% 20 ml via EV lento 8/8h"
+  },
+  {
+    "medicamento": "Clopidogrel",
+    "posologia_completa": "Clopidogrel (75mg) - 1 comprimido, via oral, 1x/dia após o almoço"
+  },
+  {
+    "medicamento": "Furosemida",
+    "posologia_completa": "Furosemida (20mg/ml) - 1 anpola, via EV, de 12/12h"
+  }
+]
