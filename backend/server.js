@@ -427,6 +427,7 @@ apiRouter.delete('/evolutions/:evolutionId', async (req, res) => {
     }
 });
 
+
 app.use('/api', apiRouter);
 
 // Rota final para servir o frontend
