@@ -472,3 +472,43 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUnitAndBeds();
     loadCidData();
 });
+// ... dentro do seu arquivo unit-view.js
+
+if (bedGridContainer) {
+    bedGridContainer.addEventListener('click', function(event) {
+        // LOG DE DIAGNÓSTICO 1: Checar se qualquer clique está sendo detectado
+        console.log('Clique detectado no grid de leitos. Alvo do clique:', event.target);
+
+        const target = event.target;
+        const bedCard = target.closest('.bed-card');
+        if (!bedCard) {
+            // LOG DE DIAGNÓSTICO 2: Mensagem se o clique for fora de um card
+            console.log('Clique fora de um bed-card, ignorando.');
+            return;
+        }
+
+        // ...
+
+        if (target.closest('.cadastrar-paciente-btn')) {
+            // LOG DE DIAGNÓSTICO 3: Checar se o botão de cadastro é reconhecido
+            console.log('BOTÃO CADASTRAR RECONHECIDO');
+            // ... (resto do seu código para este botão)
+        }
+        
+        // ...
+
+        else if (target.closest('.dar-alta-btn')) {
+            // LOG DE DIAGNÓSTICO 4: Checar se o botão de alta é reconhecido
+            console.log('BOTÃO DAR ALTA RECONHECIDO');
+            // ... (resto do seu código para este botão)
+        }
+
+        else if (target.closest('.transferir-paciente-btn')) {
+            // LOG DE DIAGNÓSTICO 5: Checar se o botão de transferir é reconhecido
+            console.log('BOTÃO TRANSFERIR RECONHECIDO');
+            // ... (resto do seu código para este botão)
+        }
+    });
+}
+
+// ...
