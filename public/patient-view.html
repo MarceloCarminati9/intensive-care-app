@@ -9,58 +9,74 @@
 </head>
 <body>
     <div class="patient-view-container">
-        <header class="patient-header">
-            <div class="patient-info-main">
-                <a href="dashboard.html" class="back-link">&larr; Voltar para o Dashboard</a>
+        <a href="dashboard.html" id="backLink" class="back-link">&larr; Voltar para o Dashboard</a>
+        
+        <header class="patient-header-card">
+            <div class="patient-title">
                 <h1 id="patientNameHeader">Carregando paciente...</h1>
-                <div class="patient-details">
-                    <span><strong>Idade:</strong> <span id="patientAge">--</span></span>
-                    <span><strong>CNS:</strong> <span id="patientCns">Não informado</span></span>
-                    <span><strong>DIH:</strong> <span id="patientDih">--/--/----</span></span>
-                    <span><strong>Dias na UTI:</strong> <span id="patientDaysInIcu">--</span></span>
-                </div>
+                <div id="admission-info-container" class="status-tag admitted"></div>
+                <div id="discharge-info-container" class="status-tag discharged" style="display: none;"></div>
             </div>
 
-            <div id="admission-info-container" class="status-card admitted">
-                <h2>Status Atual</h2>
-                <p id="patientBed">
-                    Carregando...
-                </p>
-            </div>
-
-            <div id="discharge-info-container" class="status-card discharged" style="display: none;">
-                <h2>Status Atual: ALTA</h2>
-                <p>
-                    <strong>Motivo:</strong> <span id="dischargeReason"></span>
-                </p>
-                <div class="admission-details">
-                    Data da Alta: <strong id="dischargeDate">--/--/----</strong>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span>Idade</span>
+                    <strong id="patientAge">--</strong>
                 </div>
-                <div class="patient-actions">
-                    <button id="readmitPatientBtn" class="button-primary">Reinternar Paciente</button>
+                <div class="detail-item">
+                    <span>CNS</span>
+                    <strong id="patientCns">Não informado</strong>
                 </div>
-            </div>
-        </header>
-
-        <main class="patient-content">
-            <div class="patient-summary">
-                <div class="summary-item">
-                    <h4>Hipóteses Diagnósticas</h4>
+                <div class="detail-item">
+                    <span>Data de Internação Hospitalar</span>
+                    <strong id="patientDih">--/--/----</strong>
+                </div>
+                <div class="detail-item">
+                    <span>Dias na UTI</span>
+                    <strong id="patientDaysInIcu">--</strong>
+                </div>
+                 <div class="detail-item full-span">
+                    <span>Nome da Mãe</span>
+                    <strong id="patientMotherName">Não informado</strong>
+                </div>
+                 <div class="detail-item full-span">
+                    <span>Alergias</span>
+                    <strong id="patientAllergies">Nenhuma informada</strong>
+                </div>
+                <div class="detail-item full-span">
+                    <span>Hipóteses Diagnósticas</span>
                     <div id="patientHd"><p>Carregando...</p></div>
                 </div>
-                 <div class="summary-item">
-                    <h4>História Patológica Pregressa (HPP)</h4>
+                <div class="detail-item full-span">
+                    <span>História Patológica Pregressa (HPP)</span>
                     <p id="patientHpp">Carregando...</p>
                 </div>
             </div>
 
+            <div id="readmit-button-container" class="patient-actions" style="display: none;">
+                 <button id="readmitPatientBtn" class="button-primary">Reinternar Paciente</button>
+            </div>
+        </header>
+
+        <section class="actions-grid">
+            <a href="#" id="goToPrescriptionBtn" class="action-button">Nova Receita</a>
+            <a href="#" id="goToEvolutionBtn" class="action-button">Nova Evolução</a>
+            <button class="action-button" disabled>Resumo de Alta</button>
+            <button class="action-button" disabled>Intercorrências</button>
+            <button class="action-button" disabled>Exames Laboratoriais</button>
+            <button class="action-button" disabled>Exames de Imagem</button>
+            <button class="action-button" disabled>Hemocomponentes</button>
+            <button class="action-button" disabled>Pareceres</button>
+            <button class="action-button" disabled>Avaliação Cirúrgica</button>
+            <button class="action-button" disabled>APAC</button>
+            <button class="action-button" disabled>CCIH</button>
+            <button class="action-button" disabled>Nova Admissão</button>
+        </section>
+
+        <main class="patient-content">
             <div class="history-section">
                 <div class="history-header">
                     <h3>Histórico do Paciente</h3>
-                    <div class="history-actions">
-                        <a href="#" id="goToPrescriptionBtn" class="button-secondary">Nova Receita</a>
-                        <a href="#" id="goToEvolutionBtn" class="button-primary">Nova Evolução</a>
-                    </div>
                 </div>
                 <div id="historyList">
                     <p>Carregando histórico...</p>
@@ -75,8 +91,7 @@
                 <h2 id="viewerTitle">Visualizar Documento</h2>
                 <button id="closeViewerBtn" class="close-button">&times;</button>
             </div>
-            <div id="viewerContent" class="modal-body report-view">
-                </div>
+            <div id="viewerContent" class="modal-body report-view"></div>
             <div class="modal-footer">
                 <button id="printDocumentBtn" class="button-primary">Imprimir</button>
             </div>
@@ -91,7 +106,6 @@
             </div>
             <form id="readmitForm" class="modal-body" onsubmit="return false;">
                 <p>Reinternando o paciente <strong id="readmitPatientName"></strong>.</p>
-                
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="readmitUnitSelect">Nova Unidade de Destino</label>
@@ -110,11 +124,8 @@
                         <input type="datetime-local" id="readmissionDate" name="readmissionDate" required>
                     </div>
                 </div>
-
                 <hr>
-                
                 <h4>Novas Hipóteses Diagnósticas para esta Internação</h4>
-
                 <div class="form-group">
                     <label for="readmit_hd_primary_desc">Hipótese Diagnóstica Primária</label>
                     <div class="autocomplete-container">
@@ -124,7 +135,6 @@
                     <label for="readmit_hd_primary_cid" class="cid-label">CID-10</label>
                     <input type="text" id="readmit_hd_primary_cid" name="hd_primary_cid" placeholder="Ex: J18.9">
                 </div>
-    
                 <div class="form-group full-width">
                     <label>Diagnósticos Secundários</label>
                     <div id="readmit_secondary_diagnoses_container">
@@ -141,7 +151,6 @@
                     </div>
                     <button type="button" id="readmit_add_secondary_diag_btn" class="button-secondary small-btn">Adicionar outro diagnóstico</button>
                 </div>
-
             </form>
             <div class="modal-footer">
                 <button id="cancelReadmitBtn" class="button-secondary">Cancelar</button>
@@ -149,7 +158,6 @@
             </div>
         </div>
     </div>
-
 
     <script src="patient-view.js"></script>
 </body>
