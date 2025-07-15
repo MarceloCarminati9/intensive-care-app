@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const prescriptionsResult = await prescriptionsResponse.json();
             const combinedHistory = [
                 ...(evolutionsResult.data || []).map(item => ({ ...item, type: 'Evolução Médica' })),
-                ...(prescriptionsResult.data || []).map(item => ({ ...item, type: 'Receituário' })) // Mantido como Receituário para o histórico
+                ...(prescriptionsResult.data || []).map(item => ({ ...item, type: 'Prescrição' }))
             ];
             renderHistoryList(combinedHistory, patientData);
         } catch(error) {
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!historyList) return;
         historyList.innerHTML = '';
         if (!history || history.length === 0) {
-            historyList.innerHTML = '<p>Nenhum histórico de evoluções ou receitas encontrado.</p>';
+            historyList.innerHTML = '<p>Nenhum histórico de evoluções ou prescrições encontrado.</p>';
             return;
         }
         history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -169,9 +169,9 @@ document.addEventListener('DOMContentLoaded', function() {
             let buttonsHTML = '';
             if (item.type === 'Evolução Médica') {
                 const isDisabled = !!item.deleted_at;
-                buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button>`;
-            } else if (item.type === 'Receituário') {
-                buttonsHTML = `<button class="button-secondary" data-action="view">Visualizar/Imprimir</button>`;
+                buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button> `;
+            } else if (item.type === 'Prescrição') {
+                buttonsHTML = `<button class="button-secondary" data-action="view-prescription">Visualizar/Imprimir</button>`;
             }
             historyItemDiv.innerHTML = `<div class="history-item-content"><div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div><div class="history-item-actions">${buttonsHTML}</div></div>`;
             historyList.appendChild(historyItemDiv);
