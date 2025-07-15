@@ -158,16 +158,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // =================================================================================
-    // LÓGICA DE EVENTOS E MODAIS (COM A NOVA LÓGICA DE "FORÇAR")
+    // LÓGICA DE EVENTOS E MODAIS
     // =================================================================================
     
-    // ATUALIZADO: Função de fechar o modal agora reverte os estilos diretos
+    const openModal = (modal) => {
+        if (!modal) return;
+        // Pede ao navegador para executar esta ação no próximo ciclo de renderização
+        requestAnimationFrame(() => {
+            modal.style.display = 'flex'; // Ou 'block', dependendo do seu CSS
+            modal.style.visibility = 'visible';
+            // Adicionamos um pequeno delay para a opacidade para garantir que a transição CSS funcione
+            setTimeout(() => {
+                modal.style.opacity = '1';
+            }, 10);
+        });
+    };
+
     const closeModal = (modal) => { 
         if(modal) {
-            modal.classList.remove('active');
-            // Reverte os estilos diretos que forçaram a abertura
-            modal.style.display = 'none';
-            modal.style.visibility = 'hidden';
+            modal.style.opacity = '0';
+            // Espera a transição de opacidade terminar para esconder o modal
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+            }, 200); // O tempo deve ser igual à duração da sua transição CSS
 
             if (modal.id === 'addPatientModal' && patientForm && secondaryDiagnosesContainer) {
                 patientForm.reset();
@@ -194,17 +208,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
             const patientInfoP = bedCard.querySelector('.patient-info p');
             const patientName = patientInfoP && patientInfoP.lastChild ? patientInfoP.lastChild.textContent.trim() : 'Paciente';
+            
+            event.stopPropagation(); // Impede a propagação para todos os cliques em botões
     
             if (target.closest('.cadastrar-paciente-btn')) {
-                event.stopPropagation(); // Boa prática adicionar aqui também
                 if (patientModal) {
                     const bedNumberSpan = document.getElementById('modalLeitoNum');
                     if (bedNumberSpan) {
                          bedNumberSpan.textContent = bedCard.querySelector('h2').textContent.replace('Leito ','');
                     }
                     patientModal.dataset.bedId = bedCard.dataset.bedId;
-                    patientModal.style.display = 'flex'; // Usando estilo direto
-                    patientModal.style.visibility = 'visible';
+                    openModal(patientModal);
                 }
             }
             
@@ -214,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
     
             else if (target.closest('.dar-alta-btn')) {
-                event.stopPropagation(); // Evita conflitos
                 if (dischargeModal && dischargePatientName && dischargeDateInput) {
                     dischargePatientName.textContent = patientName;
                     dischargeModal.dataset.patientId = bedCard.dataset.patientId;
@@ -224,27 +237,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                     dischargeDateInput.value = now.toISOString().slice(0, 16);
                     
-                    dischargeModal.style.display = 'flex'; // Usando estilo direto
-                    dischargeModal.style.visibility = 'visible';
+                    openModal(dischargeModal);
                 }
             }
     
-            // ATUALIZADO: Lógica para FORÇAR a abertura do modal de transferência
             else if (target.closest('.transferir-paciente-btn')) {
-                // 1. Impedir que o evento se propague e cause conflitos
-                event.stopPropagation();
-
                 if (transferModal && transferPatientName && destinationUnitSelect && destinationBedSelect) {
                     transferPatientName.textContent = patientName;
                     transferModal.dataset.patientId = bedCard.dataset.patientId;
                     transferModal.dataset.oldBedId = bedCard.dataset.bedId;
                     
-                    // 2. Forçar a exibição do modal com estilos diretos
-                    // (Assumindo que o modal usa flex para centralizar. Se não, use 'block')
-                    transferModal.style.display = 'flex'; 
-                    transferModal.style.visibility = 'visible';
+                    openModal(transferModal); 
                     
-                    // 3. Buscar os dados em segundo plano, como antes
                     (async () => {
                         try {
                             const response = await fetch('/api/units-with-free-beds');
@@ -472,43 +476,3 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUnitAndBeds();
     loadCidData();
 });
-// ... dentro do seu arquivo unit-view.js
-
-if (bedGridContainer) {
-    bedGridContainer.addEventListener('click', function(event) {
-        // LOG DE DIAGNÓSTICO 1: Checar se qualquer clique está sendo detectado
-        console.log('Clique detectado no grid de leitos. Alvo do clique:', event.target);
-
-        const target = event.target;
-        const bedCard = target.closest('.bed-card');
-        if (!bedCard) {
-            // LOG DE DIAGNÓSTICO 2: Mensagem se o clique for fora de um card
-            console.log('Clique fora de um bed-card, ignorando.');
-            return;
-        }
-
-        // ...
-
-        if (target.closest('.cadastrar-paciente-btn')) {
-            // LOG DE DIAGNÓSTICO 3: Checar se o botão de cadastro é reconhecido
-            console.log('BOTÃO CADASTRAR RECONHECIDO');
-            // ... (resto do seu código para este botão)
-        }
-        
-        // ...
-
-        else if (target.closest('.dar-alta-btn')) {
-            // LOG DE DIAGNÓSTICO 4: Checar se o botão de alta é reconhecido
-            console.log('BOTÃO DAR ALTA RECONHECIDO');
-            // ... (resto do seu código para este botão)
-        }
-
-        else if (target.closest('.transferir-paciente-btn')) {
-            // LOG DE DIAGNÓSTICO 5: Checar se o botão de transferir é reconhecido
-            console.log('BOTÃO TRANSFERIR RECONHECIDO');
-            // ... (resto do seu código para este botão)
-        }
-    });
-}
-
-// ...
