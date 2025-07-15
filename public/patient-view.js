@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modal de Reinternação
     const readmitModal = document.getElementById('readmitModal');
+    const readmitForm = document.getElementById('readmitForm');
     const readmitPatientNameEl = document.getElementById('readmitPatientName');
     const closeReadmitModalBtn = document.getElementById('closeReadmitModal');
     const cancelReadmitBtn = document.getElementById('cancelReadmitBtn');
@@ -35,6 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmissionDateInput = document.getElementById('readmissionDate');
     let unitsWithFreeBeds = [];
 
+    // Elementos de Diagnóstico do Modal de Reinternação
+    const readmitHdPrimaryDesc = document.getElementById('readmit_hd_primary_desc');
+    const readmitHdPrimaryResults = document.getElementById('readmit_hd_primary_results');
+    const readmitHdPrimaryCid = document.getElementById('readmit_hd_primary_cid');
+    const readmitAddSecondaryDiagBtn = document.getElementById('readmit_add_secondary_diag_btn');
+    const readmitSecondaryDiagnosesContainer = document.getElementById('readmit_secondary_diagnoses_container');
+    
     // Elementos do Histórico
     const historyList = document.getElementById('historyList');
     const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
@@ -44,6 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewerContent = document.getElementById('viewerContent');
     const closeViewerBtn = document.getElementById('closeViewerBtn');
     const printDocumentBtn = document.getElementById('printDocumentBtn');
+    
+    // Variáveis para a lógica de busca de CID
+    let cid10Data = [];
+    let cidTimeout;
 
     if (!patientId) {
         document.body.innerHTML = '<h1>Erro: ID do paciente não fornecido.</h1><a href="dashboard.html">Voltar</a>';
@@ -51,8 +63,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =================================================================================
-    // FUNÇÕES DE RENDERIZAÇÃO E LÓGICA
+    // FUNÇÕES DE LÓGICA E RENDERIZAÇÃO
     // =================================================================================
+
+    async function loadCidData() {
+        try {
+            const response = await fetch('data/cid10.json'); 
+            if (!response.ok) throw new Error('Não foi possível carregar a lista de CIDs.');
+            cid10Data = await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     async function loadPageData() {
         try {
@@ -62,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             const patient = result.data;
 
-            // *** LINHA DE DIAGNÓSTICO IMPORTANTE ***
             console.log("Dados do paciente recebidos do servidor:", patient);
 
             renderPatientInfo(patient);
@@ -76,7 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderPatientInfo(patient) {
-        // 1. Preenche os dados gerais que aparecem sempre
         patientNameHeader.textContent = patient.name || 'Nome não encontrado';
         if(patientAgeEl) patientAgeEl.textContent = patient.age ? `${patient.age} anos` : 'N/A';
         if(patientCnsEl) patientCnsEl.textContent = patient.cns || 'N/A';
@@ -101,21 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
             patientHdEl.innerHTML = hdContent || '<p>Nenhuma hipótese diagnóstica cadastrada.</p>';
         }
 
-        // 2. Lógica condicional para exibir o status correto
         if (patient.discharge_date) {
-            // PACIENTE COM ALTA
             admissionContainer.style.display = 'none';
             dischargeContainer.style.display = 'block';
-
-            const dischargeReasons = {
-                'alta_enfermaria': 'Alta para Enfermaria',
-                'alta_domiciliar': 'Alta Domiciliar',
-                'obito': 'Óbito',
-                'transferencia_externa': 'Transferência Externa'
-            };
+            const dischargeReasons = { 'alta_enfermaria': 'Alta para Enfermaria', 'alta_domiciliar': 'Alta Domiciliar', 'obito': 'Óbito', 'transferencia_externa': 'Transferência Externa' };
             dischargeReasonEl.textContent = dischargeReasons[patient.discharge_reason] || patient.discharge_reason;
             dischargeDateEl.textContent = new Date(patient.discharge_date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-
             if (patient.discharge_reason === 'obito') {
                 readmitPatientBtn.textContent = 'Paciente em Óbito';
                 readmitPatientBtn.disabled = true;
@@ -123,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 readmitPatientBtn.addEventListener('click', () => openReadmitModal(patient));
             }
         } else {
-            // PACIENTE INTERNADO
             admissionContainer.style.display = 'block';
             dischargeContainer.style.display = 'none';
             if(patientBedEl) patientBedEl.textContent = `${patient.unit_name || 'Unidade'} - Leito ${patient.bed_number || 'N/A'}`;
@@ -136,19 +146,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 fetch(`/api/patients/${patientData.id}/evolutions`),
                 fetch(`/api/patients/${patientData.id}/prescriptions`)
             ]);
-
             if (!evolutionsResponse.ok || !prescriptionsResponse.ok) {
                 throw new Error('Falha ao buscar o histórico do paciente.');
             }
-
             const evolutionsResult = await evolutionsResponse.json();
             const prescriptionsResult = await prescriptionsResponse.json();
-
             const combinedHistory = [
                 ...(evolutionsResult.data || []).map(item => ({ ...item, type: 'Evolução Médica' })),
                 ...(prescriptionsResult.data || []).map(item => ({ ...item, type: 'Receituário' }))
             ];
-            
             renderHistoryList(combinedHistory, patientData);
         } catch(error) {
             console.error("Erro ao carregar histórico:", error);
@@ -233,6 +239,34 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="report-section"><h4>Condutas</h4><p>${getField('condutas')}</p></div>
             <div class="signature-area"><div class="signature-line">${getField('medico_responsavel')}<br>CRM: ${getField('crm_medico')}</div></div>
         `;
+    }
+    
+    function searchCid(query, resultsContainer) {
+        if (!resultsContainer) return;
+        resultsContainer.innerHTML = '';
+        if (query.length < 2) {
+            resultsContainer.classList.remove('active');
+            return;
+        }
+        const lowerCaseQuery = query.toLowerCase();
+        const results = cid10Data.filter(item => 
+            (item.display && item.display.toLowerCase().includes(lowerCaseQuery)) || 
+            (item.code && item.code.toLowerCase().includes(lowerCaseQuery))
+        ).slice(0, 10);
+        
+        if (results.length > 0) {
+            results.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                div.textContent = `${item.code} - ${item.display}`;
+                div.dataset.cid = item.code;
+                div.dataset.nome = item.display;
+                resultsContainer.appendChild(div);
+            });
+        } else {
+            resultsContainer.innerHTML = '<div class="autocomplete-item error-item">Nenhum resultado encontrado.</div>';
+        }
+        resultsContainer.classList.add('active');
     }
 
     // Lógica dos listeners de histórico
@@ -354,17 +388,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if(confirmReadmitBtn) {
         confirmReadmitBtn.addEventListener('click', async () => {
-            const newBedId = readmitBedSelect.value;
-            const newAdmissionDate = readmissionDateInput.value;
-            if (!newBedId || !newAdmissionDate) {
+            const secondaryDiagnoses = [];
+            if (readmitSecondaryDiagnosesContainer) {
+                readmitSecondaryDiagnosesContainer.querySelectorAll('.secondary-diagnosis-entry').forEach(entry => {
+                    const desc = entry.querySelector('.secondary_desc').value.trim();
+                    const cid = entry.querySelector('.secondary_cid').value.trim();
+                    if (desc) { secondaryDiagnoses.push({ desc, cid }); }
+                });
+            }
+
+            const readmissionData = {
+                bed_id: readmitBedSelect.value,
+                dih: readmissionDateInput.value,
+                hd_primary_desc: readmitHdPrimaryDesc.value.trim(),
+                hd_primary_cid: readmitHdPrimaryCid.value.trim(),
+                secondary_diagnoses: secondaryDiagnoses
+            };
+
+            if (!readmissionData.bed_id || !readmissionData.dih) {
                 alert('Por favor, selecione a unidade, o leito e a data de reinternação.');
                 return;
             }
+
             try {
                 const response = await fetch(`/api/patients/${patientId}/readmit`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ bed_id: newBedId, dih: newAdmissionDate })
+                    body: JSON.stringify(readmissionData)
                 });
                 if (!response.ok) throw new Error((await response.json()).error || 'Falha ao processar reinternação.');
                 alert('Paciente reinternado com sucesso!');
@@ -375,9 +425,73 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    if(readmitForm) {
+        readmitForm.addEventListener('input', (e) => {
+            const targetInput = e.target;
+            let resultsContainer;
+            if (targetInput.id === 'readmit_hd_primary_desc') {
+                resultsContainer = document.getElementById('readmit_hd_primary_results');
+            } else if (targetInput.classList.contains('secondary_desc')) {
+                resultsContainer = targetInput.closest('.autocomplete-container').querySelector('.autocomplete-results');
+            }
+
+            if (resultsContainer) {
+                clearTimeout(cidTimeout);
+                cidTimeout = setTimeout(() => searchCid(targetInput.value, resultsContainer), 150);
+            }
+        });
+
+        readmitForm.addEventListener('click', function(e) {
+            const item = e.target.closest('.autocomplete-item');
+            if (item && !item.classList.contains('error-item')) {
+                const container = item.parentElement;
+                const parentGroup = container.closest('.form-group') || container.closest('.secondary-diagnosis-entry');
+                
+                if (parentGroup) {
+                    const descInput = parentGroup.querySelector('#readmit_hd_primary_desc, .secondary_desc');
+                    const cidInput = parentGroup.querySelector('#readmit_hd_primary_cid, .secondary_cid');
+                    if (descInput && cidInput) {
+                        descInput.value = item.dataset.nome;
+                        cidInput.value = item.dataset.cid;
+                    }
+                }
+                container.innerHTML = '';
+                container.classList.remove('active');
+            }
+        });
+    }
+
+    if (readmitAddSecondaryDiagBtn) {
+        readmitAddSecondaryDiagBtn.addEventListener('click', () => {
+            const uniqueId = 'readmit_sec_diag_' + Date.now();
+            const newEntry = document.createElement('div');
+            newEntry.className = 'secondary-diagnosis-entry';
+            newEntry.innerHTML = `
+                <div class="autocomplete-container">
+                    <label for="${uniqueId}_desc" class="sr-only">Descrição do Diagnóstico Secundário</label>
+                    <textarea id="${uniqueId}_desc" name="secondary_desc[]" class="secondary_desc" rows="2" placeholder="Comece a digitar o diagnóstico..."></textarea>
+                    <div class="autocomplete-results"></div>
+                </div>
+                <label for="${uniqueId}_cid" class="cid-label">CID-10</label>
+                <input type="text" id="${uniqueId}_cid" name="secondary_cid[]" class="secondary_cid" placeholder="Ex: A00.1">
+                <button type="button" class="remove-diag-btn">&times;</button>
+            `;
+            if (readmitSecondaryDiagnosesContainer) readmitSecondaryDiagnosesContainer.appendChild(newEntry);
+        });
+    }
+    
+    if (readmitSecondaryDiagnosesContainer) {
+        readmitSecondaryDiagnosesContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-diag-btn')) {
+                e.target.closest('.secondary-diagnosis-entry').remove();
+            }
+        });
+    }
+
     if(closeReadmitModalBtn) closeReadmitModalBtn.addEventListener('click', closeReadmitModal);
     if(cancelReadmitBtn) cancelReadmitBtn.addEventListener('click', closeReadmitModal);
 
     // INICIALIZAÇÃO
     loadPageData();
+    loadCidData(); 
 });
