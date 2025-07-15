@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitButtonContainer = document.getElementById('readmit-button-container');
     const readmitPatientBtn = document.getElementById('readmitPatientBtn');
     
-    // CORREÇÃO: Selecionando os botões com seus IDs corretos
+    // Selecionando todos os botões de ação
     const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
     const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
     const goToReceitaBtn = document.getElementById('goToReceitaBtn');
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const patient = result.data;
             
             renderPatientInfo(patient);
-            updateActionLinks(patient.id);
+            updateActionLinks(patient.id); // Garante que os links são atualizados
             loadHistory(patient);
 
         } catch (error) {
@@ -189,17 +189,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (item.type === 'Evolução Médica') {
                 const isDisabled = !!item.deleted_at;
                 buttonsHTML = `<button class="button-secondary" data-action="view" ${isDisabled ? 'disabled' : ''}>Visualizar/Imprimir</button><button class="button-secondary" data-action="copy" ${isDisabled ? 'disabled' : ''}>Copiar para Nova</button><button class="button-secondary" data-action="edit" ${isDisabled ? 'disabled' : ''}>Editar</button><button class="button-danger" data-action="delete" ${isDisabled ? 'disabled' : ''}>Excluir</button>`;
-            } else if (item.type === 'Prescrição') {
+            } else if (item.type === 'Prescrição' || item.type === 'Receituário') {
                 buttonsHTML = `<button class="button-secondary" data-action="view-prescription">Visualizar/Imprimir</button>`;
-            } else if (item.type === 'Receituário') { // Mantido por segurança, caso existam dados antigos
-                 buttonsHTML = `<button class="button-secondary" data-action="view-receita">Visualizar/Imprimir</button>`;
             }
             historyItemDiv.innerHTML = `<div class="history-item-content"><div class="history-item-title">${item.type} - ${formattedCreationDate} às ${formattedCreationTime}${editedText}</div><div class="history-item-actions">${buttonsHTML}</div></div>`;
             historyList.appendChild(historyItemDiv);
         });
     }
 
-    // ATUALIZADO: Habilita todos os links de ação
+    // CORREÇÃO: Função atualizada para habilitar todos os botões de ação
     function updateActionLinks(pId) {
         if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?patientId=${pId}`;
         if (goToPrescriptionBtn) goToPrescriptionBtn.href = `prescricao.html?patientId=${pId}`;
