@@ -1,4 +1,4 @@
-// VERSÃO COM CORREÇÃO DEFINITIVA NA ORDEM DAS ROTAS - 14/07/2025
+// VERSÃO COM unit_id NA ROTA DE PACIENTE - 15/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -25,6 +25,7 @@ app.use(express.static(publicPath));
 const apiRouter = express.Router();
 
 // --- ROTAS DE UNIDADES E LEITOS ---
+// (Nenhuma alteração nesta seção)
 apiRouter.get('/units', async (req, res) => {
     try {
         const sql = `
@@ -140,17 +141,14 @@ apiRouter.post('/patients', async (req, res) => {
         const patientParams = [name, mother_name, dob, cns, hpp, allergies, bed_id];
         const patientResult = await client.query(patientSql, patientParams);
         const newPatientId = patientResult.rows[0].id;
-
         const admissionSql = `
             INSERT INTO admissions (patient_id, bed_id, admission_date, hd_primary_desc, hd_primary_cid, secondary_diagnoses)
             VALUES ($1, $2, $3, $4, $5, $6);
         `;
         const admissionParams = [newPatientId, bed_id, dih, hd_primary_desc, hd_primary_cid, JSON.stringify(secondary_diagnoses || [])];
         await client.query(admissionSql, admissionParams);
-
         const bedSql = `UPDATE beds SET status = 'occupied', patient_id = $1, patient_name = $2 WHERE id = $3;`;
         await client.query(bedSql, [newPatientId, name, bed_id]);
-        
         await client.query('COMMIT');
         res.status(201).json({ message: 'Paciente admitido com sucesso!', patientId: newPatientId });
     } catch (err) {
@@ -162,9 +160,7 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
-// =================================================================================
-// CORREÇÃO DEFINITIVA DE ORDEM: A rota '/search' PRECISA vir antes da rota '/:id'
-// =================================================================================
+// A ROTA DE BUSCA (/search) DEVE VIR ANTES da rota genérica (/:id)
 apiRouter.get('/patients/search', async (req, res) => {
     const { q } = req.query; 
     if (!q || q.length < 3) { return res.status(400).json({ error: 'O termo de busca deve ter pelo menos 3 caracteres.' }); }
@@ -189,6 +185,7 @@ apiRouter.get('/patients/search', async (req, res) => {
     }
 });
 
+// ATUALIZADO: Buscar os dados de um paciente, incluindo o ID da sua unidade
 apiRouter.get('/patients/:id', async (req, res) => {
     try {
         const sql = `
@@ -196,6 +193,7 @@ apiRouter.get('/patients/:id', async (req, res) => {
                 p.id, p.name, p.mother_name, p.dob, p.cns, p.hpp, p.allergies, p.current_bed_id,
                 b.bed_number, 
                 u.name as unit_name,
+                u.id as unit_id, -- CAMPO ADICIONADO
                 a.admission_date as dih,
                 a.discharge_date,
                 a.discharge_reason,
