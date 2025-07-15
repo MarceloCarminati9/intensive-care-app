@@ -1,366 +1,1748 @@
 [
   {
-    "medicamento": "Dieta enteral via sonda nasoentérica",
-    "posologia_completa": "Dieta enteral via sonda nasoentérica (META: 700kcal/dia + 40g proteína/dia), infusão contínua"
+    "medicamento": "AAS (Ácido acetilsalicílico)",
+    "posologia_completa": "AAS 100mg, 1 comprimido, via oral, após almoço"
+  },
+  {
+    "medicamento": "Aciclovir",
+    "posologia_completa": "Aciclovir 250mg, diluir em SF 0,9% 100mL, via EV, de 8/8 horas"
+  },
+  {
+    "medicamento": "Adrenalina (Epinefrina)",
+    "posologia_completa": "Adrenalina 1mg/mL, 4 ampolas em SG 5% 96mL, via EV em BIC"
   },
   {
     "medicamento": "Água filtrada via sonda nasoentérica",
-    "posologia_completa": "Água filtrada via sonda nasoentérica, 150mL de 4/4 horas"
+    "posologia_completa": "Água filtrada via sonda nasoentérica, 200mL de 4/4 horas"
   },
   {
     "medicamento": "Água filtrada via sonda nasoentérica com Whey Protein",
     "posologia_completa": "Água filtrada via sonda nasoentérica, 150mL + 1 colher de sopa de Whey Protein de 4/4 horas"
   },
   {
-    "medicamento": "SF 0,9% 500mL",
-    "posologia_completa": "SF 0,9% 500mL, via EV, ACM"
-  },
-  {
-    "medicamento": "SF 0,9% 500mL + Eletrólitos",
-    "posologia_completa": "SF 0,9% 500mL + Cloreto de potássio 10% 10mL + Gluconato de cálcio 10% 10mL + Sulfato de magnésio 10% 10mL, via EV, de 6/6 horas"
-  },
-  {
-    "medicamento": "SF 0,9% 500mL + Glicose 50%",
-    "posologia_completa": "SF 0,9% 500mL + Glicose 50% 50mL, via EV, de 6/6 horas"
-  },
-  {
-    "medicamento": "SRL 500mL",
-    "posologia_completa": "SRL 500mL, via EV, de 6/6 horas"
-  },
-  {
-    "medicamento": "SRL 500mL + Eletrólitos",
-    "posologia_completa": "SRL 500mL + Cloreto de potássio 10% 10mL + Gluconato de cálcio 10% 10mL + Sulfato de magnésio 10% 10mL, via EV, de 6/6 horas"
-  },
-  {
-    "medicamento": "SRL 500mL + Glicose 50%",
-    "posologia_completa": "SRL 500mL + Glicose 50% 50mL, via EV, de 6/6 horas"
-  },
-  {
-    "medicamento": "Gluconato de cálcio 10%",
-    "posologia_completa": "Gluconato de cálcio 10%, diluir 20mL em SF 0,9% 100mL, via EV em 20 minutos"
-  },
-  {
-    "medicamento": "Sulfato de magnésio 10%",
-    "posologia_completa": "Sulfato de magnésio 10%, diluir 20mL em SF 0,9% 100mL, via EV em 1 hora"
-  },
-  {
-    "medicamento": "Sulfato de magnésio 50%",
-    "posologia_completa": "Sulfato de magnésio 50%, diluir 5mL em SF 0,9% 100mL, via EV em 1 hora"
-  },
-  {
-    "medicamento": "Cloreto de potássio 10%",
-    "posologia_completa": "Cloreto de potássio 10% (100mg/mL), diluir 30mL em 220 mL de SF 0,9%, via EV, infundir em 3h ACM"
-  },
-  {
-    "medicamento": "Rosuvastatina",
-    "posologia_completa": "Rosuvastatina [20mg] VSNE 01x/dia"
-  },
-  {
-    "medicamento": "Aciclovir",
-    "posologia_completa": "Aciclovir (FA de 250mg), diluir em AD 20mL, diluir em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 1 hora"
-  },
-  {
     "medicamento": "Amicacina",
-    "posologia_completa": "Amicacina (1g), diluir em SF 0,9% 100mL, via EV 1x/dia, infundir em 1 hora"
+    "posologia_completa": "Amicacina 500mg, diluir em SF 0,9% 100mL, via EV, 1x/dia"
+  },
+  {
+    "medicamento": "Amiodarona",
+    "posologia_completa": "Amiodarona 150mg/3mL, 6 ampolas em SG 5% 232mL, via EV em BIC, 1mL/min por 6h, depois 0,5mL/min por 18h"
+  },
+  {
+    "medicamento": "Amoxicilina",
+    "posologia_completa": "Amoxicilina 500mg, 1 comprimido, via oral, de 8/8 horas, por 7 dias"
   },
   {
     "medicamento": "Ampicilina + Sulbactam",
-    "posologia_completa": "Ampicilina + Sulbactam (3g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 4 oras"
-  },
-  {
-    "medicamento": "Clavulin (Amoxicilina + Clavulanato)",
-    "posologia_completa": "Clavulin (1,2g), reconstituir em AD 20mL, diluir em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 30 minutos"
+    "posologia_completa": "Ampicilina + Sulbactam 3g, diluir em SF 0,9% 100mL, via EV, de 6/6 horas"
   },
   {
     "medicamento": "Anfotericina B",
-    "posologia_completa": "Anfotericina B (50mg), reconstituir em AD 10mL, diluir em SG 5% 250mL, via EV 1x/dia, infundir em 4 horas"
+    "posologia_completa": "Anfotericina B 50mg, diluir em SG 5% 500mL, via EV, em 4-6 horas"
   },
   {
-    "medicamento": "Azitromicina",
-    "posologia_completa": "Azitromicina (500mg), reconstituir em AD 5mL, diluir em SF 0,9% 250mL, via EV 1x/dia, infundir em 1 hora"
+    "medicamento": "Anlodipino",
+    "posologia_completa": "Anlodipino 5mg, 1 comprimido, via oral, 1x/dia"
   },
   {
-    "medicamento": "Cefalotina",
-    "posologia_completa": "Cefalotina (1g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 30 minutos"
+    "medicamento": "Apixabana",
+    "posologia_completa": "Apixabana 5mg, 1 comprimido, via oral, de 12/12 horas"
   },
   {
-    "medicamento": "Claritromicina",
-    "posologia_completa": "Claritromicina (500mg/10ml) diluir em SF 0,9% 250mL, via EV de 12/12 horas, infundir em 60 minutos"
+    "medicamento": "Artemeter + Lumefantrina",
+    "posologia_completa": "Artemeter 20mg + Lumefantrina 120mg, via oral, conforme protocolo do MS"
+  },
+  {
+    "medicamento": "Atenolol",
+    "posologia_completa": "Atenolol 50mg, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Azitromicina EV",
+    "posologia_completa": "Azitromicina 500mg, diluir em SF 0,9% 250mL, via EV, 1x/dia"
+  },
+  {
+    "medicamento": "Azitromicina Oral",
+    "posologia_completa": "Azitromicina 500mg, 1 comprimido, via oral, 1x/dia por 3 dias"
+  },
+  {
+    "medicamento": "Bicarbonato de Sódio 8,4%",
+    "posologia_completa": "Bicarbonato de Sódio 8,4%, 100mL, via EV, em 1 hora"
+  },
+  {
+    "medicamento": "Bromoprida",
+    "posologia_completa": "Bromoprida 10mg, 1 ampola, via EV, de 8/8h, se náuseas ou vômitos"
+  },
+  {
+    "medicamento": "Captopril",
+    "posologia_completa": "Captopril 25mg, 1 comprimido, via oral, de 8/8 horas"
+  },
+  {
+    "medicamento": "Carvedilol",
+    "posologia_completa": "Carvedilol 12,5mg, 1 comprimido, via oral, de 12/12 horas"
+  },
+  {
+    "medicamento": "Cefalexina",
+    "posologia_completa": "Cefalexina 500mg, 1 comprimido, via oral, de 6/6 horas, por 7 dias"
   },
   {
     "medicamento": "Cefepime",
-    "posologia_completa": "Cefepime (2g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 4 horas"
-  },
-  {
-    "medicamento": "Caspofungina",
-    "posologia_completa": "Caspofungina 70mg- 01FA + 10ml de AD. Reconstituir para 150ml de sf0.9% EV 1xdia. Infusão em 1 hora"
-  },
-  {
-    "medicamento": "Gentamicina",
-    "posologia_completa": "Gentamicina (80mg/2ml ), diluir em 200mL de SF 0,9%, infundir em 30min, EV 8/8hs"
+    "posologia_completa": "Cefepime 2g, diluir em SF 0,9% 100mL, via EV, de 8/8 horas"
   },
   {
     "medicamento": "Ceftriaxona",
-    "posologia_completa": "Ceftriaxona (1g), reconstituir em AD 10mL, diluir em SF 0,9% 100mL, via EV de 12/12 horas, infundir em 30 minutos"
+    "posologia_completa": "Ceftriaxona 1g, diluir em SF 0,9% 100mL, via EV, de 12/12 horas"
+  },
+  {
+    "medicamento": "Cetamina (Ketamina)",
+    "posologia_completa": "Cetamina 500mg/10mL, ___ mg, via EV, para sedação"
   },
   {
     "medicamento": "Ciprofloxacina",
-    "posologia_completa": "Ciprofloxacina (400mg), via EV de 12/12 horas, infundir em 1 hora"
+    "posologia_completa": "Ciprofloxacina 400mg, via EV, de 12/12 horas"
+  },
+  {
+    "medicamento": "Cisatracúrio",
+    "posologia_completa": "Cisatracúrio 10mg/5mL, via EV em BIC, para bloqueio neuromuscular"
   },
   {
     "medicamento": "Clindamicina",
     "posologia_completa": "Clindamicina (600mg), diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 1 hora"
   },
   {
-    "medicamento": "Linezolida",
-    "posologia_completa": "Linezolida (2mg/ml), infundir 600mg via Endovenosa de 12 em 12 horas, tempo de infusão 1h"
+    "medicamento": "Clonazepam",
+    "posologia_completa": "Clonazepam 2mg, 1 comprimido, via oral, à noite"
   },
   {
-    "medicamento": "Fluconazol EV",
-    "posologia_completa": "Fluconazol 200mg/100mL, via EV 1x/dia, infundir em 1 hora"
+    "medicamento": "Clopidogrel",
+    "posologia_completa": "Clopidogrel 75mg, 1 comprimido, via oral, 1x/dia"
   },
   {
-    "medicamento": "Fluconazol SNE",
-    "posologia_completa": "Fluconazol 150mg por SNE 1x/dia"
+    "medicamento": "Cloreto de Potássio 19,1% (KCl)",
+    "posologia_completa": "KCl 19,1%, 10mL em cada SG 5% 500mL (NÃO PODE SER EM SF)"
   },
   {
-    "medicamento": "Imipenem",
-    "posologia_completa": "Imipenem (1g), diluir em SG 5% 100mL, via EV de 8/8 horas, infundir em 3 horas"
+    "medicamento": "Cloreto de Sódio 20% (NaCl)",
+    "posologia_completa": "NaCl 20%, 10mL em cada SF 0,9% 500mL"
   },
   {
-    "medicamento": "Metronidazol",
-    "posologia_completa": "Metronidazol (500mg), administrar a solução pronta, via EV de 8/8 horas, infundir lento"
+    "medicamento": "Cloroquina",
+    "posologia_completa": "Difosfato de Cloroquina 150mg, via oral, conforme protocolo do MS"
   },
   {
-    "medicamento": "Levofloxacina",
-    "posologia_completa": "Levofloxacina (750mg), via EV 1x/dia, infundir em 1 hora"
+    "medicamento": "Dexmedetomidina (Precedex)",
+    "posologia_completa": "Dexmedetomidina 200mcg/2mL, diluir 2 ampolas em SF 0,9% 96mL, via EV em BIC"
   },
   {
-    "medicamento": "Meropenem",
-    "posologia_completa": "Meropenem (1g), diluir em SG 5% 100mL, via EV de 8/8 horas, infundir em 3 horas"
+    "medicamento": "Dexametasona",
+    "posologia_completa": "Dexametasona 4mg, via EV, de 6/6 horas"
   },
   {
-    "medicamento": "Artesunato",
-    "posologia_completa": "Artesunato 170mg (3 frascos), reconstitua cada frasco em 1mL da ampola de bicarbonato, dilua em 5mL da solução salina, administre 17mL, via EV 1x/dia, em 1 hora"
+    "medicamento": "Diazepam",
+    "posologia_completa": "Diazepam 10mg, via EV, se agitação ou convulsão"
   },
   {
-    "medicamento": "Polimixina B",
-    "posologia_completa": "Polimixina B 500.000 UI (02 Frascos- DOSE TOTAL 1.000.000 UI) + SG5% 500 ml, via EV em BIC de 12/12hs infundir em 60min"
+    "medicamento": "Dieta Branda",
+    "posologia_completa": "Dieta Branda, via oral, a critério."
   },
   {
-    "medicamento": "Tazocin (Piperacilina/Tazobactam)",
-    "posologia_completa": "Tazocin (4,5g), reconstituir em SF 0,9% 20mL, diluir em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 3H"
+    "medicamento": "Dieta enteral via sonda nasoentérica",
+    "posologia_completa": "Dieta enteral via sonda nasoentérica (META: 1800kcal/dia + 70g proteína/dia), infusão contínua"
   },
   {
-    "medicamento": "Teicoplamina",
-    "posologia_completa": "Teicoplamina 400mg, reconstituir em 3ml de AD, diluir em SF 0,9% 100ml e infudir EV 12/12hs a correr em 20 minutos"
+    "medicamento": "Dieta Hipossódica",
+    "posologia_completa": "Dieta Hipossódica, via oral, conforme prescrição da nutrição."
   },
   {
-    "medicamento": "Tigeciclina",
-    "posologia_completa": "Tigeciclina 50mg + SG5% 100ml a correr 1h EV 12/12hs"
+    "medicamento": "Dieta Livre / Geral",
+    "posologia_completa": "Dieta Livre / Geral, via oral, a critério."
   },
   {
-    "medicamento": "Vancomicina",
-    "posologia_completa": "Vancomicina (1g), reconstituir em AD 10mL, diluir em SF 0,9% 250mL, via EV de 12/12 horas e infundir em 1 hora"
+    "medicamento": "Dieta Líquida Completa",
+    "posologia_completa": "Dieta Líquida Completa, via oral, a critério."
   },
   {
-    "medicamento": "Noradrenalina",
-    "posologia_completa": "Noradrenalina (4mg/4mL), diluir 5 ampolas em SG 5% 80mL, via EV (acesso venoso central), infundir em BIC"
+    "medicamento": "Dieta Líquida de Prova",
+    "posologia_completa": "Dieta Líquida de Prova, via oral, a critério."
   },
   {
-    "medicamento": "Adrenalina (Epinefrina)",
-    "posologia_completa": "Adrenalina (1mg/mL), diluir 4 ampolas em SG 5% 100mL, via EV (acesso venoso central), infundir em BIC"
+    "medicamento": "Dieta para Diabéticos (DM)",
+    "posologia_completa": "Dieta para DM, via oral, conforme prescrição da nutrição."
+  },
+  {
+    "medicamento": "Dieta para Insuficiência Renal (IRC)",
+    "posologia_completa": "Dieta para IRC, via oral, conforme prescrição da nutrição."
+  },
+  {
+    "medicamento": "Dieta Pastosa",
+    "posologia_completa": "Dieta Pastosa, via oral, a critério."
+  },
+  {
+    "medicamento": "Digoxina",
+    "posologia_completa": "Digoxina 0,25mg, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Dipirona",
+    "posologia_completa": "Dipirona 1g, via EV, de 6/6h, se dor ou febre T > 37.8°C"
   },
   {
     "medicamento": "Dobutamina",
-    "posologia_completa": "Dobutamina (250mg/20mL), diluir 80 ml em SF 0,9% 170mL, via EV, infundir em BIC"
+    "posologia_completa": "Dobutamina 250mg/20mL, 1 ampola em SF 0,9% 230mL, via EV em BIC"
   },
   {
-    "medicamento": "Nitroglicerina (Tridil)",
-    "posologia_completa": "Nitroglicerina (Tridil 50mg/10mL), diluir 1 ampola em SG 5% 250mL, via EV, infundir em BIC"
+    "medicamento": "Dopamina",
+    "posologia_completa": "Dopamina 50mg/10mL, 5 ampolas em SG 5% 200mL, via EV em BIC"
   },
   {
-    "medicamento": "Nitroprussiato (Nipride)",
-    "posologia_completa": "Nitroprussiato (Niprid 50mg/2mL), diluir 1 ampola em SG 5% 250ml, via EV, infundir em BIC"
+    "medicamento": "Doxiciclina",
+    "posologia_completa": "Doxiciclina 100mg, 1 comprimido, via oral, de 12/12 horas, por 14 dias"
   },
   {
-    "medicamento": "Vasopressina",
-    "posologia_completa": "Vasopressina 20U/mL – 1 ampola + 99mL de SG 5% (vazão de 6mL a 24mL/h)"
+    "medicamento": "Enalapril",
+    "posologia_completa": "Enalapril 20mg, 1 comprimido, via oral, 1x/dia"
   },
   {
-    "medicamento": "Amiodarona (Ataque)",
-    "posologia_completa": "Amiodarona (150mg/3mL), diluir em SG 5% 100mL, via EV em 15 minutos"
+    "medicamento": "Enoxaparina",
+    "posologia_completa": "Enoxaparina 40mg, 1 seringa, via SC, 1x/dia"
   },
   {
-    "medicamento": "Amiodarona (Manutenção)",
-    "posologia_completa": "Amiodarona (150mg/3mL), diluir 6 ampolas em SG 5% 250mL, via EV em BIC, 18mL/h nas primeiras 6 horas e 9mL/h por 18 horas"
-  },
-  {
-    "medicamento": "Propofol",
-    "posologia_completa": "Propofol (10mg/mL), sem diluição, via EV, em BIC, 10mL/h ou ACM"
-  },
-  {
-    "medicamento": "Remifentanila",
-    "posologia_completa": "Remifentanila 02 Amp + SF0,9% 80 ml via EV em BIC"
+    "medicamento": "Espinolactona",
+    "posologia_completa": "Espinolactona 25mg, 1 comprimido, via oral, 1x/dia"
   },
   {
     "medicamento": "Fentanil",
-    "posologia_completa": "Fentanil (50mcg/mL), sem diluição, via EV, em BIC, 3mL/h"
+    "posologia_completa": "Fentanil 50mcg/mL, 10mL em SF 0,9% 90mL, via EV em BIC"
   },
   {
-    "medicamento": "Midazolam",
-    "posologia_completa": "Midazolam (5mg/mL), diluir 4 amp + SF09% 160ml , via EV, em BIC"
+    "medicamento": "Fosfato de Potássio",
+    "posologia_completa": "Fosfato de Potássio 2mEq/mL, ___ mL, via EV, em ___"
   },
   {
-    "medicamento": "Dexmedetomidina",
-    "posologia_completa": "Dexmedetomidina (200mcg/2mL), diluir 2 ampolas em SF 0,9% 100mL, via EV, em BIC"
+    "medicamento": "Furosemida",
+    "posologia_completa": "Furosemida 20mg, 1 ampola, via EV, de 12/12 horas"
   },
   {
-    "medicamento": "Tramadol",
-    "posologia_completa": "Tramadol (100mg/2mL), diluir 1 ampola em SF 0,9% 100mL, via EV de 6/6 horas, infundir em 30 minutos"
+    "medicamento": "Glibenclamida",
+    "posologia_completa": "Glibenclamida 5mg, 1 comprimido, via oral, antes do café da manhã"
   },
   {
-    "medicamento": "Suxametonio",
-    "posologia_completa": "Suxametonio (500mg) Diluir 2 FA 1g + SG5% 500ml X BIC"
+    "medicamento": "Gliclazida",
+    "posologia_completa": "Gliclazida 30mg, 1 comprimido, via oral, pela manhã"
   },
   {
-    "medicamento": "Rocuronio",
-    "posologia_completa": "Rocuronio (50mg/5mL) 4 ampolas + SG 5% 100mL, via EV em BIC"
+    "medicamento": "Gluconato de cálcio 10%",
+    "posologia_completa": "Gluconato de cálcio 10%, 10mL em SF 0,9% 100mL, via EV, em 20 minutos"
   },
   {
-    "medicamento": "Lidocaína (Sem vasoconstritor)",
-    "posologia_completa": "Lidocaína (Sem vasoconstritor) diluir 20ml em SF0,9% 200mL, via EV em BIC"
-  },
-  {
-    "medicamento": "Haldol + Prometazina",
-    "posologia_completa": "Prometazina (50mgr)+haldol (5mgr) +18ml AD EV 8/8h Na Falta de Bloqueador Neuromuscular"
-  },
-  {
-    "medicamento": "Morfina (BIC)",
-    "posologia_completa": "Morfina 4 amp + 100ml de SF0,9%, EV em BIC, em falta de Fentanil e Remifentanila"
-  },
-  {
-    "medicamento": "Ketodex (Cetamina + Dexmedetomidina)",
-    "posologia_completa": "Ketodex (solução padrão) Dexmedetomidina (200mcg/2mL) 4 ampolas + Cetamina (500mg/10mL) 4 ampolas diluídos em SF 0,9% 200mL, via EV, em BIC"
-  },
-  {
-    "medicamento": "Cisatracurio",
-    "posologia_completa": "Cisatracurio 5 Amp + SF09% 250ml X BIC"
+    "medicamento": "Haloperidol",
+    "posologia_completa": "Haloperidol 5mg, 1 ampola, via IM, se agitação intensa"
   },
   {
     "medicamento": "Heparina não fracionada (Bomba de Infusão)",
     "posologia_completa": "Heparina não fracionada (5000UI/1mL)-5ml + 245ml SG5%, EV em BIC (Concentração final= 100UI/mL)"
   },
   {
-    "medicamento": "Enoxaparina sódica",
-    "posologia_completa": "Enoxaparina sódica (20mg/0,2mL), administrar 0,2mL via SC de 1x/dia Gelo Antes e Após"
-  },
-  {
-    "medicamento": "Heparina não fracionada (SC)",
-    "posologia_completa": "Heparina não fracionada (5.000UI/0,25mL) administrar 0,25mL, via SC de 12/12 horas (gelo antes e após aplicação)"
-  },
-  {
-    "medicamento": "Insulina regular (Bomba de Infusão)",
-    "posologia_completa": "Insulina regular 100UI (1mL) diluir em SF 0,9% 100mL, via EV, em BIC conforme protocolo de correção"
-  },
-  {
-    "medicamento": "Ranitidina",
-    "posologia_completa": "Ranitidina (50mg/mL), diluir 1 ampola de AD 10mL, via EV de 8/8 horas"
-  },
-  {
-    "medicamento": "Omeprazol EV",
-    "posologia_completa": "Omeprazol (frasco 40mg), reconstituir o frasco em diluente próprio, via EV 1x/dia, infundir lento"
-  },
-  {
-    "medicamento": "Omeprazol SNE",
-    "posologia_completa": "Omeprazol 40mg, comprimido via SNE, 1x/dia, SE AUSÊNCIA DA APRESENTAÇÃO INJETÁVEL"
-  },
-  {
-    "medicamento": "Dipirona",
-    "posologia_completa": "Dipirona [500mg/ml] diluir 2ml em AD 10ml via EV de 6/6h, SE DOR OU FEBRE"
-  },
-  {
-    "medicamento": "Metoclopramida",
-    "posologia_completa": "Metoclopramida (5mg/mL), diluir 2mL em 10mL de AD, via EV de 8/8 horas, infundir lento, se náuseas ou vômitos"
-  },
-  {
-    "medicamento": "Bromoprida",
-    "posologia_completa": "Bromoprida (10mg/2mL), diluir 2mL em 10mL de AD, via EV de 8/8 horas, infundir lento"
+    "medicamento": "Hidroclorotiazida",
+    "posologia_completa": "Hidroclorotiazida 25mg, 1 comprimido, via oral, pela manhã"
   },
   {
     "medicamento": "Hidrocortisona",
-    "posologia_completa": "Hidrocortisona (100mg), reconstituir em AD 10mL, diluir em SF 0,9% 10mL, via EV de 8/8 horas, infundir lento"
+    "posologia_completa": "Hidrocortisona 100mg, via EV, de 8/8 horas"
   },
   {
-    "medicamento": "Dexametasona",
-    "posologia_completa": "Dexametasona (4mg/mL), diluir 1,5mL (6 mg) em 10mL de SF 0,9%, via EV 1x/dia, infundir lento"
+    "medicamento": "Insulina NPH",
+    "posologia_completa": "Insulina NPH, ___ UI, via SC, às 22h"
   },
   {
-    "medicamento": "NBZ com Atrovent",
-    "posologia_completa": "NBZ: Atrovent 40 gotas + SF 0,9% 05 ml, de 20/20 minutos até 03x em 01 hora, em aeroneb"
+    "medicamento": "Insulina Regular",
+    "posologia_completa": "Insulina Regular, via SC, conforme glicemia capilar"
   },
   {
-    "medicamento": "Hidralazina",
-    "posologia_completa": "Hidralazina (20mg/mL), diluir em AD 10mL, via EV ACM"
+    "medicamento": "Insulina Regular (Bomba de Infusão)",
+    "posologia_completa": "Insulina Regular 100UI em SF 0,9% 99mL, via EV em BIC, conforme protocolo"
   },
   {
-    "medicamento": "Glicemia capilar",
-    "posologia_completa": "Glicemia capilar de 4/4 horas. Correções conforme tabela na folha de balanço"
+    "medicamento": "Levofloxacina",
+    "posologia_completa": "Levofloxacina 750mg, 1 frasco, via EV, 1x/dia"
   },
   {
-    "medicamento": "Hipromelose 0,5%",
-    "posologia_completa": "Hipromelose 0,5% 2 gotas em cada olho de 4/4h."
+    "medicamento": "Linezolida",
+    "posologia_completa": "Linezolida (2mg/ml), infundir 600mg via Endovenosa de 12 em 12 horas, tempo de infusão 1h"
   },
   {
-    "medicamento": "Banho com clorexidine",
-    "posologia_completa": "Banho diário com clorexidine 2 ou 4%"
+    "medicamento": "Losartana",
+    "posologia_completa": "Losartana 50mg, 1 comprimido, via oral, 1x/dia"
   },
   {
-    "medicamento": "Higiene oral com clorexidina",
-    "posologia_completa": "Higiene oral com clorexidina 0,12% 3x/dia"
+    "medicamento": "Manitol 20%",
+    "posologia_completa": "Manitol 20% 250mL, via EV, correr em 30 minutos"
   },
   {
-    "medicamento": "Mudança de decúbito",
-    "posologia_completa": "Mudança de decúbito de 2/2 horas, conforme protocolo da instituição"
+    "medicamento": "Meropenem",
+    "posologia_completa": "Meropenem 1g, diluir em SF 0,9% 100mL, via EV, de 8/8 horas"
   },
   {
-    "medicamento": "Cabeceira elevada",
-    "posologia_completa": "Cabeceira elevada 35º"
+    "medicamento": "Metformina",
+    "posologia_completa": "Metformina 500mg, 1 comprimido, via oral, 2x/dia"
   },
   {
-    "medicamento": "FST Motora e Respiratória",
-    "posologia_completa": "FST Motora e Resp"
+    "medicamento": "Metilprednisolona",
+    "posologia_completa": "Metilprednisolona 125mg, via EV, de 6/6 horas"
   },
   {
-    "medicamento": "Buscopan composto",
-    "posologia_completa": "Buscopan composto (4mg/ml + 500mg/ml) 1 ampola + SG 5% 20 ml EV lento 8/8 horas"
+    "medicamento": "Metoclopramida (Plasil)",
+    "posologia_completa": "Metoclopramida 10mg, via EV, de 8/8h, se náuseas ou vômitos"
   },
   {
-    "medicamento": "Vitamina K",
-    "posologia_completa": "Vit K 1 Amp IM 12/12hs"
+    "medicamento": "Metronidazol",
+    "posologia_completa": "Metronidazol 500mg, 1 frasco, via EV, de 8/8 horas"
   },
   {
-    "medicamento": "Ácido Tranexâmico (Transamin)",
-    "posologia_completa": "Transamin 50mg/ml Fazer 10ml(500mg) + SF09% 100ml EV 8/8hs"
+    "medicamento": "Midazolam",
+    "posologia_completa": "Midazolam 50mg em SF 0,9% 85mL, via EV em BIC"
   },
   {
-    "medicamento": "Fenitoina",
-    "posologia_completa": "Fenitoina (50mg/mL), diluir 2mL em SF 0,9% 100mL, via EV de 8/8 horas, infundir em 30 minutos"
+    "medicamento": "Milrinona",
+    "posologia_completa": "Milrinona 20mg em SG 5% 80mL, via EV em BIC"
   },
   {
-    "medicamento": "Cetoprofeno",
-    "posologia_completa": "Cetoprofeno 100 mg - reconstituir em 10 ml de AD e diluir em 100 ml de SF 0,9% - via EV 8/8h"
+    "medicamento": "Morfina",
+    "posologia_completa": "Morfina 2mg, via EV, de 4/4h, se dor"
+  },
+  {
+    "medicamento": "Nebivolol",
+    "posologia_completa": "Nebivolol 5mg, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Nitroprussiato de Sódio (Nipride)",
+    "posologia_completa": "Nipride 50mg em SG 5% 248mL, via EV em BIC (proteger da luz)"
+  },
+  {
+    "medicamento": "Noradrenalina",
+    "posologia_completa": "Noradrenalina 16mg em SG 5% 84mL, via EV em BIC"
+  },
+  {
+    "medicamento": "Omeprazol",
+    "posologia_completa": "Omeprazol 40mg, 1 frasco, via EV, 1x/dia"
   },
   {
     "medicamento": "Ondansetrona",
-    "posologia_completa": "Ondansetrona 2 mg/ml (1 ampola 4ml- 8 mg) + SF 0,9% 20 ml via EV lento 8/8h"
+    "posologia_completa": "Ondansetrona 8mg, via EV, de 8/8h, se náuseas ou vômitos"
+  },
+  {
+    "medicamento": "Pantoprazol",
+    "posologia_completa": "Pantoprazol 40mg, 1 frasco, via EV, 1x/dia"
+  },
+  {
+    "medicamento": "Paracetamol",
+    "posologia_completa": "Paracetamol 750mg, 1 comprimido, via oral, de 6/6h, se dor ou febre"
+  },
+  {
+    "medicamento": "Piperacilina + Tazobactam (Tazocin)",
+    "posologia_completa": "Tazocin 4,5g, diluir em SF 0,9% 100mL, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "Prednisona",
+    "posologia_completa": "Prednisona 20mg, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Primaquina",
+    "posologia_completa": "Bissulfato de Primaquina 15mg, via oral, conforme protocolo do MS"
+  },
+  {
+    "medicamento": "Propofol",
+    "posologia_completa": "Propofol 10mg/mL, via EV em BIC, para sedação contínua"
+  },
+  {
+    "medicamento": "Quetiapina",
+    "posologia_completa": "Quetiapina 25mg, 1 comprimido, via oral, à noite"
+  },
+  {
+    "medicamento": "Ranitidina",
+    "posologia_completa": "Ranitidina 50mg, via EV, de 8/8 horas"
+  },
+  {
+    "medicamento": "Remifentanil",
+    "posologia_completa": "Remifentanil 2mg, 2 ampolas em SF 0,9% 96mL, via EV em BIC"
+  },
+  {
+    "medicamento": "Rocurônio",
+    "posologia_completa": "Rocurônio 50mg, via EV, para bloqueio neuromuscular"
+  },
+  {
+    "medicamento": "Salbutamol Spray (Aerolin)",
+    "posologia_completa": "Salbutamol 100mcg/jato, 4 jatos, via inalatória, de 6/6 horas"
+  },
+  {
+    "medicamento": "Sertralina",
+    "posologia_completa": "Sertralina 50mg, 1 comprimido, via oral, pela manhã"
+  },
+  {
+    "medicamento": "SF 0,9% 1000mL",
+    "posologia_completa": "SF 0,9% 1000mL, via EV, de 8/8 horas"
+  },
+  {
+    "medicamento": "SG 5% 500mL",
+    "posologia_completa": "SG 5% 500mL, via EV, de 8/8 horas"
+  },
+  {
+    "medicamento": "Sinvastatina",
+    "posologia_completa": "Sinvastatina 40mg, 1 comprimido, via oral, à noite"
+  },
+  {
+    "medicamento": "SRL 500mL",
+    "posologia_completa": "SRL 500mL, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "Sulfametoxazol + Trimetoprima",
+    "posologia_completa": "Sulfametoxazol 800mg + Trimetoprima 160mg, 1 comprimido, via oral, de 12/12 horas, por 10 dias"
+  },
+  {
+    "medicamento": "Sulfato de magnésio 50%",
+    "posologia_completa": "Sulfato de magnésio 50%, 4mL em SF 0,9% 100mL, via EV, em 1 hora"
+  },
+  {
+    "medicamento": "Suxametônio",
+    "posologia_completa": "Suxametônio 100mg, via EV, para sequência rápida de intubação"
+  },
+  {
+    "medicamento": "Tiamina (Vitamina B1)",
+    "posologia_completa": "Tiamina 100mg, 1 ampola, via IM, 1x/dia"
+  },
+  {
+    "medicamento": "Tiotrópio",
+    "posologia_completa": "Tiotrópio (Spiriva Respimat), 2 puffs, via inalatória, 1x/dia"
+  },
+  {
+    "medicamento": "Tramadol",
+    "posologia_completa": "Tramadol 100mg, diluir em SF 0,9% 100mL, via EV, de 8/8h"
+  },
+  {
+    "medicamento": "Vancomicina",
+    "posologia_completa": "Vancomicina 1g, diluir em SF 0,9% 250mL, via EV, de 12/12 horas"
+  },
+
+  {
+    "medicamento": "Varfarina",
+    "posologia_completa": "Varfarina 5mg, via oral, 1x/dia, ajustar conforme INR"
+  },
+  {
+    "medicamento": "Vasopressina",
+    "posologia_completa": "Vasopressina 20U/mL, 1 ampola em SF 0,9% 99mL, via EV em BIC"
+  }
+{
+    "medicamento": "Dopamina",
+    "posologia_completa": "Dopamina 50mg/10mL, 5 ampolas em SG 5% 200mL, via EV em BIC"
+  },
+  {
+    "medicamento": "Milrinona",
+    "posologia_completa": "Milrinona 20mg em SG 5% 80mL, via EV em BIC"
+  },
+  {
+    "medicamento": "Levosimendan",
+    "posologia_completa": "Levosimendan 12,5mg/5mL, 1 frasco em SG 5% 45mL, via EV em BIC"
+  },
+  {
+    "medicamento": "Cetamina (Ketamina)",
+    "posologia_completa": "Cetamina 500mg/10mL, 2 ampolas em SF 0,9% 80mL, via EV em BIC para sedoanalgesia"
+  },
+  {
+    "medicamento": "Metadona",
+    "posologia_completa": "Metadona 10mg, via oral, de 12/12 horas (para desmame de opioide)"
+  },
+  {
+    "medicamento": "Lorazepam",
+    "posologia_completa": "Lorazepam 2mg, via oral, de 8/8 horas"
+  },
+  {
+    "medicamento": "Pancurônio",
+    "posologia_completa": "Pancurônio 4mg/2mL, via EV, para bloqueio neuromuscular"
+  },
+  {
+    "medicamento": "Salmeterol + Fluticasona (Seretide®)",
+    "posologia_completa": "Salmeterol 25mcg + Fluticasona 125mcg, 2 jatos, via inalatória, de 12/12 horas"
+  },
+  {
+    "medicamento": "Budesonida (Pulmicort®)",
+    "posologia_completa": "Budesonida 0,25mg/mL, 1 flaconete, via nebulização, de 12/12 horas"
+  },
+  {
+    "medicamento": "Formoterol + Budesonida (Alenia®)",
+    "posologia_completa": "Formoterol 12mcg + Budesonida 400mcg, 1 cápsula, via inalatória, de 12/12 horas"
+  },
+  {
+    "medicamento": "Metilprednisolona",
+    "posologia_completa": "Metilprednisolona 125mg, via EV, de 6/6 horas"
+  },
+  {
+    "medicamento": "Prednisona",
+    "posologia_completa": "Prednisona 20mg, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Bicarbonato de Sódio 8,4%",
+    "posologia_completa": "Bicarbonato de Sódio 8,4%, 100mL, via EV, em 1 hora, se acidose metabólica"
+  },
+  {
+    "medicamento": "Fosfato de Potássio",
+    "posologia_completa": "Fosfato de Potássio 2mEq/mL, ___ mL, via EV, em ___"
+  },
+  {
+    "medicamento": "Manitol 20%",
+    "posologia_completa": "Manitol 20% 250mL, via EV, correr em 30 minutos"
+  },
+  {
+    "medicamento": "Espironolactona",
+    "posologia_completa": "Espironolactona 25mg, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Varfarina",
+    "posologia_completa": "Varfarina 5mg, via oral, 1x/dia, ajustar conforme INR"
+  },
+  {
+    "medicamento": "Digoxina",
+    "posologia_completa": "Digoxina 0,25mg, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Isossorbida (Mononitrato)",
+    "posologia_completa": "Mononitrato de Isossorbida 20mg, 1 comprimido, via oral, de 12/12 horas"
+  },
+  {
+    "medicamento": "Propranolol",
+    "posologia_completa": "Propranolol 40mg, 1 comprimido, via oral, de 8/8 horas"
+  },
+  {
+    "medicamento": "Sertralina",
+    "posologia_completa": "Sertralina 50mg, 1 comprimido, via oral, pela manhã"
+  },
+  {
+    "medicamento": "Fluoxetina",
+    "posologia_completa": "Fluoxetina 20mg, 1 comprimido, via oral, pela manhã"
+  },
+  {
+    "medicamento": "Amitriptilina",
+    "posologia_completa": "Amitriptilina 25mg, 1 comprimido, via oral, à noite"
+  },
+  {
+    "medicamento": "Risperidona",
+    "posologia_completa": "Risperidona 2mg, 1 comprimido, via oral, à noite"
+  },
+  {
+    "medicamento": "Complexo B",
+    "posologia_completa": "Complexo B, 1 comprimido, via oral, 1x/dia"
+  },
+  {
+    "medicamento": "Ibuprofeno",
+    "posologia_completa": "Ibuprofeno 600mg, 1 comprimido, via oral, de 8/8h, se dor"
+  },
+  {
+    "medicamento": "Tenoxicam",
+    "posologia_completa": "Tenoxicam 20mg, 1 ampola, via IM, 1x/dia"
+  },
+  {
+    "medicamento": "Lactulose",
+    "posologia_completa": "Lactulose xarope, 15mL, via oral, de 12/12 horas"
+  },
+  {
+    "medicamento": "Simeticona",
+    "posologia_completa": "Simeticona 40mg, 40 gotas, via oral, de 6/6h, se flatulência"
+  }
+{
+    "medicamento": "Fentanil 50mcg/mL (ampola 2mL)",
+    "posologia_completa": "Fentanil 50mcg/mL, 2mL, via EV, para analgesia aguda."
+  },
+  {
+    "medicamento": "Fentanil 50mcg/mL (ampola 10mL)",
+    "posologia_completa": "Fentanil 50mcg/mL, 10mL + 90mL SF 0,9%, via EV em BIC para sedoanalgesia contínua."
+  },
+  {
+    "medicamento": "Remifentanil 2mg (frasco)",
+    "posologia_completa": "Remifentanil 2mg, reconstituir e diluir para 50mL com SF 0,9%, via EV em BIC."
+  },
+  {
+    "medicamento": "Morfina 10mg/mL (ampola 1mL)",
+    "posologia_completa": "Morfina 10mg/mL, diluir 1mL em 9mL AD, via EV, administrar 2 a 4mg a cada 4h, se dor."
+  },
+  {
+    "medicamento": "Metadona 10mg/mL (ampola 1mL)",
+    "posologia_completa": "Metadona 10mg, via EV ou SC, de 8/8h para controle de dor crônica ou desmame."
+  },
+  {
+    "medicamento": "Codeína 30mg (comprimido)",
+    "posologia_completa": "Codeína 30mg, 1 comprimido, via oral, de 6/6h, associado a analgésico."
+  },
+  {
+    "medicamento": "Oxicodona 10mg (comprimido)",
+    "posologia_completa": "Oxicodona 10mg, 1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Midazolam 15mg/3mL (5mg/mL)",
+    "posologia_completa": "Midazolam 15mg/3mL, diluir 15mg em 85mL SF 0,9%, via EV em BIC para sedação."
+  },
+  {
+    "medicamento": "Midazolam 50mg/10mL (5mg/mL)",
+    "posologia_completa": "Midazolam 50mg/10mL, 1 frasco em 40mL SF 0,9%, via EV em BIC para sedação."
+  },
+  {
+    "medicamento": "Diazepam 10mg/2mL",
+    "posologia_completa": "Diazepam 10mg, 1 ampola, via EV lento, para sedação ou crise convulsiva."
+  },
+  {
+    "medicamento": "Lorazepam 2mg (comprimido)",
+    "posologia_completa": "Lorazepam 2mg, 1 comprimido, via sublingual, para ansiedade ou agitação."
+  },
+  {
+    "medicamento": "Rocurônio 50mg/5mL",
+    "posologia_completa": "Rocurônio 50mg/5mL, ___ mg, via EV, para bloqueio neuromuscular."
+  },
+  {
+    "medicamento": "Cisatracúrio 10mg/5mL",
+    "posologia_completa": "Cisatracúrio 10mg/5mL, diluir 30mg em 35mL de SG 5%, via EV em BIC."
+  },
+  {
+    "medicamento": "Pancurônio 4mg/2mL",
+    "posologia_completa": "Pancurônio 4mg/2mL, 1 ampola, via EV, a cada 2-4 horas, conforme necessidade."
+  },
+  {
+    "medicamento": "Atracúrio 25mg/2.5mL",
+    "posologia_completa": "Atracúrio 25mg/2.5mL, diluir 50mg em 40mL de SF 0,9%, via EV em BIC."
+  },
+  {
+    "medicamento": "Suxametônio 100mg (pó)",
+    "posologia_completa": "Suxametônio 100mg, reconstituir com 10mL AD, administrar ___ mg, via EV, para IOT."
+  },
+  {
+    "medicamento": "Noradrenalina 1mg/mL (ampola 4mL)",
+    "posologia_completa": "Noradrenalina 1mg/mL, 4 ampolas (16mg) em 84mL de SG 5%, via EV em acesso central, em BIC."
+  },
+  {
+    "medicamento": "Dopamina 5mg/mL (ampola 10mL)",
+    "posologia_completa": "Dopamina 5mg/mL, 5 ampolas (250mg) em 200mL de SG 5%, via EV em BIC."
+  },
+  {
+    "medicamento": "Vasopressina 20U/mL (ampola 1mL)",
+    "posologia_completa": "Vasopressina 20U, 1 ampola em 99mL de SF 0,9%, via EV em BIC."
+  },
+  {
+    "medicamento": "Milrinona 1mg/mL (frasco 10mL)",
+    "posologia_completa": "Milrinona 1mg/mL, 2 frascos (20mg) em 80mL de SG 5%, via EV em BIC."
+  },
+  {
+    "medicamento": "Levosimendan 2,5mg/mL (frasco 5mL)",
+    "posologia_completa": "Levosimendan 12,5mg, 1 frasco em 45mL de SG 5%, via EV em BIC."
+  }
+{
+    "medicamento": "Abatacepte",
+    "posologia_completa": "Conforme protocolo clínico e diretrizes terapêuticas."
+  },
+  {
+    "medicamento": "Acetato de Ciproterona",
+    "posologia_completa": "Acetato de Ciproterona 50mg, via oral, conforme prescrição."
+  },
+  {
+    "medicamento": "Acetato de Glatirâmer",
+    "posologia_completa": "Acetato de Glatirâmer 20mg, via subcutânea, conforme prescrição."
+  },
+  {
+    "medicamento": "Acetato de Medroxiprogesterona",
+    "posologia_completa": "Acetato de Medroxiprogesterona 150 mg/mL, via intramuscular, a cada 3 meses."
+  },
+  {
+    "medicamento": "Ácido Acetilsalicílico (AAS)",
+    "posologia_completa": "AAS 100mg, 1 comprimido, via oral, após almoço."
+  },
+  {
+    "medicamento": "Ácido Fólico",
+    "posologia_completa": "Ácido Fólico 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Ácido Tranexâmico (Transamin)",
+    "posologia_completa": "Transamin 50mg/ml, 10ml (500mg) + SF 0,9% 100ml, via EV, de 8/8hs."
+  },
+  {
+    "medicamento": "Ácido Valproico",
+    "posologia_completa": "Ácido Valproico 250mg, via oral, conforme prescrição."
+  },
+  {
+    "medicamento": "Ácido Zoledrônico",
+    "posologia_completa": "Ácido Zoledrônico 4mg, via EV, conforme protocolo."
+  },
+  {
+    "medicamento": "Aciclovir (Comprimido)",
+    "posologia_completa": "Aciclovir 200mg, 1 comprimido, via oral, de 4/4 horas por 5 dias."
+  },
+  {
+    "medicamento": "Aciclovir (Injetável)",
+    "posologia_completa": "Aciclovir 250mg, diluir em SF 0,9% 100mL, via EV, de 8/8 horas."
+  },
+  {
+    "medicamento": "Adalimumabe",
+    "posologia_completa": "Adalimumabe 40mg, via subcutânea, conforme protocolo."
+  },
+  {
+    "medicamento": "Adrenalina (Epinefrina)",
+    "posologia_completa": "Adrenalina 1mg/mL, 4 ampolas em SG 5% 96mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Água filtrada via sonda nasoentérica",
+    "posologia_completa": "Água filtrada via sonda nasoentérica, 200mL de 4/4 horas."
+  },
+  {
+    "medicamento": "Albendazol",
+    "posologia_completa": "Albendazol 400mg, 1 comprimido, via oral, dose única."
+  },
+  {
+    "medicamento": "Alopurinol",
+    "posologia_completa": "Alopurinol 100mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Amicacina",
+    "posologia_completa": "Amicacina 500mg, diluir em SF 0,9% 100mL, via EV, 1x/dia."
+  },
+  {
+    "medicamento": "Amiodarona",
+    "posologia_completa": "Amiodarona 150mg/3mL, 6 ampolas em SG 5% 232mL, via EV em BIC, 1mL/min por 6h, depois 0,5mL/min por 18h."
+  },
+  {
+    "medicamento": "Amitriptilina",
+    "posologia_completa": "Amitriptilina 25mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Amoxicilina",
+    "posologia_completa": "Amoxicilina 500mg, 1 comprimido, via oral, de 8/8 horas, por 7 dias."
+  },
+  {
+    "medicamento": "Amoxicilina + Clavulanato",
+    "posologia_completa": "Amoxicilina 500mg + Clavulanato 125mg, 1 comprimido, via oral, de 8/8h, por 7 dias."
+  },
+  {
+    "medicamento": "Ampicilina + Sulbactam",
+    "posologia_completa": "Ampicilina + Sulbactam 3g, diluir em SF 0,9% 100mL, via EV, de 6/6 horas."
+  },
+  {
+    "medicamento": "Anfotericina B",
+    "posologia_completa": "Anfotericina B 50mg, diluir em SG 5% 500mL, via EV, em 4-6 horas."
+  },
+  {
+    "medicamento": "Anlodipino",
+    "posologia_completa": "Anlodipino 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Apixabana",
+    "posologia_completa": "Apixabana 5mg, 1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Artemeter + Lumefantrina",
+    "posologia_completa": "Artemeter 20mg + Lumefantrina 120mg, via oral, conforme protocolo do MS."
+  },
+  {
+    "medicamento": "Atenolol",
+    "posologia_completa": "Atenolol 50mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Atorvastatina",
+    "posologia_completa": "Atorvastatina 20mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Atracúrio",
+    "posologia_completa": "Atracúrio 25mg/2.5mL, diluir 50mg em 40mL de SF 0,9%, via EV em BIC."
+  },
+  {
+    "medicamento": "Azatioprina",
+    "posologia_completa": "Azatioprina 50mg, via oral, conforme prescrição."
+  },
+  {
+    "medicamento": "Azitromicina EV",
+    "posologia_completa": "Azitromicina 500mg, diluir em SF 0,9% 250mL, via EV, 1x/dia."
+  },
+  {
+    "medicamento": "Azitromicina Oral",
+    "posologia_completa": "Azitromicina 500mg, 1 comprimido, via oral, 1x/dia por 3 dias."
+  },
+  {
+    "medicamento": "Bicarbonato de Sódio 8,4%",
+    "posologia_completa": "Bicarbonato de Sódio 8,4%, 100mL, via EV, em 1 hora, se acidose metabólica."
+  },
+  {
+    "medicamento": "Biperideno",
+    "posologia_completa": "Biperideno 2mg, 1 comprimido, via oral, 2x/dia."
+  },
+  {
+    "medicamento": "Bromoprida",
+    "posologia_completa": "Bromoprida 10mg, 1 ampola, via EV, de 8/8h, se náuseas ou vômitos."
+  },
+  {
+    "medicamento": "Budesonida (Inalatória)",
+    "posologia_completa": "Budesonida 200mcg, 1 cápsula, via inalatória, de 12/12 horas."
+  },
+  {
+    "medicamento": "Bupivacaína",
+    "posologia_completa": "Bupivacaína 0,5%, para anestesia local/regional."
+  },
+  {
+    "medicamento": "Calcitonina",
+    "posologia_completa": "Calcitonina 200 UI, 1 nebulização, via nasal, 1x/dia."
+  },
+  {
+    "medicamento": "Captopril",
+    "posologia_completa": "Captopril 25mg, 1 comprimido, via oral, de 8/8 horas."
+  },
+  {
+    "medicamento": "Carbamazepina",
+    "posologia_completa": "Carbamazepina 200mg, 1 comprimido, via oral, de 12/12h."
+  },
+  {
+    "medicamento": "Carbidopa + Levodopa",
+    "posologia_completa": "Carbidopa 25mg + Levodopa 250mg, via oral, de 6/6 horas."
+  },
+  {
+    "medicamento": "Carvão Ativado",
+    "posologia_completa": "Carvão Ativado, 50g, via oral/SNE, diluído em água."
+  },
+  {
+    "medicamento": "Carvedilol",
+    "posologia_completa": "Carvedilol 12,5mg, 1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Cefalexina",
+    "posologia_completa": "Cefalexina 500mg, 1 comprimido, via oral, de 6/6 horas, por 7 dias."
+  },
+  {
+    "medicamento": "Cefazolina",
+    "posologia_completa": "Cefazolina 1g, via EV, de 8/8 horas, para profilaxia cirúrgica."
+  },
+  {
+    "medicamento": "Cefepime",
+    "posologia_completa": "Cefepime 2g, diluir em SF 0,9% 100mL, via EV, de 8/8 horas."
+  },
+  {
+    "medicamento": "Ceftriaxona",
+    "posologia_completa": "Ceftriaxona 1g, diluir em SF 0,9% 100mL, via EV, de 12/12 horas."
+  },
+  {
+    "medicamento": "Cetamina (Ketamina)",
+    "posologia_completa": "Cetamina 500mg/10mL, ___ mg, via EV, para sedação."
+  },
+  {
+    "medicamento": "Ciclofosfamida",
+    "posologia_completa": "Ciclofosfamida 50mg, via oral, conforme protocolo de quimioterapia."
+  },
+  {
+    "medicamento": "Ciclosporina",
+    "posologia_completa": "Ciclosporina 100mg, via oral, conforme prescrição e nível sérico."
+  },
+  {
+    "medicamento": "Ciprofloxacina (Oral)",
+    "posologia_completa": "Ciprofloxacina 500mg, 1 comprimido, via oral, de 12/12h."
+  },
+  {
+    "medicamento": "Ciprofloxacina (Injetável)",
+    "posologia_completa": "Ciprofloxacina 400mg, via EV, de 12/12 horas."
+  },
+  {
+    "medicamento": "Cisatracúrio",
+    "posologia_completa": "Cisatracúrio 10mg/5mL, via EV em BIC, para bloqueio neuromuscular."
+  },
+  {
+    "medicamento": "Citalopram",
+    "posologia_completa": "Citalopram 20mg, 1 comprimido, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Clindamicina",
+    "posologia_completa": "Clindamicina 600mg, diluir em SF 0,9% 100mL, via EV, de 6/6 horas."
+  },
+  {
+    "medicamento": "Clonazepam",
+    "posologia_completa": "Clonazepam 2mg, 1 comprimido, via oral, à noite."
   },
   {
     "medicamento": "Clopidogrel",
-    "posologia_completa": "Clopidogrel (75mg) - 1 comprimido, via oral, 1x/dia após o almoço"
+    "posologia_completa": "Clopidogrel 75mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Cloreto de Potássio 19,1% (KCl)",
+    "posologia_completa": "KCl 19,1%, 10mL em cada SG 5% 500mL (NÃO PODE SER EM SF)."
+  },
+  {
+    "medicamento": "Cloreto de Sódio 20% (NaCl)",
+    "posologia_completa": "NaCl 20%, 10mL em cada SF 0,9% 500mL."
+  },
+  {
+    "medicamento": "Cloroquina",
+    "posologia_completa": "Difosfato de Cloroquina 150mg, via oral, conforme protocolo do MS."
+  },
+  {
+    "medicamento": "Clorpromazina",
+    "posologia_completa": "Clorpromazina 25mg, via IM, se agitação."
+  },
+  {
+    "medicamento": "Codeína",
+    "posologia_completa": "Codeína 30mg, 1 comprimido, via oral, de 6/6h."
+  },
+  {
+    "medicamento": "Complexo B",
+    "posologia_completa": "Complexo B, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Dexametasona",
+    "posologia_completa": "Dexametasona 4mg, via EV, de 6/6 horas."
+  },
+  {
+    "medicamento": "Dexmedetomidina (Precedex)",
+    "posologia_completa": "Dexmedetomidina 200mcg/2mL, diluir 2 ampolas em SF 0,9% 96mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Diazepam",
+    "posologia_completa": "Diazepam 10mg, 1 ampola, via EV lento, para crise convulsiva."
+  },
+  {
+    "medicamento": "Digoxina",
+    "posologia_completa": "Digoxina 0,25mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Dipirona",
+    "posologia_completa": "Dipirona 1g, via EV, de 6/6h, se dor ou febre T > 37.8°C."
+  },
+  {
+    "medicamento": "Dobutamina",
+    "posologia_completa": "Dobutamina 250mg/20mL, 1 ampola em SF 0,9% 230mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Dopamina",
+    "posologia_completa": "Dopamina 50mg/10mL, 5 ampolas em SG 5% 200mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Doxiciclina",
+    "posologia_completa": "Doxiciclina 100mg, 1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Enalapril",
+    "posologia_completa": "Enalapril 20mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Enoxaparina",
+    "posologia_completa": "Enoxaparina 40mg, 1 seringa, via SC, 1x/dia."
+  },
+  {
+    "medicamento": "Espirinolactona",
+    "posologia_completa": "Espirinolactona 25mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Etossuximida",
+    "posologia_completa": "Etossuximida 250mg, via oral, conforme prescrição."
+  },
+  {
+    "medicamento": "Fenitoína",
+    "posologia_completa": "Fenitoína 100mg, 1 comprimido, via oral, de 8/8h."
+  },
+  {
+    "medicamento": "Fenobarbital",
+    "posologia_completa": "Fenobarbital 100mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Fentanil",
+    "posologia_completa": "Fentanil 50mcg/mL, 10mL em SF 0,9% 90mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Ferro (Sulfato Ferroso)",
+    "posologia_completa": "Sulfato Ferroso, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Filgrastim",
+    "posologia_completa": "Filgrastim 300mcg, via SC, 1x/dia, conforme protocolo."
+  },
+  {
+    "medicamento": "Fluconazol",
+    "posologia_completa": "Fluconazol 150mg, 1 comprimido, via oral, dose única semanal."
+  },
+  {
+    "medicamento": "Fluoxetina",
+    "posologia_completa": "Fluoxetina 20mg, 1 comprimido, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Formoterol + Budesonida",
+    "posologia_completa": "Formoterol 12mcg + Budesonida 400mcg, 1 cápsula, via inalatória, de 12/12 horas."
+  },
+  {
+    "medicamento": "Fosfato de Potássio",
+    "posologia_completa": "Fosfato de Potássio 2mEq/mL, ___ mL, via EV, em ___"
   },
   {
     "medicamento": "Furosemida",
-    "posologia_completa": "Furosemida (20mg/ml) - 1 anpola, via EV, de 12/12h"
+    "posologia_completa": "Furosemida 20mg, 1 ampola, via EV, de 12/12 horas."
+  },
+  {
+    "medicamento": "Gabapentina",
+    "posologia_completa": "Gabapentina 300mg, 1 comprimido, via oral, de 8/8h."
+  },
+  {
+    "medicamento": "Gentamicina",
+    "posologia_completa": "Gentamicina 80mg, via EV, de 8/8h."
+  },
+  {
+    "medicamento": "Glibenclamida",
+    "posologia_completa": "Glibenclamida 5mg, 1 comprimido, via oral, antes do café da manhã."
+  },
+  {
+    "medicamento": "Gliclazida",
+    "posologia_completa": "Gliclazida 30mg, 1 comprimido, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Gluconato de Cálcio 10%",
+    "posologia_completa": "Gluconato de cálcio 10%, 10mL em SF 0,9% 100mL, via EV, em 20 minutos."
+  },
+  {
+    "medicamento": "Haloperidol",
+    "posologia_completa": "Haloperidol 5mg, 1 ampola, via IM, se agitação."
+  },
+  {
+    "medicamento": "Heparina (Bomba de Infusão)",
+    "posologia_completa": "Heparina 5000UI/mL, 5mL (25000UI) em SG 5% 245mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Hidroclorotiazida",
+    "posologia_completa": "Hidroclorotiazida 25mg, 1 comprimido, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Hidrocortisona",
+    "posologia_completa": "Hidrocortisona 100mg, via EV, de 8/8 horas."
+  },
+  {
+    "medicamento": "Hidróxido de Alumínio",
+    "posologia_completa": "Hidróxido de Alumínio, 10mL, via oral, após refeições e ao deitar."
+  },
+  {
+    "medicamento": "Ibuprofeno",
+    "posologia_completa": "Ibuprofeno 600mg, 1 comprimido, via oral, de 8/8h, se dor."
+  },
+  {
+    "medicamento": "Imipramina",
+    "posologia_completa": "Imipramina 25mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Insulina NPH",
+    "posologia_completa": "Insulina NPH, ___ UI, via SC, às 22h."
+  },
+  {
+    "medicamento": "Insulina Regular",
+    "posologia_completa": "Insulina Regular, via SC, conforme glicemia capilar."
+  },
+  {
+    "medicamento": "Itraconazol",
+    "posologia_completa": "Itraconazol 100mg, 1 comprimido, via oral, 2x/dia."
+  },
+  {
+    "medicamento": "Ivermectina",
+    "posologia_completa": "Ivermectina 6mg, ___ comprimidos, via oral, dose única."
+  },
+  {
+    "medicamento": "Lactulose",
+    "posologia_completa": "Lactulose xarope, 15mL, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Lamotrigina",
+    "posologia_completa": "Lamotrigina 100mg, 1 comprimido, via oral, de 12/12h."
+  },
+  {
+    "medicamento": "Levofloxacina",
+    "posologia_completa": "Levofloxacina 750mg, 1 frasco, via EV, 1x/dia."
+  },
+  {
+    "medicamento": "Levotiroxina Sódica",
+    "posologia_completa": "Levotiroxina 50mcg, 1 comprimido, via oral, em jejum."
+  },
+  {
+    "medicamento": "Lidocaína",
+    "posologia_completa": "Lidocaína 2% sem vasoconstritor, para anestesia local."
+  },
+  {
+    "medicamento": "Linezolida",
+    "posologia_completa": "Linezolida 600mg, via EV, de 12/12 horas."
+  },
+  {
+    "medicamento": "Lítio (Carbonato de)",
+    "posologia_completa": "Carbonato de Lítio 300mg, via oral, conforme prescrição e litemia."
+  },
+  {
+    "medicamento": "Loratadina",
+    "posologia_completa": "Loratadina 10mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Lorazepam",
+    "posologia_completa": "Lorazepam 2mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Losartana",
+    "posologia_completa": "Losartana 50mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Manitol 20%",
+    "posologia_completa": "Manitol 20% 250mL, via EV, correr em 30 minutos."
+  },
+  {
+    "medicamento": "Mebendazol",
+    "posologia_completa": "Mebendazol 100mg, 1 comprimido, via oral, de 12/12h, por 3 dias."
+  },
+  {
+    "medicamento": "Meropenem",
+    "posologia_completa": "Meropenem 1g, diluir em SF 0,9% 100mL, via EV, de 8/8 horas."
+  },
+  {
+    "medicamento": "Metadona",
+    "posologia_completa": "Metadona 10mg, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Metformina",
+    "posologia_completa": "Metformina 500mg, 1 comprimido, via oral, 2x/dia."
+  },
+  {
+    "medicamento": "Metildopa",
+    "posologia_completa": "Metildopa 250mg, 1 comprimido, via oral, de 8/8h."
+  },
+  {
+    "medicamento": "Metilprednisolona",
+    "posologia_completa": "Metilprednisolona 125mg, via EV, de 6/6 horas."
+  },
+  {
+    "medicamento": "Metoclopramida (Plasil)",
+    "posologia_completa": "Metoclopramida 10mg, via EV, de 8/8h, se náuseas ou vômitos."
+  },
+  {
+    "medicamento": "Metronidazol",
+    "posologia_completa": "Metronidazol 500mg, 1 frasco, via EV, de 8/8 horas."
+  },
+  {
+    "medicamento": "Midazolam",
+    "posologia_completa": "Midazolam 50mg em SF 0,9% 85mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Milrinona",
+    "posologia_completa": "Milrinona 20mg em SG 5% 80mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Morfina",
+    "posologia_completa": "Morfina 2mg, via EV, de 4/4h, se dor."
+  },
+  {
+    "medicamento": "Nistatina",
+    "posologia_completa": "Nistatina suspensão oral, 1mL, 4x/dia, bochechar e engolir."
+  },
+  {
+    "medicamento": "Nitrofurantoína",
+    "posologia_completa": "Nitrofurantoína 100mg, 1 comprimido, via oral, de 6/6h, por 7 dias."
+  },
+  {
+    "medicamento": "Nitroprussiato de Sódio (Nipride)",
+    "posologia_completa": "Nipride 50mg em SG 5% 248mL, via EV em BIC (proteger da luz)."
+  },
+  {
+    "medicamento": "Noradrenalina",
+    "posologia_completa": "Noradrenalina 16mg em SG 5% 84mL, via EV em acesso central, em BIC."
+  },
+  {
+    "medicamento": "Nortriptilina",
+    "posologia_completa": "Nortriptilina 25mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Omeprazol",
+    "posologia_completa": "Omeprazol 40mg, 1 frasco, via EV, 1x/dia."
+  },
+  {
+    "medicamento": "Ondansetrona",
+    "posologia_completa": "Ondansetrona 8mg, via EV, de 8/8h, se náuseas ou vômitos."
+  },
+  {
+    "medicamento": "Oxacilina",
+    "posologia_completa": "Oxacilina 2g, via EV, de 4/4 horas."
+  },
+  {
+    "medicamento": "Oxicodona",
+    "posologia_completa": "Oxicodona 10mg, 1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Pancurônio",
+    "posologia_completa": "Pancurônio 4mg/2mL, 1 ampola, via EV, a cada 2-4 horas, conforme necessidade."
+  },
+  {
+    "medicamento": "Pantoprazol",
+    "posologia_completa": "Pantoprazol 40mg, 1 frasco, via EV, 1x/dia."
+  },
+  {
+    "medicamento": "Paracetamol",
+    "posologia_completa": "Paracetamol 750mg, 1 comprimido, via oral, de 6/6h, se dor ou febre."
+  },
+  {
+    "medicamento": "Penicilina G Benzatina",
+    "posologia_completa": "Penicilina G Benzatina 1.200.000 UI, via IM, dose única."
+  },
+  {
+    "medicamento": "Penicilina G Cristalina",
+    "posologia_completa": "Penicilina G Cristalina 5.000.000 UI, via EV, de 4/4 horas."
+  },
+  {
+    "medicamento": "Piperacilina + Tazobactam (Tazocin)",
+    "posologia_completa": "Tazocin 4,5g, diluir em SF 0,9% 100mL, via EV, de 6/6 horas."
+  },
+  {
+    "medicamento": "Prednisona",
+    "posologia_completa": "Prednisona 20mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Primaquina",
+    "posologia_completa": "Bissulfato de Primaquina 15mg, via oral, conforme protocolo do MS."
+  },
+  {
+    "medicamento": "Prometazina",
+    "posologia_completa": "Prometazina 25mg, 1 ampola, via IM, se reação alérgica."
+  },
+  {
+    "medicamento": "Propranolol",
+    "posologia_completa": "Propranolol 40mg, 1 comprimido, via oral, de 8/8h."
+  },
+  {
+    "medicamento": "Propofol",
+    "posologia_completa": "Propofol 10mg/mL, via EV em BIC, para sedação contínua."
+  },
+  {
+    "medicamento": "Quetiapina",
+    "posologia_completa": "Quetiapina 25mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Ranitidina",
+    "posologia_completa": "Ranitidina 50mg, via EV, de 8/8 horas."
+  },
+  {
+    "medicamento": "Remifentanil",
+    "posologia_completa": "Remifentanil 2mg, 2 ampolas em SF 0,9% 96mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Risperidona",
+    "posologia_completa": "Risperidona 2mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Ritonavir",
+    "posologia_completa": "Ritonavir 100mg, via oral, conforme protocolo TARV."
+  },
+  {
+    "medicamento": "Rivaroxabana",
+    "posologia_completa": "Rivaroxabana 20mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Rocurônio",
+    "posologia_completa": "Rocurônio 50mg, via EV, para bloqueio neuromuscular."
+  },
+  {
+    "medicamento": "Salbutamol (Inalatório)",
+    "posologia_completa": "Salbutamol 100mcg/jato, 4 jatos, via inalatória, de 4/4 horas, se broncoespasmo."
+  },
+  {
+    "medicamento": "Sertralina",
+    "posologia_completa": "Sertralina 50mg, 1 comprimido, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Sinvastatina",
+    "posologia_completa": "Sinvastatina 40mg, 1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Sulfametoxazol + Trimetoprima",
+    "posologia_completa": "Sulfametoxazol 800mg + Trimetoprima 160mg, 1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Suxametônio",
+    "posologia_completa": "Suxametônio 100mg, via EV, para sequência rápida de intubação."
+  },
+  {
+    "medicamento": "Tenofovir + Lamivudina",
+    "posologia_completa": "Tenofovir 300mg + Lamivudina 300mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Tenoxicam",
+    "posologia_completa": "Tenoxicam 20mg, 1 ampola, via IM, 1x/dia."
+  },
+  {
+    "medicamento": "Tiamina (Vitamina B1)",
+    "posologia_completa": "Tiamina 100mg, 1 ampola, via IM, 1x/dia."
+  },
+  {
+    "medicamento": "Tiotrópio",
+    "posologia_completa": "Tiotrópio (Spiriva Respimat), 2 puffs, via inalatória, 1x/dia."
+  },
+  {
+    "medicamento": "Tramadol",
+    "posologia_completa": "Tramadol 100mg, diluir em SF 0,9% 100mL, via EV, de 8/8h."
+  },
+  {
+    "medicamento": "Vancomicina",
+    "posologia_completa": "Vancomicina 1g, diluir em SF 0,9% 250mL, via EV, de 12/12 horas."
+  },
+  {
+    "medicamento": "Varfarina",
+    "posologia_completa": "Varfarina 5mg, via oral, 1x/dia, ajustar conforme INR."
+  },
+  {
+    "medicamento": "Vasopressina",
+    "posologia_completa": "Vasopressina 20U/mL, 1 ampola em SF 0,9% 99mL, via EV em BIC."
+  },
+  {
+    "medicamento": "Vitamina K (Fitomenadiona)",
+    "posologia_completa": "Vitamina K 10mg, via EV lento."
+  }
+ {
+    "medicamento": "Acetato de Medroxiprogesterona 150 mg/mL - disponível na farmácia popular",
+    "posologia_completa": "1 ampola, via intramuscular, a cada 3 meses."
+  },
+  {
+    "medicamento": "Alendronato de Sódio 70 mg - disponível na farmácia popular",
+    "posologia_completa": "1 comprimido, via oral, uma vez por semana, em jejum."
+  },
+  {
+    "medicamento": "Besilato de Anlodipino 5 mg - disponível na farmácia popular",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Budesonida 50 mcg (Inalatório) - disponível na farmácia popular",
+    "posologia_completa": "1 cápsula inalatória ou jato, conforme prescrição."
+  },
+  {
+    "medicamento": "Carbidopa 25 mg + Levodopa 250 mg - disponível na farmácia popular",
+    "posologia_completa": "1 comprimido, via oral, de 6/6 horas."
+  },
+  {
+    "medicamento": "Cloridrato de Metformina 850 mg - disponível na farmácia popular",
+    "posologia_completa": "1 comprimido, via oral, 2x/dia, após refeições."
+  },
+  {
+    "medicamento": "Cloridrato de Propranolol 40 mg - disponível na farmácia popular",
+    "posologia_completa": "1 comprimido, via oral, de 8/8 horas."
+  },
+  {
+    "medicamento": "Etinilestradiol 0,03 mg + Levonorgestrel 0,15 mg - disponível na farmácia popular",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, uso contínuo."
+  },
+  {
+    "medicamento": "Insulina Humana Regular 100 UI/mL - disponível na farmácia popular",
+    "posologia_completa": "Via subcutânea, conforme glicemia capilar e prescrição."
+  },
+  {
+    "medicamento": "Ipratrópio (Brometo de) 0,25 mg/mL - disponível na farmácia popular",
+    "posologia_completa": "Solução para inalação, conforme prescrição médica."
+  },
+  {
+    "medicamento": "Maleato de Timolol 0,5% (Colírio) - disponível na farmácia popular",
+    "posologia_completa": "1 gota no olho afetado, de 12/12 horas."
+  },
+  {
+    "medicamento": "Noretisterona 0,35 mg - disponível na farmácia popular",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, uso contínuo."
+  },
+  {
+    "medicamento": "Salbutamol (Sulfato) 5 mg/mL - disponível na farmácia popular",
+    "posologia_completa": "Solução para inalação, 10 gotas em 3-5mL de SF 0,9%, de 6/6h."
+  }
+Excelente ideia! Adicionar os nomes comerciais mais conhecidos tornará a busca na hora de prescrever muito mais rápida e intuitiva para o médico.
+
+Realizei uma pesquisa nas principais drogarias do Brasil para compilar uma lista dos anti-hipertensivos de marca mais comuns e suas combinações. Para cada um, adicionei os princípios ativos entre parênteses para maior clareza e segurança na prescrição.
+
+Abaixo está o bloco de código JSON com os novos medicamentos. Assim como antes, você pode copiar este bloco e adicioná-lo ao final da sua lista no arquivo public/data/farmacos.json. Lembre-se de colocar uma vírgula , após o último item da sua lista atual antes de colar.
+
+JSON
+
+[
+  {
+    "medicamento": "Ablok (Atenolol)",
+    "posologia_completa": "Atenolol 50mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Atacand (Candesartana Cilexetila)",
+    "posologia_completa": "Candesartana 8mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Atacand HCT (Candesartana + Hidroclorotiazida)",
+    "posologia_completa": "Candesartana 16mg + Hidroclorotiazida 12,5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Besilapin (Anlodipino)",
+    "posologia_completa": "Anlodipino 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Brasart (Valsartana)",
+    "posologia_completa": "Valsartana 160mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Bravan (Valsartana)",
+    "posologia_completa": "Valsartana 160mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Bravan Duo (Valsartana + Anlodipino)",
+    "posologia_completa": "Valsartana 160mg + Anlodipino 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Capoten (Captopril)",
+    "posologia_completa": "Captopril 25mg, 1 comprimido, via oral, de 8/8 horas."
+  },
+  {
+    "medicamento": "Cardizem (Diltiazem)",
+    "posologia_completa": "Diltiazem 60mg, 1 comprimido, via oral, de 8/8 horas."
+  },
+  {
+    "medicamento": "Co-Pressotec (Enalapril + Hidroclorotiazida)",
+    "posologia_completa": "Enalapril 20mg + Hidroclorotiazida 12,5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Concor (Bisoprolol)",
+    "posologia_completa": "Hemifumarato de Bisoprolol 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Cozaar (Losartana Potássica)",
+    "posologia_completa": "Losartana Potássica 50mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Diovan (Valsartana)",
+    "posologia_completa": "Valsartana 160mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Diovan Amlo (Valsartana + Anlodipino)",
+    "posologia_completa": "Valsartana 160mg + Anlodipino 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Diovan HCT (Valsartana + Hidroclorotiazida)",
+    "posologia_completa": "Valsartana 160mg + Hidroclorotiazida 12,5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Exforge (Valsartana + Anlodipino)",
+    "posologia_completa": "Valsartana 160mg + Anlodipino 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Higroton (Clortalidona)",
+    "posologia_completa": "Clortalidona 25mg, 1 comprimido, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Indapen (Indapamida)",
+    "posologia_completa": "Indapamida 1,5mg, 1 comprimido, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Lasix (Furosemida)",
+    "posologia_completa": "Furosemida 40mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Lotar (Losartana + Anlodipino)",
+    "posologia_completa": "Losartana 50mg + Anlodipino 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Micardis (Telmisartana)",
+    "posologia_completa": "Telmisartana 80mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Micardis HCT (Telmisartana + Hidroclorotiazida)",
+    "posologia_completa": "Telmisartana 80mg + Hidroclorotiazida 12,5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Nebilet (Nebivolol)",
+    "posologia_completa": "Nebivolol 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Olmetec (Olmesartana Medoxomila)",
+    "posologia_completa": "Olmesartana 20mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Prazosina",
+    "posologia_completa": "Cloridrato de Prazosina 1mg, via oral, iniciar com 1x/dia e ajustar."
+  },
+  {
+    "medicamento": "Pressat (Anlodipino)",
+    "posologia_completa": "Besilato de Anlodipino 5mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Renitec (Enalapril)",
+    "posologia_completa": "Maleato de Enalapril 10mg, 1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Selozok (Succinato de Metoprolol)",
+    "posologia_completa": "Metoprolol 50mg, 1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Zart (Losartana Potássica)",
+    "posologia_completa": "Losartana Potássica 50mg, 1 comprimido, via oral, 1x/dia."
+  }
+{
+    "medicamento": "Nebacetin (Neomicina + Bacitracina)",
+    "posologia_completa": "Aplicar uma fina camada sobre a área afetada, 2 a 5 vezes ao dia."
+  },
+  {
+    "medicamento": "Mupirocina 20 mg/g (Bactroban)",
+    "posologia_completa": "Aplicar uma pequena quantidade na área afetada, 3 vezes ao dia, por até 10 dias."
+  },
+  {
+    "medicamento": "Gentamicina (Creme/Pomada)",
+    "posologia_completa": "Aplicar na área afetada, 3 a 4 vezes ao dia."
+  },
+  {
+    "medicamento": "Rifocina Spray (Rifamicina)",
+    "posologia_completa": "Aplicar sobre a lesão, cobrindo-a completamente, 1 a 2 vezes ao dia."
+  },
+  {
+    "medicamento": "Hidrocortisona 1% (Creme)",
+    "posologia_completa": "Aplicar uma camada fina na área afetada, 2 a 3 vezes ao dia."
+  },
+  {
+    "medicamento": "Dexametasona 1 mg/g (Creme)",
+    "posologia_completa": "Aplicar uma pequena quantidade na área afetada, 2 a 3 vezes ao dia."
+  },
+  {
+    "medicamento": "Betametasona (Valerato) 1 mg/g (Betnovate)",
+    "posologia_completa": "Aplicar na área afetada, 1 a 2 vezes ao dia."
+  },
+  {
+    "medicamento": "Betametasona + Gentamicina + Tolnaftato + Clioquinol (Quadriderm)",
+    "posologia_completa": "Aplicar na área afetada, 2 vezes ao dia."
+  },
+  {
+    "medicamento": "Triancinolona Acetonida Orabase (Omcilon-A)",
+    "posologia_completa": "Aplicar uma pequena quantidade na lesão oral, preferencialmente à noite."
+  },
+  {
+    "medicamento": "Fenergan (Prometazina) - Creme",
+    "posologia_completa": "Aplicar sobre a área afetada, 3 a 4 vezes ao dia."
+  },
+  {
+    "medicamento": "Polaramine (Maleato de Dexclorfeniramina) - Creme",
+    "posologia_completa": "Aplicar sobre a área da pele afetada, 2 vezes ao dia."
+  },
+  {
+    "medicamento": "Bepantol Derma (Dexpantenol)",
+    "posologia_completa": "Aplicar uma camada na pele e espalhar delicadamente, 1 a 3 vezes ao dia."
+  },
+  {
+    "medicamento": "Sulfadiazina de Prata 1%",
+    "posologia_completa": "Aplicar uma camada de 2mm na lesão de queimadura, 1 a 2 vezes ao dia."
+  },
+  {
+    "medicamento": "Iruxol (Colagenase + Cloranfenicol)",
+    "posologia_completa": "Aplicar uma fina camada na lesão, 1 vez ao dia, para desbridamento."
+  },
+  {
+    "medicamento": "Cataflam Emulgel (Diclofenaco Dietilamônio)",
+    "posologia_completa": "Aplicar sobre a região afetada, 3 a 4 vezes ao dia, massageando suavemente."
+  },
+  {
+    "medicamento": "Cetoconazol 20 mg/g (Creme)",
+    "posologia_completa": "Aplicar na área afetada, 1 vez ao dia."
+  },
+  {
+    "medicamento": "Miconazol 20 mg/g (Creme)",
+    "posologia_completa": "Aplicar na área afetada, 2 vezes ao dia, por 2 a 4 semanas."
+  },
+  {
+    "medicamento": "Nistatina + Óxido de Zinco",
+    "posologia_completa": "Aplicar em fina camada após o banho e a cada troca de fraldas."
+  },
+  {
+    "medicamento": "Clotrimazol 10 mg/g (Creme)",
+    "posologia_completa": "Aplicar uma camada fina na área afetada, 2 a 3 vezes ao dia."
+  },
+  {
+    "medicamento": "Fibrase (Fibrinolisina + Desoxirribonuclease + Cloranfenicol)",
+    "posologia_completa": "Aplicar na lesão, 1 vez ao dia, para desbridamento químico."
+  },
+  {
+    "medicamento": "Proctyl (Policresuleno + Cloridrato de Cinchocaína)",
+    "posologia_completa": "Aplicar no local (intrarretal ou externamente), 2 a 3 vezes ao dia."
+  },
+  {
+    "medicamento": "Gino-Canesten (Clotrimazol) - Creme Vaginal",
+    "posologia_completa": "Aplicar 1 aplicador cheio (5g), via vaginal, à noite, por 6 dias."
+  },
+  {
+    "medicamento": "Podofilina 25%",
+    "posologia_completa": "Uso em consultório. Aplicar sobre as lesões de condiloma, proteger a pele sã."
+  }
+Com certeza. Ótima ideia. Expandir a lista com os principais antidepressivos e ansiolíticos é fundamental, dado o uso prevalente desses medicamentos.
+
+Realizei a pesquisa para compilar uma lista com os fármacos mais comuns nessas categorias, incluindo nomes comerciais conhecidos no Brasil para facilitar a busca. Como sempre, adicionei apenas os medicamentos que ainda não constavam em nossa lista mestra para evitar duplicatas.
+
+Ação
+Abaixo está o bloco de código JSON com as novas medicações. Você pode copiar este bloco e adicioná-lo ao final do seu arquivo farmacos.json. Lembre-se de colocar uma vírgula , após o último item que já existe na sua lista, antes de colar.
+
+JSON
+
+[
+  {
+    "medicamento": "Escitalopram 10mg (Lexapro®, Reconter®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, pela manhã."
+  },
+  {
+    "medicamento": "Paroxetina 20mg (Aropax®, Pondera®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, pela manhã."
+  },
+  {
+    "medicamento": "Fluvoxamina 100mg (Luvox®)",
+    "posologia_completa": "1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Venlafaxina 75mg (Efexor XR®, Alenthus®)",
+    "posologia_completa": "1 cápsula de liberação prolongada, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Desvenlafaxina 50mg (Pristiq®, Elifore®)",
+    "posologia_completa": "1 comprimido de liberação prolongada, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Duloxetina 60mg (Cymbalta®, Velija®)",
+    "posologia_completa": "1 cápsula, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Bupropiona 150mg (Wellbutrin XL®, Bup®)",
+    "posologia_completa": "1 comprimido de liberação prolongada, via oral, pela manhã."
+  },
+  {
+    "medicamento": "Mirtazapina 30mg (Remeron®)",
+    "posologia_completa": "1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Trazodona 50mg (Donaren®)",
+    "posologia_completa": "1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Clomipramina 25mg (Anafranil®)",
+    "posologia_completa": "1 comprimido, via oral, à noite."
+  },
+  {
+    "medicamento": "Agomelatina 25mg (Valdoxan®)",
+    "posologia_completa": "1 comprimido, via oral, ao deitar."
+  },
+  {
+    "medicamento": "Alprazolam 0,5mg (Frontal®, Apraz®)",
+    "posologia_completa": "1 comprimido, via oral, de 8/8 horas, conforme necessidade."
+  },
+  {
+    "medicamento": "Bromazepam 3mg (Lexotan®)",
+    "posologia_completa": "1 comprimido, via oral, até 3x/dia."
+  },
+  {
+    "medicamento": "Cloxazolam 1mg (Olcadil®)",
+    "posologia_completa": "1 comprimido, via oral, 1 a 2x/dia."
+  },
+  {
+    "medicamento": "Buspirona 5mg (Ansitec®)",
+    "posologia_completa": "1 comprimido, via oral, de 8/8 horas."
+  },
+  {
+    "medicamento": "Hidroxizina 25mg (Hixizine®)",
+    "posologia_completa": "1 comprimido, via oral, de 8/8 horas, se prurido ou ansiedade."
+  },
+  {
+    "medicamento": "Pregabalina 75mg (Lyrica®)",
+    "posologia_completa": "1 cápsula, via oral, de 12/12 horas."
+  }
+{
+    "medicamento": "Glimepirida 2mg (Amaryl®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, antes do café da manhã."
+  },
+  {
+    "medicamento": "Metformina XR 500mg (Glifage XR®)",
+    "posologia_completa": "1 comprimido de liberação prolongada, via oral, 1x/dia, ao jantar."
+  },
+  {
+    "medicamento": "Pioglitazona 30mg (Actos®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Sitagliptina 100mg (Januvia®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Vildagliptina 50mg (Galvus®)",
+    "posologia_completa": "1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Linagliptina 5mg (Trayenta®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Sitagliptina + Metformina (Janumet® 50/1000mg)",
+    "posologia_completa": "1 comprimido, via oral, de 12/12 horas, junto às refeições."
+  },
+  {
+    "medicamento": "Dapagliflozina 10mg (Forxiga®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Empagliflozina 25mg (Jardiance®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, pela manhã."
+  },
+  {
+    "medicamento": "Canagliflozina 100mg (Invokana®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, antes da primeira refeição."
+  },
+  {
+    "medicamento": "Semaglutida Oral 3mg (Rybelsus®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, em jejum com um pouco de água."
+  }
+Com certeza. Dando sequência à expansão da nossa base de fármacos, realizei a pesquisa para compilar uma lista dos principais anti-inflamatórios e corticoides, incluindo seus nomes comerciais mais populares no Brasil.
+
+Como nas outras vezes, a lista abaixo contém apenas os medicamentos que ainda não temos ou apresentações diferentes (oral, injetável) de fármacos já existentes, para evitar duplicatas e tornar a lista ainda mais útil.
+
+Ação
+Abaixo está o bloco de código JSON com as novas medicações. Adicione este bloco ao final do seu arquivo farmacos.json (lembrando de colocar uma vírgula , após o último item da sua lista atual).
+
+JSON
+
+[
+  {
+    "medicamento": "Nimesulida 100mg (Nisulid®, Scaflam®)",
+    "posologia_completa": "1 comprimido, via oral, de 12/12 horas, após as refeições."
+  },
+  {
+    "medicamento": "Diclofenaco Potássico 50mg (Cataflam®)",
+    "posologia_completa": "1 comprimido, via oral, de 8/8 horas, se dor ou inflamação."
+  },
+  {
+    "medicamento": "Diclofenaco Sódico 50mg (Voltaren®)",
+    "posologia_completa": "1 comprimido, via oral, de 8/8 horas, após as refeições."
+  },
+  {
+    "medicamento": "Cetoprofeno 100mg (Profenid®) - Comprimido",
+    "posologia_completa": "1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Piroxicam 20mg (Feldene®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Meloxicam 15mg (Movatec®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Celecoxibe 200mg (Celebra®)",
+    "posologia_completa": "1 cápsula, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Etoricoxibe 90mg (Arcoxia®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Naproxeno 500mg (Flanax®)",
+    "posologia_completa": "1 comprimido, via oral, de 12/12 horas."
+  },
+  {
+    "medicamento": "Dexametasona 4mg (Decadron®) - Comprimido",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Betametasona (Celestone®) - Comprimido",
+    "posologia_completa": "1 comprimido de 2mg, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Betametasona (Diprospan®) - Injetável",
+    "posologia_completa": "1 ampola, via intramuscular, dose única (ação prolongada)."
+  },
+  {
+    "medicamento": "Prednisolona 20mg",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia, pela manhã."
+  },
+  {
+    "medicamento": "Deflazacorte 6mg (Calcort®)",
+    "posologia_completa": "1 comprimido, via oral, 1x/dia."
+  },
+  {
+    "medicamento": "Aceclofenaco 100mg (Proflam®)",
+    "posologia_completa": "1 comprimido, via oral, de 12/12 horas."
   }
 ]
