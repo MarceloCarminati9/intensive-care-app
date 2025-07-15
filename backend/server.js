@@ -1,4 +1,4 @@
-// VERSÃO COM CORREÇÃO FINAL NA BUSCA - 14/07/2025
+// VERSÃO COM CORREÇÃO FINAL NA ORDEM DAS ROTAS - 14/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -157,36 +157,16 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
-apiRouter.get('/patients/:id', async (req, res) => {
-    try {
-        const sql = `
-            SELECT p.*, b.bed_number, u.name as unit_name
-            FROM patients p
-            LEFT JOIN beds b ON p.current_bed_id = b.id
-            LEFT JOIN units u ON b.unit_id = u.id
-            WHERE p.id = $1;
-        `;
-        const { rows } = await pool.query(sql, [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
-        res.json({ data: rows[0] });
-    } catch (err) {
-        console.error("Erro ao buscar paciente:", err);
-        res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
-    }
-});
-
-
+// =================================================================================
+// CORREÇÃO: A ROTA DE BUSCA (/search) DEVE VIR ANTES da rota genérica (/:id)
+// =================================================================================
 apiRouter.get('/patients/search', async (req, res) => {
-    const { q } = req.query; 
-
+    const { q } = req.params; // Corrigido para req.params
     if (!q || q.length < 3) {
         return res.status(400).json({ error: 'O termo de busca deve ter pelo menos 3 caracteres.' });
     }
-
     try {
         const searchTerm = `%${q}%`;
-        
-        // CORREÇÃO DEFINITIVA: Usando parâmetros separados ($1 e $2) para evitar ambiguidade de tipo.
         const query = `
             SELECT 
                 p.id, p.name, p.dob, p.cns,
@@ -208,21 +188,32 @@ apiRouter.get('/patients/search', async (req, res) => {
                 p.name ASC
             LIMIT 10; 
         `;
-        
         const result = await pool.query(query, [searchTerm, searchTerm]);
-        
         res.json({ data: result.rows });
-
     } catch (error) {
-        console.error("--- ERRO DETALHADO NA BUSCA DE PACIENTES ---");
-        console.error("Termo Buscado:", q);
-        console.error("Mensagem do Erro:", error.message);
-        console.error("Stack do Erro:", error.stack);
-        console.error("--- FIM DO ERRO DETALHADO ---");
+        console.error("Erro na busca de pacientes:", error.message);
         res.status(500).json({ error: 'Erro interno do servidor ao buscar pacientes.' });
     }
 });
 
+
+apiRouter.get('/patients/:id', async (req, res) => {
+    try {
+        const sql = `
+            SELECT p.*, b.bed_number, u.name as unit_name
+            FROM patients p
+            LEFT JOIN beds b ON p.current_bed_id = b.id
+            LEFT JOIN units u ON b.unit_id = u.id
+            WHERE p.id = $1;
+        `;
+        const { rows } = await pool.query(sql, [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ message: "Paciente não encontrado." });
+        res.json({ data: rows[0] });
+    } catch (err) {
+        console.error("Erro ao buscar paciente:", err);
+        res.status(500).json({ error: 'Erro no servidor ao buscar paciente.' });
+    }
+});
 
 apiRouter.post('/patients/:id/discharge', async (req, res) => {
     const { id } = req.params;
