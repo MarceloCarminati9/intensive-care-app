@@ -198,10 +198,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // CORREÇÃO: Função atualizada para habilitar todos os botões de ação
+    // =================================================================================
+    // ATUALIZAÇÃO DEFINITIVA DA FUNÇÃO DE LINKS
+    // =================================================================================
     function updateActionLinks(pId) {
-        if (goToEvolutionBtn) goToEvolutionBtn.href = `patient-evolution.html?patientId=${pId}`;
-        if (goToPrescriptionBtn) goToPrescriptionBtn.href = `prescricao.html?patientId=${pId}`;
-        if (goToReceitaBtn) goToReceitaBtn.href = `receita.html?patientId=${pId}`;
+        console.log("Iniciando a atualização dos links de ação para o paciente ID:", pId);
+
+        const evolutionBtn = document.getElementById('goToEvolutionBtn');
+        if (evolutionBtn) {
+            evolutionBtn.href = `patient-evolution.html?patientId=${pId}`;
+            console.log("Link 'Nova Evolução' atualizado para:", evolutionBtn.href);
+        } else {
+            console.error("ERRO: Botão com id 'goToEvolutionBtn' não foi encontrado no HTML.");
+        }
+
+        const receitaBtn = document.getElementById('goToReceitaBtn');
+        if (receitaBtn) {
+            receitaBtn.href = `receita.html?patientId=${pId}`;
+            console.log("Link 'Nova Receita' atualizado para:", receitaBtn.href);
+        } else {
+            console.error("ERRO: Botão com id 'goToReceitaBtn' não foi encontrado no HTML.");
+        }
+
+        const prescricaoBtn = document.getElementById('goToPrescriptionBtn');
+        if (prescricaoBtn) {
+            prescricaoBtn.href = `prescricao.html?patientId=${pId}`;
+            console.log("Link 'Nova Prescrição' atualizado para:", prescricaoBtn.href);
+        } else {
+            console.error("ERRO: Botão com id 'goToPrescriptionBtn' não foi encontrado no HTML.");
+        }
     }
 
     function generateEvolutionReportHTML(patientData, evolutionContent) {if (!patientData || !evolutionContent) return '<p>Dados insuficientes para gerar o relatório.</p>';const getField = (field) => evolutionContent[field] || 'N/A';const patientDIH = patientData.dih ? new Date(patientData.dih).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : 'N/A';return `<div class="report-header"><h3>Evolução Médica Diária</h3><p>Intensive Care Brasil</p></div><div class="report-id-section"><h4>Identificação do Paciente</h4><div class="report-id-grid"><p><strong>Nome:</strong> ${patientData.name || 'N/A'}</p><p><strong>Idade:</strong> ${calculateAge(patientData.dob)}</p><p><strong>Leito:</strong> ${patientData.bed_number || 'N/A'}</p><p><strong>DIH:</strong> ${patientDIH}</p></div></div><div class="report-section"><h4>Impressão 24h</h4><p>${getField('impressao24h')}</p></div><div class="report-section"><h4>Condutas</h4><p>${getField('condutas')}</p></div><div class="signature-area"><div class="signature-line">${getField('medico_responsavel')}<br>CRM: ${getField('crm_medico')}</div></div>`;}
