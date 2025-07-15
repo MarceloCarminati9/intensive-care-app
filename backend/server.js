@@ -1,4 +1,4 @@
-// VERSÃO COM CORREÇÃO FINAL NA ORDEM DAS ROTAS - 14/07/2025
+// VERSÃO COM CORREÇÃO FINAL NA LEITURA DO PARÂMETRO DE BUSCA - 14/07/2025
 
 const express = require('express');
 const path = require('path');
@@ -157,16 +157,18 @@ apiRouter.post('/patients', async (req, res) => {
     }
 });
 
-// =================================================================================
-// CORREÇÃO: A ROTA DE BUSCA (/search) DEVE VIR ANTES da rota genérica (/:id)
-// =================================================================================
+// A ROTA DE BUSCA (/search) DEVE VIR ANTES da rota genérica (/:id)
 apiRouter.get('/patients/search', async (req, res) => {
-    const { q } = req.params; // Corrigido para req.params
+    // CORREÇÃO FINAL: Usando req.query para buscar o parâmetro da URL
+    const { q } = req.query; 
+
     if (!q || q.length < 3) {
         return res.status(400).json({ error: 'O termo de busca deve ter pelo menos 3 caracteres.' });
     }
+
     try {
         const searchTerm = `%${q}%`;
+        
         const query = `
             SELECT 
                 p.id, p.name, p.dob, p.cns,
@@ -188,10 +190,12 @@ apiRouter.get('/patients/search', async (req, res) => {
                 p.name ASC
             LIMIT 10; 
         `;
+        
         const result = await pool.query(query, [searchTerm, searchTerm]);
         res.json({ data: result.rows });
+
     } catch (error) {
-        console.error("Erro na busca de pacientes:", error.message);
+        console.error('Erro na busca de pacientes:', error.message);
         res.status(500).json({ error: 'Erro interno do servidor ao buscar pacientes.' });
     }
 });
