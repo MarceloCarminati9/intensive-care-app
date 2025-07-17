@@ -50,32 +50,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // CARREGAMENTO DE DADOS
     // =================================================================================
     async function loadPatientData() {
-        try {
-            const response = await fetch(`/api/patients/${patientId}`);
-            if (!response.ok) throw new Error('Paciente não encontrado');
-            const result = await response.json();
-            patientData = result.data;
-            
-            backLink.href = `patient-view.html?patientId=${patientId}`;
-            patientNameHeader.textContent = patientData.name;
-            patientBedHeader.textContent = `${patientData.unit_name || 'Unidade'} - Leito ${patientData.bed_number || 'N/A'}`;
-            prescriptionDateEl.textContent = new Date().toLocaleDateString('pt-BR');
-        } catch (error) {
-            console.error("Erro ao carregar dados do paciente:", error);
-            patientNameHeader.textContent = "Erro ao carregar";
+    try {
+        const response = await fetch(`/api/patients/${patientId}`);
+        if (!response.ok) throw new Error('Paciente não encontrado');
+        
+        const result = await response.json();
+        
+        // ===== INÍCIO DA CORREÇÃO =====
+        // Adiciona uma verificação para garantir que 'result.data' existe antes de usá-lo.
+        if (!result || !result.data) {
+            throw new Error('A resposta da API não contém os dados do paciente no formato esperado.');
+        }
+        
+        patientData = result.data;
+        // ===== FIM DA CORREÇÃO =====
+        
+        backLink.href = `patient-view.html?patientId=${patientId}`;
+        patientNameHeader.textContent = patientData.name;
+        patientBedHeader.textContent = `${patientData.unit_name || 'Unidade'} - Leito ${patientData.bed_number || 'N/A'}`;
+        prescriptionDateEl.textContent = new Date().toLocaleDateString('pt-BR');
+    } catch (error) {
+        console.error("Erro ao carregar dados do paciente:", error);
+        patientNameHeader.textContent = "Erro ao carregar";
+        patientBedHeader.textContent = "---";
+        // Desabilita o botão de salvar se não conseguir carregar o paciente
+        const saveBtn = document.getElementById('savePrescriptionBtn');
+        if (saveBtn) {
+            saveBtn.disabled = true;
         }
     }
-
-    async function loadFarmacosData() {
-        try {
-            const response = await fetch('data/farmacos.json');
-            if (!response.ok) throw new Error('Arquivo de fármacos não encontrado');
-            farmacosData = await response.json();
-        } catch (error) {
-            console.error("Erro ao carregar fármacos:", error);
-            alert("Atenção: A lista de medicamentos para autocompletar não foi encontrada. Verifique o arquivo public/data/farmacos.json");
-        }
-    }
+}
 
     // =================================================================================
     // MANIPULAÇÃO DINÂMICA DE ITENS

@@ -46,49 +46,53 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Função para lidar com o envio do formulário
-    form.addEventListener('submit', async function(event) {
-        event.preventDefault(); // Impede que a página recarregue
+    // CÓDIGO CORRIGIDO PARA O ARQUIVO: receita-script.js
 
-        const data = {
-            patient_id: patientIdInput.value,
-            medicamento: medicamentoInput.value.trim(),
-            posologia: posologiaInput.value.trim(),
-            via: viaInput.value.trim(),
-            quantidade: quantidadeInput.value.trim()
-        };
+form.addEventListener('submit', async function(event) {
+    event.preventDefault(); // Impede que a página recarregue
 
-        // Validação simples
-        if (!data.patient_id || !data.medicamento || !data.posologia) {
-            alert('Por favor, preencha todos os campos obrigatórios (Medicamento e Posologia).');
-            return;
+    const data = {
+        patient_id: patientIdInput.value,
+        medicamento: medicamentoInput.value.trim(),
+        posologia: posologiaInput.value.trim(),
+        via: viaInput.value.trim(),
+        quantidade: quantidadeInput.value.trim()
+    };
+
+    // Validação simples
+    if (!data.patient_id || !data.medicamento || !data.posologia) {
+        alert('Por favor, preencha todos os campos obrigatórios (Medicamento e Posologia).');
+        return;
+    }
+
+    try {
+        // ===== CORREÇÃO APLICADA AQUI =====
+        // Alterado o endpoint de "/api/prescriptions" para a nova rota "/api/recipes"
+        const response = await fetch('/api/recipes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        // ===== FIM DA CORREÇÃO =====
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            // Lança um erro se o backend retornar uma falha
+            throw new Error(result.error || 'Falha no servidor ao salvar a receita.');
         }
 
-        try {
-            // Envia os dados para a API salvar no banco de dados
-            const response = await fetch('/api/prescriptions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
+        alert('Receita salva com sucesso!');
+        // Redireciona de volta para a página de visualização do paciente
+        window.location.href = `patient-view.html?patientId=${data.patient_id}`;
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                // Lança um erro se o backend retornar uma falha
-                throw new Error(result.message || 'Falha no servidor ao salvar a receita.');
-            }
-
-            alert('Receita salva com sucesso!');
-            // Redireciona de volta para a página de visualização do paciente
-            window.location.href = `patient-view.html?patientId=${data.patient_id}`;
-
-        } catch (error) {
-            console.error('Erro ao enviar receita:', error);
-            alert(`Erro: ${error.message}`);
-        }
-    });
+    } catch (error) {
+        console.error('Erro ao enviar receita:', error);
+        alert(`Erro: ${error.message}`);
+    }
+});
 
     // --- Inicialização ---
     // Chama a função para carregar os dados assim que a página estiver pronta

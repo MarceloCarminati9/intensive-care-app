@@ -367,6 +367,44 @@ apiRouter.get('/patients/:id/evolutions', async (req, res) => {
         res.status(500).json({ error: 'Erro no servidor ao buscar evoluções.' });
     }
 });
+// [NOVA ROTA PARA RECEITAS SIMPLES]
+apiRouter.post('/recipes', async (req, res) => {
+    const { patient_id, medicamento, posologia, via, quantidade } = req.body;
+
+    if (!patient_id || !medicamento || !posologia) {
+        return res.status(400).json({ error: 'ID do paciente, medicamento e posologia são obrigatórios.' });
+    }
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. Cria um registro "pai" na tabela de prescrições
+        const prescriptionSql = `INSERT INTO prescriptions (patient_id, diet_description) VALUES ($1, $2) RETURNING id;`;
+        const prescriptionResult = await client.query(prescriptionSql, [patient_id, 'Receituário simples']);
+        const newPrescriptionId = prescriptionResult.rows[0].id;
+
+        // 2. Insere o item da receita na tabela de itens de prescrição
+        const itemSql = `
+            INSERT INTO prescription_items (prescription_id, item_type, name, dose, via, frequency, notes) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7);
+        `;
+        
+        // Mapeia os campos da receita para as colunas da tabela de itens
+        const itemParams = [newPrescriptionId, 'medication', medicamento, quantidade, via, null, posologia];
+        await client.query(itemSql, itemParams);
+
+        await client.query('COMMIT');
+        res.status(201).json({ message: 'Receita salva com sucesso!', prescriptionId: newPrescriptionId });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao salvar receita:', err);
+        res.status(500).json({ error: 'Erro no servidor ao salvar a receita.' });
+    } finally {
+        client.release();
+    }
+});
 
 // ATUALIZADO: Rota para buscar as prescrições
 apiRouter.get('/patients/:id/prescriptions', async (req, res) => {
