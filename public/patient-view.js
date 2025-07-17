@@ -22,22 +22,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitButtonContainer = document.getElementById('readmit-button-container');
     const readmitPatientBtn = document.getElementById('readmitPatientBtn');
     
-    // Selecionando todos os botões de ação
     const goToEvolutionBtn = document.getElementById('goToEvolutionBtn');
     const goToPrescriptionBtn = document.getElementById('goToPrescriptionBtn');
     const goToReceitaBtn = document.getElementById('goToReceitaBtn');
 
-    // Elementos do Histórico
     const historyList = document.getElementById('historyList');
     
-    // Elementos do Modal de Visualização
     const historyViewerModal = document.getElementById('historyViewerModal');
     const viewerTitle = document.getElementById('viewerTitle');
     const viewerContent = document.getElementById('viewerContent');
     const closeViewerBtn = document.getElementById('closeViewerBtn');
     const printDocumentBtn = document.getElementById('printDocumentBtn');
 
-    // Elementos do Modal de Reinternação
     const readmitModal = document.getElementById('readmitModal');
     const closeReadmitModalBtn = document.getElementById('closeReadmitModal');
     const cancelReadmitBtn = document.getElementById('cancelReadmitBtn');
@@ -52,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const readmitAddSecondaryDiagBtn = document.getElementById('readmit_add_secondary_diag_btn');
     const readmitForm = document.getElementById('readmitForm');
     
-    // Dados em cache
     let cid10Data = [];
     let unitsWithFreeBeds = [];
     
@@ -74,8 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
             const patient = result.data;
 
-            // ===== ATUALIZAÇÃO 1: VERIFICAÇÃO DE SEGURANÇA =====
-            // Garante que os dados do paciente existem antes de continuar
             if (!patient || !patient.id) {
                 throw new Error("Os dados do paciente recebidos do servidor estão incompletos ou em formato inválido.");
             }
@@ -191,8 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(isDisabled) {
                 historyItemDiv.classList.add('deleted');
             }
-
-            // Armazena os dados completos no elemento para uso posterior
+            
             historyItemDiv.dataset.item = JSON.stringify(item);
             historyItemDiv.dataset.patient = JSON.stringify(patientData);
 
@@ -270,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         const response = await fetch(`/api/evolutions/${itemData.id}`, { method: 'DELETE' });
                         if (!response.ok) throw new Error('Falha ao excluir a evolução no servidor.');
-                        await loadPageData(); // Recarrega tudo
+                        await loadPageData();
                     } catch (error) {
                         console.error('Erro ao excluir evolução:', error);
                         alert(error.message);
@@ -285,8 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     viewerContent.innerHTML = generateEvolutionReportHTML(patientData, itemData.content);
                     historyViewerModal.classList.add('active');
                     break;
-
-                // ===== ATUALIZAÇÃO 2: LÓGICA PARA VISUALIZAR PRESCRIÇÃO =====
+                
                 case 'view-prescription':
                     try {
                         viewerTitle.textContent = `Carregando Prescrição...`;
@@ -301,24 +292,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         const result = await response.json();
                         const prescription = result.data;
 
-                        let prescriptionHtml = `<div class="report-section"><h4>Dieta</h4><p>${prescription.diet_description || 'Nenhuma dieta especificada.'}</p></div>`;
+                        let prescriptionHtml = '';
+                        if (itemData.type === 'Receituário') {
+                            const recipeItem = prescription.items[0] || {};
+                            prescriptionHtml = `
+                                <div class="report-section"><h4>Medicamento</h4><p>${recipeItem.name || 'N/A'}</p></div>
+                                <div class="report-section"><h4>Posologia</h4><p>${recipeItem.notes || 'N/A'}</p></div>
+                                <div class="report-section"><h4>Via de Administração</h4><p>${recipeItem.via || 'N/A'}</p></div>
+                                <div class="report-section"><h4>Quantidade</h4><p>${recipeItem.dose || 'N/A'}</p></div>
+                            `;
+                        } else {
+                            prescriptionHtml = `<div class="report-section"><h4>Dieta</h4><p>${prescription.diet_description || 'Nenhuma dieta especificada.'}</p></div>`;
 
-                        const hydrationItems = prescription.items.filter(i => i.item_type === 'hydration');
-                        if (hydrationItems.length > 0) {
-                            prescriptionHtml += `<div class="report-section"><h4>Hidratação Venosa</h4><ul>`;
-                            hydrationItems.forEach(item => {
-                                prescriptionHtml += `<li><strong>${item.name || ''}</strong> - ${item.dose || ''} - ${item.via || ''} - ${item.frequency || ''} ${item.notes ? `(${item.notes})` : ''}</li>`;
-                            });
-                            prescriptionHtml += `</ul></div>`;
-                        }
+                            const hydrationItems = prescription.items.filter(i => i.item_type === 'hydration');
+                            if (hydrationItems.length > 0) {
+                                prescriptionHtml += `<div class="report-section"><h4>Hidratação Venosa</h4><ul>`;
+                                hydrationItems.forEach(item => {
+                                    prescriptionHtml += `<li><strong>${item.name || ''}</strong> - ${item.dose || ''} - ${item.via || ''} - ${item.frequency || ''} ${item.notes ? `(${item.notes})` : ''}</li>`;
+                                });
+                                prescriptionHtml += `</ul></div>`;
+                            }
 
-                        const medicationItems = prescription.items.filter(i => i.item_type === 'medication');
-                        if (medicationItems.length > 0) {
-                            prescriptionHtml += `<div class="report-section"><h4>Medicamentos</h4><ul>`;
-                            medicationItems.forEach(item => {
-                                prescriptionHtml += `<li><strong>${item.name || ''}</strong> - ${item.dose || ''} - ${item.via || ''} - ${item.frequency || ''} ${item.notes ? `(${item.notes})` : ''}</li>`;
-                            });
-                            prescriptionHtml += `</ul></div>`;
+                            const medicationItems = prescription.items.filter(i => i.item_type === 'medication');
+                            if (medicationItems.length > 0) {
+                                prescriptionHtml += `<div class="report-section"><h4>Medicamentos</h4><ul>`;
+                                medicationItems.forEach(item => {
+                                    prescriptionHtml += `<li><strong>${item.name || ''}</strong> - ${item.dose || ''} - ${item.via || ''} - ${item.frequency || ''} ${item.notes ? `(${item.notes})` : ''}</li>`;
+                                });
+                                prescriptionHtml += `</ul></div>`;
+                            }
                         }
 
                         viewerTitle.textContent = `Visualizar ${itemData.type} - ${new Date(itemData.created_at).toLocaleDateString('pt-BR')}`;
@@ -354,7 +356,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         });
     }
-
+    
+    // O restante do arquivo continua aqui (lógica de reinternação, etc.)
+    //... (código para reinternação omitido para brevidade, mas está incluso na sua cópia)
+    
     async function openReadmitModal(patient) {
         if (!readmitModal) return;
         readmitPatientNameEl.textContent = patient.name;
