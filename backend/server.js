@@ -429,7 +429,29 @@ apiRouter.get('/evolutions/:evolutionId', async (req, res) => {
         res.status(500).json({ error: 'Erro no servidor ao buscar a evolução.' });
     }
 });
+/ ROTA PARA BUSCAR UMA PRESCRIÇÃO COMPLETA COM SEUS ITENS
+apiRouter.get('/prescriptions/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Pega os dados gerais da prescrição (a "capa")
+        const prescriptionResult = await pool.query('SELECT * FROM prescriptions WHERE id = $1', [id]);
+        if (prescriptionResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Prescrição não encontrada.' });
+        }
+        const prescription = prescriptionResult.rows[0];
 
+        // Pega todos os itens (medicamentos, hidratação) associados a essa prescrição
+        const itemsResult = await pool.query('SELECT * FROM prescription_items WHERE prescription_id = $1 ORDER BY item_type, id', [id]);
+        
+        // Adiciona os itens ao objeto da prescrição
+        prescription.items = itemsResult.rows;
+
+        res.json({ data: prescription });
+    } catch (err) {
+        console.error(`Erro ao buscar prescrição completa (id: ${id}):`, err);
+        res.status(500).json({ error: 'Erro no servidor ao buscar a prescrição.' });
+    }
+});
 apiRouter.put('/evolutions/:evolutionId', async (req, res) => {
     const { evolutionId } = req.params;
     const evolutionData = req.body;
