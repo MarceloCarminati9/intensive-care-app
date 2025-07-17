@@ -333,17 +333,19 @@ apiRouter.post('/prescriptions', async (req, res) => {
         `;
 
         if (hydration_items && hydration_items.length > 0) {
-            for (const item of hydration_items) {
-                const itemParams = [newPrescriptionId, 'hydration', item.name, item.dose, item.via, item.frequency, item.obs];
-                await client.query(itemSql, itemParams);
-            }
-        }
-        if (medication_items && medication_items.length > 0) {
-            for (const item of medication_items) {
-                const itemParams = [newPrescriptionId, 'medication', item.name, item.dose, item.via, item.frequency, item.obs];
-                await client.query(itemSql, itemParams);
-            }
-        }
+    for (const item of hydration_items) {
+        // Correção: Alterado de item.obs para item.notes
+        const itemParams = [newPrescriptionId, 'hydration', item.name, item.dose, item.via, item.frequency, item.notes];
+        await client.query(itemSql, itemParams);
+    }
+}
+if (medication_items && medication_items.length > 0) {
+    for (const item of medication_items) {
+        // Correção: Alterado de item.obs para item.notes
+        const itemParams = [newPrescriptionId, 'medication', item.name, item.dose, item.via, item.frequency, item.notes];
+        await client.query(itemSql, itemParams);
+    }
+}
         await client.query('COMMIT');
         res.status(201).json({ message: 'Prescrição salva com sucesso!', prescriptionId: newPrescriptionId });
     } catch (err) {
