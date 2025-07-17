@@ -429,9 +429,9 @@ apiRouter.get('/evolutions/:evolutionId', async (req, res) => {
         res.status(500).json({ error: 'Erro no servidor ao buscar a evolução.' });
     }
 });
-/ ROTA PARA BUSCAR UMA PRESCRIÇÃO COMPLETA COM SEUS ITENS
+// ROTA PARA BUSCAR UMA PRESCRIÇÃO COMPLETA COM SEUS ITENS
 apiRouter.get('/prescriptions/:id', async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; // Esta linha foi descomentada
     try {
         // Pega os dados gerais da prescrição (a "capa")
         const prescriptionResult = await pool.query('SELECT * FROM prescriptions WHERE id = $1', [id]);
